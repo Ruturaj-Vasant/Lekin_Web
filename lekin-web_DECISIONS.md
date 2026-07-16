@@ -332,3 +332,93 @@ Each entry should follow this format:
     bundles and report thousands of irrelevant findings.
   - Re-ran lint and the production build after cleanup.
 - Status: merged to `main` in merge commit `ed67632`.
+
+## [2026-07-15] lib/: schema, registry, recalculation engine, adapter core
+- Branch: `feat/scheduling-core-lib`
+- Phase: 1, first non-UI implementation milestone
+- What changed:
+  - Adopted a code-ownership split for the remaining implementation work:
+    Claude owns `lib/` (pure TypeScript, no React/DOM/Pyodide dependency,
+    unit-testable in Node); Codex owns everything touching the DOM, React,
+    or browser APIs (`app/`, `components/`, `worker/`, the actual
+    Pyodide/Web Worker plumbing). This keeps the two of us in different
+    files by construction. See `lib/README.md` for the full map and the
+    intended composition (adapter step order, drag-and-drop call sequence).
+  - `lib/schema/`: Zod schemas + TS types for every ARCHITECTURE.md §1
+    shape. `validateProblemDefinition()` implements the multi-error,
+    client-side validation layer (§1.4) — structural type-shape check via
+    Zod, then plain-function business-rule checks (duplicates,
+    cross-references, positivity, `Machine.workcenterId`/
+    `Workcenter.machineIds` consistency, `operationIndex` correctness,
+    rgb range, NaN/Infinity) and a separate non-blocking warnings pass
+    (due-before-release, unusually large weight/processing time, unclear
+    status), all collected in one call.
+  - `lib/registry/algorithms.ts`: the four built-in algorithms'
+    `AlgorithmDefinition`s. `libraryMetadata` for each was verified
+    directly against `lekin-library`'s `lekinpy/algorithms/*.py` at commit
+    `a3fee48` (tag `v0.2.0`), not assumed. `verify.test.ts` is the
+    registry-drift guard from §1.5 — opt-in (needs a local Python +
+    `lekin-library` checkout via `LEKINPY_SOURCE`), and I ran it for real
+    against the actual pinned library (all 4 passed), then deliberately
+    broke one entry to confirm the guard actually catches drift before
+    restoring it.
+  - `lib/scheduling/`: `graph.ts` (the precedence graph — job edges fixed
+    from `ProblemDefinition`, machine edges from the current queue order —
+    and Kahn's-algorithm cycle detection/topological sort in one pass,
+    §4.2/§4.3), `recalculate.ts` (`checkDropValidity()` for the two
+    hard-reject cases and `recalculate()` for the topological placement
+    pass, §4.4/§4.5), `metrics.ts` (`computeMetrics()`, §1.3, mirroring
+    `display_summary()`'s exact min/max-over-a-job's-ops approach and its
+    silent-exclusion-of-unscheduled-jobs behavior, with the precise
+    `makespan - machine.release` utilization denominator from the v1.1
+    revision).
+  - `lib/adapter/`: `policy.ts` (`checkExecutionPolicy`, producing
+    PRODUCT_SPEC §10's exact rejection wording), `validate-request.ts`
+    (`validateExecutionRequest`, composing the Zod problem check with the
+    `UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION` check, which needs both
+    the problem and the selected algorithm id together), `translate.ts`
+    (the snake_case/flat <-> camelCase/nested translation boundary,
+    §2.2/§5 — `toLekinpySystemPayload`/`fromLekinpyScheduleDict`).
+  - Added `zod` and `vitest` as dependencies; a `vitest.config.ts` scoped
+    to `lib/**/*.test.ts`; a new `test:unit` script (left the existing
+    `test` script, which runs lint+build, untouched so this doesn't change
+    Codex's existing tooling assumptions).
+- Why: this is the pure-logic layer the React/adapter-glue work depends on
+  — in particular the recalculation engine, which went through two rounds
+  of real correctness corrections during architecture review (the
+  workcenter-eligibility-only claim, then the missing machine-release-time
+  and non-persistent-constraint gaps) and was judged worth implementing
+  directly rather than handing off as a spec, to minimize a third round of
+  translation error.
+- Alternatives considered / tradeoffs:
+  - Considered doing all business-rule validation via Zod's
+    `.superRefine()`/`ctx.addIssue()` API directly on `ProblemDefinitionSchema`.
+    Rejected in favor of plain TypeScript functions run after a
+    structural-only Zod parse succeeds: this keeps every `ValidationIssue`'s
+    `code`/`path`/context fields under exact control instead of
+    reverse-engineering them from Zod's own generic issue format, and is
+    far more readable/testable as one linear pass over already-typed data.
+  - `checkDropValidity()`'s topological order and `recalculate()`'s own
+    topological pass are computed independently (not literally threaded
+    through a shared call), even though ARCHITECTURE.md §4.5 step 2 notes
+    they're "one computation shared between validation and recalculation."
+    Recomputing is cheap at this scale (documented cost analysis in §4.3)
+    and keeps `recalculate()` a self-contained pure function instead of
+    requiring callers to pass through an opaque topo-order handle from a
+    prior `checkDropValidity()` call. `recalculate()` still defensively
+    re-checks for a cycle and throws if a caller ever invokes it with an
+    edit that wasn't actually accepted first.
+  - The registry-drift guard shells out to a real `python3` process rather
+    than trying to run lekinpy's logic in-browser/in-Pyodide for the
+    check — simpler, and this test only needs to run at dev-time/CI, never
+    in the shipped app.
+- Tests added: 42 passing (`npm run test:unit`), plus 4 opt-in
+  (`lib/registry/verify.test.ts`, requires `LEKINPY_SOURCE`) — covering
+  every case in §4.7's required list including the exact two-job/
+  two-machine cycle counterexample from the architecture review, the
+  dual-incoming-edge max() regression case, machine-release-time,
+  persistent-constraint survival/undo/redo/clearing/hidden-then-revealed,
+  and the full multi-error validation/policy/translation surface.
+  `tsc --noEmit` and `eslint lib/` both clean.
+- Status: implemented on this branch, not merged — holding for review per
+  your standing instruction not to merge without permission.
