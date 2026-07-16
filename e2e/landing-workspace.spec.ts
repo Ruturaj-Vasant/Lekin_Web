@@ -2,6 +2,15 @@ import { expect, test } from "@playwright/test";
 import { expectNoBrowserErrors, monitorBrowserErrors, openExample } from "./helpers";
 
 test.describe("landing and workspace shell", () => {
+  test("creates a blank problem from the landing screen", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /Create new problem/ }).click();
+    await expect(page.getByLabel("Problem name")).toHaveValue("Untitled problem");
+    await expect(page.locator("details.entity-row")).toHaveCount(0);
+    await expect(page.getByLabel("Dispatching rule")).toHaveValue("spt");
+    await expect(page.locator(".valid-pill")).toContainText("Ready to run");
+  });
+
   test("presents the research workbench and opens the sample problem", async ({ page }) => {
     const errors = monitorBrowserErrors(page);
     await page.goto("/");
@@ -54,5 +63,17 @@ test.describe("landing and workspace shell", () => {
     await page.getByRole("button", { name: "Open example" }).focus();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
+  });
+
+  test("clears the current workspace with the New button", async ({ page }) => {
+    await openExample(page);
+    await page.getByLabel("Problem name").fill("Temporary experiment");
+    await page.getByLabel("Dispatching rule").selectOption("edd");
+    await page.getByRole("button", { name: /New/ }).click();
+
+    await expect(page.getByLabel("Problem name")).toHaveValue("Untitled problem");
+    await expect(page.locator("details.entity-row")).toHaveCount(0);
+    await expect(page.getByLabel("Dispatching rule")).toHaveValue("spt");
+    await expect(page.locator(".metrics article strong")).toHaveText(["-", "-", "-", "-"]);
   });
 });

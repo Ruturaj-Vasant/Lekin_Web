@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import type { ExecutionResult } from "../../../lib/schema/algorithm";
+import type { ProblemDefinition } from "../../../lib/schema/problem";
 import { hasBlockingError } from "../../../lib/schema/issue";
 import { validateExecutionRequest } from "../../../lib/adapter/validate-request";
 import { problemEditorReducer } from "../../../lib/editor/problem-editor";
 import { isResultStale, type ResultContext } from "../../../lib/editor/result-staleness";
 import type { ExecutionProgress } from "../../../worker/scheduling-protocol";
 import { BrowserExecutionEngine } from "../../execution/browser-execution-engine";
-import { SAMPLE_PROBLEM } from "../../execution/sample-problem";
+import { createBlankProblem } from "../../execution/blank-problem";
 import { Brand } from "../brand";
 import { DetailTabs } from "./detail-tabs";
 import { GanttChart } from "./gantt-chart";
@@ -15,10 +16,10 @@ import { MetricsRow } from "./metrics-row";
 import { ProblemSidebar } from "./problem-sidebar";
 import { ScheduleSummary } from "./schedule-summary";
 
-export function WorkspaceShell({ onClose }: { onClose: () => void }) {
+export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: ProblemDefinition; onClose: () => void }) {
   const engine = useRef<BrowserExecutionEngine | null>(null);
   const activeExecution = useRef<string | null>(null);
-  const [problem, dispatch] = useReducer(problemEditorReducer, SAMPLE_PROBLEM);
+  const [problem, dispatch] = useReducer(problemEditorReducer, initialProblem);
   const [algorithmId, setAlgorithmId] = useState("spt");
   const [result, setResult] = useState<ExecutionResult | null>(null);
   // What (problem, algorithmId) `result` was actually computed for, so a
@@ -69,6 +70,15 @@ export function WorkspaceShell({ onClose }: { onClose: () => void }) {
     setProgress(null);
   }
 
+  function createNewProblem() {
+    cancel();
+    dispatch({ type: "replaceProblem", problem: createBlankProblem() });
+    setAlgorithmId("spt");
+    setResult(null);
+    setResultFor(null);
+    setSidebarCollapsed(false);
+  }
+
   const stateLabel = running
     ? "Running locally"
     : result?.status === "completed"
@@ -90,7 +100,7 @@ export function WorkspaceShell({ onClose }: { onClose: () => void }) {
           <span>Local</span>
         </div>
         <div className="app-actions">
-          <button type="button">＋ New</button>
+          <button type="button" onClick={createNewProblem}>＋ New</button>
           <button type="button">⇧ Import</button>
           <button type="button">↓ Export</button>
           <span className="divider" />

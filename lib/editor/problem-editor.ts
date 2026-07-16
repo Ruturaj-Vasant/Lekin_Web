@@ -306,6 +306,7 @@ export function removeMachine(problem: ProblemDefinition, machineId: string): Pr
 // ---------------------------------------------------------------------------
 
 export type ProblemEditorAction =
+  | { type: "replaceProblem"; problem: ProblemDefinition }
   | { type: "updateProblemName"; name: string }
   | { type: "renameJob"; jobIndex: number; jobId: string }
   | { type: "renameWorkcenter"; workcenterIndex: number; workcenterId: string }
@@ -331,6 +332,8 @@ export type ProblemEditorAction =
 
 export function problemEditorReducer(problem: ProblemDefinition, action: ProblemEditorAction): ProblemDefinition {
   switch (action.type) {
+    case "replaceProblem":
+      return action.problem;
     case "updateProblemName":
       return { ...problem, name: action.name };
     case "renameJob":

@@ -4,7 +4,8 @@ import { useRef } from "react";
 import { Brand } from "./brand";
 
 type LandingScreenProps = {
-  onOpenWorkspace: () => void;
+  onCreateProblem: () => void;
+  onOpenExample: () => void;
 };
 
 const features = [
@@ -13,7 +14,7 @@ const features = [
   ["03", "Inspect every decision", "Read the Gantt chart, sequences, and metrics from one focused workspace."],
 ];
 
-export function LandingScreen({ onOpenWorkspace }: LandingScreenProps) {
+export function LandingScreen({ onCreateProblem, onOpenExample }: LandingScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null);
 
   return (
@@ -40,10 +41,10 @@ export function LandingScreen({ onOpenWorkspace }: LandingScreenProps) {
           results.
         </p>
         <div className="hero-actions">
-          <button className="primary" type="button" onClick={onOpenWorkspace}>
+          <button className="primary" type="button" onClick={onCreateProblem}>
             Create new problem <span>→</span>
           </button>
-          <button className="secondary" type="button" onClick={onOpenWorkspace}>
+          <button className="secondary" type="button" onClick={onOpenExample}>
             Open example
           </button>
         </div>
@@ -60,7 +61,7 @@ export function LandingScreen({ onOpenWorkspace }: LandingScreenProps) {
           accept=".json,.job,.mch,.seq"
           hidden
           aria-label="Import a LEKIN or JSON file"
-          onChange={onOpenWorkspace}
+          onChange={onOpenExample}
         />
       </section>
 
