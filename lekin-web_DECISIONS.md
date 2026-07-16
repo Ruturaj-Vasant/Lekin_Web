@@ -1127,4 +1127,6 @@ Each entry should follow this format:
   - the complete Chromium suite passed all 11 implemented user flows, with
     four explicitly unbuilt product flows skipped;
   - the repository-wide Unicode em dash scan and `git diff --check` passed.
-- Status: independently verified and ready to merge, push, and publish.
+- Delivery: merged to `main` as `95fa3b7`, pushed to `origin/main`, and
+  published privately from that exact source. No co-author trailer was added.
+- Status: independently verified, merged, pushed, and published.
