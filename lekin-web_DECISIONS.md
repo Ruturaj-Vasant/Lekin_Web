@@ -1064,3 +1064,25 @@ Each entry should follow this format:
 - Delivery: merged to `main` as `780d5f7` and pushed to `origin/main`; no
   co-author trailer was added.
 - Status: independently accepted, merged, pushed, and ready to publish.
+
+## [2026-07-16] Resize Problem Editor entity controls
+- Branch: `fix/sidebar-control-sizing`, created from clean current `main`.
+- Trigger: Jobs, Workcenters, and Machines were functionally editable but the
+  original 272 px setup panel forced their labels, selects, numeric fields,
+  status fields, and delete actions into cramped rows.
+- Change: made the setup panel responsive from 300-360 px on normal desktop
+  widths and 280 px on compact desktop widths; arranged the three job numeric
+  fields as equal columns; gave operation and machine workcenter selectors
+  explicit usable minimum widths; slightly widened duration inputs; moved flat
+  entity IDs onto a clear first line; and anchored workcenter/machine delete
+  actions in a consistent 24 px target so they no longer consume input width.
+- Scope: visual sizing and layout only. Editor state, validation, execution,
+  scheduling, schemas, and the mobile breakpoint are unchanged.
+- Browser acceptance: added a measured 1280x900 layout test that requires a
+  setup panel of at least 300 px, minimum widths for all Job/Workcenter/Machine
+  controls, and zero horizontal sidebar overflow. The test and all three
+  existing Problem Editor browser flows pass against a production build.
+- Repository audit: before the change, local and remote branch lists both
+  contained only `main`; every previously completed feature/review branch was
+  already merged and removed.
+- Status: implemented and verified; awaiting merge and publication.

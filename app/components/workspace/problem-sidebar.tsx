@@ -115,7 +115,7 @@ export function ProblemSidebar({
                 <IssueBadge issues={validationIssues} filter={{ jobId: job.jobId }} />
               </summary>
 
-              <div className="entity-fields">
+              <div className="entity-fields job-fields">
                 <label className="field-label">
                   Release
                   <input
@@ -253,7 +253,7 @@ export function ProblemSidebar({
         <div className="job-list">
           {problem.workcenters.map((wc) => (
             <div className="entity-row entity-row-flat" key={wc.workcenterId}>
-              <div className="entity-fields">
+              <div className="entity-fields workcenter-fields">
                 <span className="entity-id">{wc.workcenterId}</span>
                 <label className="field-label">
                   Release
@@ -301,7 +301,7 @@ export function ProblemSidebar({
         <div className="job-list">
           {problem.machines.map((machine) => (
             <div className="entity-row entity-row-flat" key={machine.machineId}>
-              <div className="entity-fields">
+              <div className="entity-fields machine-fields">
                 <span className="entity-id">{machine.machineId}</span>
                 <select
                   value={machine.workcenterId}
