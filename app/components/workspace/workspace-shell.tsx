@@ -13,6 +13,7 @@ import { DetailTabs } from "./detail-tabs";
 import { GanttChart } from "./gantt-chart";
 import { MetricsRow } from "./metrics-row";
 import { ProblemSidebar } from "./problem-sidebar";
+import { ScheduleSummary } from "./schedule-summary";
 
 export function WorkspaceShell({ onClose }: { onClose: () => void }) {
   const engine = useRef<BrowserExecutionEngine | null>(null);
@@ -29,6 +30,7 @@ export function WorkspaceShell({ onClose }: { onClose: () => void }) {
   const [resultFor, setResultFor] = useState<ResultContext | null>(null);
   const [progress, setProgress] = useState<ExecutionProgress | null>(null);
   const [running, setRunning] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   if (result !== null && isResultStale(resultFor, problem, algorithmId)) {
     setResult(null);
@@ -95,19 +97,27 @@ export function WorkspaceShell({ onClose }: { onClose: () => void }) {
           <button type="button">Help</button>
         </div>
       </header>
-      <div className="app-body">
-        <ProblemSidebar
-          problem={problem}
-          dispatch={dispatch}
-          algorithmId={algorithmId}
-          running={running}
-          canRun={canRun}
-          progress={progress}
-          validationIssues={validationIssues}
-          onAlgorithmChange={setAlgorithmId}
-          onRun={run}
-          onCancel={cancel}
-        />
+      <div className={`app-body${sidebarCollapsed ? " sidebar-collapsed" : ""}`}>
+        {sidebarCollapsed ? (
+          <aside className="sidebar-rail" aria-label="Problem setup collapsed">
+            <button type="button" aria-label="Expand problem setup panel" onClick={() => setSidebarCollapsed(false)}>›</button>
+            <span>Problem setup</span>
+          </aside>
+        ) : (
+          <ProblemSidebar
+            problem={problem}
+            dispatch={dispatch}
+            algorithmId={algorithmId}
+            running={running}
+            canRun={canRun}
+            progress={progress}
+            validationIssues={validationIssues}
+            onAlgorithmChange={setAlgorithmId}
+            onRun={run}
+            onCancel={cancel}
+            onCollapse={() => setSidebarCollapsed(true)}
+          />
+        )}
         <div className="canvas">
           <div className="canvas-head">
             <div>
@@ -132,6 +142,7 @@ export function WorkspaceShell({ onClose }: { onClose: () => void }) {
           ))}
           <MetricsRow metrics={result?.metrics ?? null} jobCount={problem.jobs.length} />
           <GanttChart schedule={result?.schedule ?? null} problem={problem} />
+          <ScheduleSummary metrics={result?.metrics ?? null} />
           <DetailTabs result={result} validationIssues={validationIssues} problem={problem} />
         </div>
       </div>

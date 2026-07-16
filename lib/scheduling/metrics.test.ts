@@ -25,6 +25,7 @@ function schedule(operations: Schedule["machines"][number]["operations"]): Sched
 describe("computeMetrics boundaries", () => {
   it("returns zero aggregates and an empty utilization object for an empty schedule", () => {
     expect(computeMetrics(schedule([]), problem)).toEqual({
+      timeStart: 0,
       makespan: 0,
       maxTardiness: 0,
       tardyJobCount: 0,
@@ -42,6 +43,7 @@ describe("computeMetrics boundaries", () => {
       workcenterId: "WC1", machineId: "M1", startTime: 2, endTime: 6,
       sequencePosition: 0, status: "pending", source: "algorithm", manuallyModified: false,
     }]), problem);
+    expect(metrics.timeStart).toBe(2);
     expect(metrics.machineUtilization).toEqual({ M1: 1 });
   });
 });

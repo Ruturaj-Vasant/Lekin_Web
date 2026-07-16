@@ -38,6 +38,7 @@ export type Schedule = z.infer<typeof ScheduleSchema>;
 
 /** ARCHITECTURE.md §1.3 - Metrics. */
 export const MetricsSchema = z.object({
+  timeStart: z.number(),
   makespan: z.number(),
   maxTardiness: z.number(),
   tardyJobCount: z.number(),
