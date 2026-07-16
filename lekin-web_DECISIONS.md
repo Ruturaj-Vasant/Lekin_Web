@@ -649,6 +649,10 @@ Each entry should follow this format:
     replaced `dist/`. The same tests failed against that exact server before
     workspace navigation, then passed 2/2 against a clean isolated `main`
     server on the same port after restart.
+  - The algorithm-rerun check now fingerprints rendered bar labels and
+    positions and asserts that FCFS and EDD visibly differ from SPT for the
+    comparison sample; changing only the execution label is no longer enough
+    for this test to pass.
 - Status: test foundation complete on its feature branch; awaiting the
   Problem Editor branch so the first two `fixme` flows can be implemented.
 
