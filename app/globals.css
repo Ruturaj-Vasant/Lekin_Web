@@ -201,3 +201,11 @@
   .operation-editor>footer span{display:none}
   .operation-editor>footer .editor-clear{grid-column:1/-1}
 }
+
+/* One shared numeric scale for ticks, grid lines, bars, and drag previews. */
+.timeline .ticks{position:relative;display:block;padding:0}
+.timeline .ticks span{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.timeline .ticks .tick-first{transform:translate(0,-50%)}
+.timeline .ticks .tick-last{transform:translate(-100%,-50%)}
+.timeline .grid{background:none}
+.grid-line{position:absolute;top:0;bottom:0;width:1px;background:#eee;pointer-events:none}

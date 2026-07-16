@@ -9,6 +9,14 @@ type DropCandidate = { machineId: string; sequencePosition: number; requestedSta
 type EditState = { operationId: string; machineId: string; sequencePosition: number; requestedStartTime: string; error: string | null };
 type MoveResult = { accepted: boolean; message: string; scheduledStartTime?: number };
 
+function timelineTicks(makespan: number, targetIntervals = 7): number[] {
+  const step = Math.max(1, Math.ceil(makespan / targetIntervals));
+  const ticks: number[] = [];
+  for (let time = 0; time < makespan; time += step) ticks.push(time);
+  ticks.push(makespan);
+  return ticks;
+}
+
 type Props = {
   schedule: Schedule | null;
   problem: ProblemDefinition;
@@ -24,7 +32,7 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
   const [edit, setEdit] = useState<EditState | null>(null);
   const machineSchedules = schedule?.machines ?? problem.machines.map((machine) => ({ machineId: machine.machineId, workcenterId: machine.workcenterId, operations: [] }));
   const makespan = Math.max(1, ...machineSchedules.flatMap((machine) => machine.operations.map((operation) => operation.endTime)));
-  const ticks = Array.from({ length: 8 }, (_, index) => Math.round((makespan * index) / 7));
+  const ticks = timelineTicks(makespan);
   const colors = new Map(problem.jobs.map((job) => [job.jobId, job.rgb ? `rgb(${job.rgb.join(",")})` : "#57068c"]));
   const draggedOperation = machineSchedules.flatMap((machine) => machine.operations).find(
     (operation) => operation.scheduledOperationId === draggedOperationId,
@@ -134,8 +142,8 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
       <div className="gantt" style={{ height: `${Math.max(190, 30 + machineSchedules.length * 72)}px` }}>
         <div className="machine-labels">{machineSchedules.map((machine) => <span key={machine.machineId}>{machine.machineId}<small>{machine.workcenterId ?? "Unassigned"}</small></span>)}</div>
         <div className="timeline">
-          <div className="ticks">{ticks.map((tick, index) => <span key={`${tick}-${index}`}>{tick}</span>)}</div>
-          <div className="grid">{machineSchedules.map((machine) => <div className="grid-row" key={machine.machineId} />)}</div>
+          <div className="ticks">{ticks.map((tick, index) => <span data-time={tick} className={index === 0 ? "tick-first" : index === ticks.length - 1 ? "tick-last" : undefined} style={{ left: `${(tick / makespan) * 100}%` }} key={tick}>{tick}</span>)}</div>
+          <div className="grid">{ticks.map((tick) => <i data-time={tick} className="grid-line" style={{ left: `${(tick / makespan) * 100}%` }} key={`line-${tick}`} />)}{machineSchedules.map((machine) => <div className="grid-row" key={machine.machineId} />)}</div>
           {schedule && <div className="drop-lanes">{machineSchedules.map((machine) => {
             const active = candidate?.machineId === machine.machineId;
             const compatible = !draggedDefinition || machine.workcenterId === draggedDefinition.workcenterId;
