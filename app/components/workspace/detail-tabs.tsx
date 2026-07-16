@@ -76,6 +76,7 @@ export function DetailTabs({ result, validationIssues, problem, comparisonResult
     ),
     "Algorithm comparison": comparisonResults.length ? (
       <div className="comparison-wrap">
+        <p className="comparison-help">Select an algorithm to restore its Gantt chart, metrics, and detailed results.</p>
         <table className="comparison-table">
           <thead>
             <tr>
@@ -102,6 +103,7 @@ export function DetailTabs({ result, validationIssues, problem, comparisonResult
                     }}
                   >
                     {row.algorithmId.toUpperCase()}
+                    {result?.algorithmId === row.algorithmId && <span>Viewing</span>}
                   </button>
                 </td>
                 <td className={row.feasible ? "success-text" : "issue-warning"}>{row.status}</td>

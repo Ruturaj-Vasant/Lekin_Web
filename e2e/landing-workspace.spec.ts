@@ -76,4 +76,20 @@ test.describe("landing and workspace shell", () => {
     await expect(page.getByLabel("Dispatching rule")).toHaveValue("spt");
     await expect(page.locator(".metrics article strong")).toHaveText(["-", "-", "-", "-"]);
   });
+
+  test("keeps editing and project actions available on a narrow screen", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openExample(page);
+
+    await expect(page.getByLabel("Problem name")).toBeVisible();
+    await expect(page.getByText("J-101", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: /New/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Import/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Export/ })).toBeVisible();
+
+    await page.getByRole("button", { name: "Collapse problem setup panel" }).click();
+    await expect(page.getByRole("button", { name: "Expand problem setup panel" })).toBeVisible();
+    await page.getByRole("button", { name: "Expand problem setup panel" }).click();
+    await expect(page.getByLabel("Problem name")).toBeVisible();
+  });
 });
