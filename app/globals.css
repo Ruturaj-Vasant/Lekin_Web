@@ -82,3 +82,18 @@
 .bar.bar-manual{box-shadow:inset 0 0 0 2px #fff,0 0 0 2px var(--violet)}
 .drag-feedback{margin:0;padding:10px 18px;border-top:1px solid #cce2d6;background:#f2f8f5;color:var(--success);font-size:10px;line-height:1.5}
 .drag-feedback.drag-rejected{border-color:#edc9bd;background:#fbeeea;color:#8f3f27}
+
+/* Local persistence */
+.save-feedback{font-size:10px;color:var(--success);white-space:nowrap;padding:0 4px}
+.landing-notice{max-width:640px;margin:0 auto 0;padding:11px 16px;border:1px solid #e2c9bd;background:#fdf6f2;color:#8f5a3f;font-size:12px;border-radius:7px;text-align:left}
+.recent-projects{max-width:900px;margin:36px auto 0;padding:0 24px;text-align:left}
+.recent-projects h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:650;margin:0 0 12px}
+.recent-project-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.recent-project-list li{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:7px;background:white}
+.recent-project-open{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;align-items:flex-start;border:0;background:none;padding:12px 14px;text-align:left}
+.recent-project-open:hover{background:var(--violet-soft)}
+.recent-project-open strong{font-size:13px;color:var(--ink)}
+.recent-project-open small{font-size:10px;color:var(--muted)}
+.recent-project-delete{border:0;background:none;color:var(--warning);font-size:11px;padding:8px 14px;flex-shrink:0}
+.recent-project-delete:hover{text-decoration:underline}
+@media(max-width:680px){.recent-projects{padding:0 16px}}
