@@ -950,3 +950,115 @@ Each entry should follow this format:
 - Delivery: merged to `main` and pushed to `origin/main`. The hosted build was
   refreshed from the same verified source.
 - Status: verified, merged, pushed, and published.
+
+## [2026-07-15] Surface already-computed results data (Job Details, Machine Sequence, weighted metrics)
+- Branch: `feat/results-detail`, created from `main` (not from
+  `feat/problem-editor`, which had already been independently reviewed and
+  merged; this is an unrelated concern about the results/detail tabs).
+- Trigger: PRODUCT_SPEC.md section 4.2 names both the metrics area (7
+  aggregate figures) and the detail tabs (Machine Sequence, Job Details,
+  Algorithm Comparison, Validation Messages, Execution Information) as
+  required surfaces, mirroring `lekinpy`'s `display_summary()`,
+  `display_job_details()`, and `display_machine_details()`. Several fields
+  were already computed by `computeMetrics()`/present on `ScheduledOperation`
+  but never rendered: `weightedCompletionTime`, `weightedTardiness`,
+  per-machine `machineUtilization`, per-operation `startTime`/`endTime`, and
+  any real per-job breakdown (the Job Details tab previously showed a single
+  aggregate sentence).
+- What changed:
+  - `lib/results/job-summary.ts` (new): `buildJobSummaries(schedule,
+    problem)` returns one row per problem job (release, due, weight,
+    completion time, tardiness, its operations sorted by `operationIndex`
+    regardless of machine iteration order). A job with zero
+    `ScheduledOperation`s in the schedule reports `completionTime`/
+    `tardiness` as `null` and `scheduled: false`, matching
+    `computeMetrics()`'s existing silent-exclusion behavior rather than
+    showing a misleading 0. Covered by `lib/results/job-summary.test.ts`
+    (5 tests: tardy job, unscheduled job, zero-not-negative tardiness,
+    cross-machine operation sorting, one row per problem job independent of
+    schedule content).
+  - `app/components/workspace/detail-tabs.tsx`: Machine Sequence now shows
+    each machine's release time, computed utilization percent, and each
+    operation chip's start-end time (previously job/operation id only). Job
+    Details now renders `buildJobSummaries()` as a real per-job block
+    (release/due/weight/completion/tardiness/not-scheduled, then its
+    operations with machine and start-end time) instead of a one-line count.
+    Execution tab appends weighted completion time and weighted tardiness.
+    Takes a new required `problem` prop (used for machine release lookup and
+    job summaries).
+  - `app/components/workspace/workspace-shell.tsx`: passes `problem` to
+    `DetailTabs`.
+  - `app/globals.css` (additive only): `.job-summary-row`/`.job-summary-head`
+    for the new per-job block layout; added `flex-wrap:wrap` and vertical
+    padding to the existing `.sequence-table>div` row so the added
+    start-end/release/utilization text and the growing operation-chip lists
+    wrap instead of clipping against `.details-card`'s `overflow:hidden`
+    (pre-existing risk for any machine with several operations, not
+    introduced by this change, just made more likely by the added text).
+- Scope decisions:
+  - Algorithm Comparison tab is untouched (explicitly a later milestone;
+    there is nothing computed yet to surface there).
+  - Top-line `MetricsRow` (the 4 always-visible cards near the Gantt chart)
+    is unchanged. The two still-missing aggregate figures
+    (`weightedCompletionTime`, `weightedTardiness`) were added to the
+    Execution tab instead of as new top-line cards, to avoid restructuring
+    `.metrics`'s fixed 4-column grid and its two breakpoint overrides, which
+    are Codex's visual-layer work. `maxTardiness` was already surfaced (as
+    part of the "Late jobs" card's note) before this change.
+  - Per-machine `machineUtilization` (as opposed to the already-shown
+    average) is shown per-row in Machine Sequence rather than as additional
+    top-line cards, for the same reason.
+- Concurrent-edit note: while implementing this, another process was found
+  live-editing ~30 unrelated files directly in this same `lekin-web`
+  checkout (matching the em-dash-removal decision above going from
+  "verification pending" to "verified and ready to merge" mid-session).
+  Confirmed with the project owner that this was expected. To avoid bundling
+  that unrelated, uncommitted work into this commit, only the files listed
+  above (plus this entry) were staged and committed; every other modified
+  file was left exactly as the concurrent process had it, untouched.
+- Verification, under Node 22.23.1 (`>=22.13.0` required; system default is
+  v20.17.0):
+  - `npm run test:unit`: 126 passed, 4 opt-in skipped (up from 121; the 5 new
+    `job-summary.test.ts` cases);
+  - `npm run test:types`: clean;
+  - full-project `tsc --noEmit`: only the pre-existing, unrelated
+    `worker/index.ts` Cloudflare ambient-type errors (`Fetcher`,
+    `D1Database`), untouched by this branch;
+  - `npm test` (ESLint + production `vinext build`): passed;
+  - `e2e/*.spec.ts` were checked for any dependency on the old tab text or
+    `.sequence-table` shape: none found, so not run against this branch
+    (they require a live Pyodide/Chromium environment not exercised here);
+  - scanned all new/changed files for the Unicode em dash per the prior
+    entry's convention: none found.
+- Known limitations: no comparison across algorithm runs (unchanged, out of
+  scope); Job Details and Machine Sequence are read-only display, no
+  drag-and-drop or manual-edit affordance (unchanged, later milestone).
+- Status: implemented on `feat/results-detail`, not merged, not pushed, not
+  deleted.
+
+## [2026-07-16] Independent review of result detail views
+- Reviewed commit: `f25d9a9` from `feat/results-detail`, integrated on top of
+  current `main` so the em dash cleanup and result-detail work were tested as
+  one prospective release.
+- Review result: `buildJobSummaries()` derives completion and non-negative
+  tardiness correctly, preserves every problem job (including an explicit
+  not-scheduled state), and presents operations in job order even when the
+  schedule groups them by machine. Machine release/utilization and weighted
+  metrics are read from the existing typed problem/result data rather than
+  recomputed in the React component.
+- Review gap corrected: the feature had five pure helper tests but no browser
+  coverage for the new user-visible fields. Added a production-browser test
+  that runs the real SPT algorithm through Pyodide and checks exact known
+  values from the sample fixture: M-01 at 69% utilization, J-103 O2 at 2-7,
+  J-101 completion at 13, J-101 O1 on M-01B at 3-7, weighted completion 75,
+  and weighted tardiness 0.
+- Verification: 126 unit/contract tests passed with four opt-in skips; all
+  four live registry-drift checks passed; the real fixture reproduced; type
+  checks, ESLint, and the production build passed. The complete Chromium
+  acceptance suite passed with 10 implemented flows and four explicitly
+  unbuilt product flows skipped.
+- Remaining product scope: weighted metrics are now visible in Execution but
+  are not yet promoted into the always-visible top Metrics row. Algorithm
+  comparison, persistence/import-export, and Gantt drag editing remain later
+  milestones.
+- Status: independently accepted and ready to merge.

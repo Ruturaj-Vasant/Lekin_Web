@@ -132,7 +132,7 @@ export function WorkspaceShell({ onClose }: { onClose: () => void }) {
           ))}
           <MetricsRow metrics={result?.metrics ?? null} jobCount={problem.jobs.length} />
           <GanttChart schedule={result?.schedule ?? null} problem={problem} />
-          <DetailTabs result={result} validationIssues={validationIssues} />
+          <DetailTabs result={result} validationIssues={validationIssues} problem={problem} />
         </div>
       </div>
     </main>
