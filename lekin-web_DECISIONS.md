@@ -447,3 +447,39 @@ Each entry should follow this format:
   that it was globally clean was corrected rather than repeated.
 - Status: independently reviewed, corrected, and merged to `main` in
   merge commit `a41c3ac`.
+
+## [2026-07-15] Browser execution adapter and first real schedule rendering
+- Branch: `feat/browser-execution-adapter`
+- Phase: 1, browser execution integration (not merged)
+- What changed:
+  - Added a module Web Worker that lazily loads pinned Pyodide `314.0.2`,
+    verifies the vendored lekinpy `0.2.0` wheel against its checked-in
+    SHA-256 digest, installs it without unused scientific dependencies,
+    constructs a real `lekinpy.System`, validates it, and runs FCFS, SPT,
+    EDD, or WSPT entirely in the browser.
+  - Added `BrowserExecutionEngine` as the browser boundary around the pure
+    `lib/` policy, validation, translation, and metrics functions. It owns
+    Worker lifecycle, progress, cancellation, the execution-only timeout,
+    library-exception mapping, and completed `ExecutionResult` assembly.
+  - Replaced the presentation-only `demo-data.ts` schedule with a typed
+    `ProblemDefinition` sample. The algorithm selector and Run button now
+    invoke the adapter; metrics, Gantt bars, machine sequences, validation,
+    and execution details render from the returned real result.
+  - Editing, persistence, comparison history, and drag-and-drop remain out
+    of scope for this branch and are still later milestones.
+- Why: this is the smallest end-to-end slice that changes the workspace from
+  a visual mockup into a real local scheduler while keeping all scheduling
+  logic in the already-reviewed framework-independent layer.
+- Reliability checks:
+  - 55 unit tests pass; four opt-in registry drift tests remain skipped
+    unless a local source path is supplied.
+  - `test:types` and ESLint pass.
+  - Production build passes under Node `22.23.1`, satisfying the repository's
+    declared `node >=22.13.0` requirement. Node `20.17.0` cannot build the
+    current vinext toolchain because it lacks `fs.promises.glob`.
+  - The checked-in wheel digest matches the wheel bytes, and the wheel was
+    independently installed and used to produce a one-operation SPT schedule.
+  - An automated in-browser execution check was attempted, but no browser
+    runtime was available in this session; the Worker/Pyodide network path
+    therefore still requires a manual browser smoke test before merge.
+- Status: implemented and verified on the feature branch; not merged.
