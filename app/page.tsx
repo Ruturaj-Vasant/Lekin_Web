@@ -15,6 +15,7 @@ import { WorkspaceShell } from "./components/workspace/workspace-shell";
 import { createBlankProblem } from "./execution/blank-problem";
 import { SAMPLE_PROBLEM } from "./execution/sample-problem";
 import { getBrowserLocalStorage } from "./persistence/browser-storage";
+import { readProblemFile } from "./import-export/browser-problem-files";
 
 export default function Home() {
   const [initialProblem, setInitialProblem] = useState<ProblemDefinition | null>(null);
@@ -86,6 +87,16 @@ export default function Home() {
     refreshRecentProjects();
   }
 
+  async function importFromLanding(file: File) {
+    const result = await readProblemFile(file);
+    if (result.ok) {
+      setNotice(null);
+      setInitialProblem(result.problem);
+    } else {
+      setNotice(`Could not import that file: ${result.message}`);
+    }
+  }
+
   if (checkingRestore) return null;
 
   return initialProblem ? (
@@ -97,6 +108,7 @@ export default function Home() {
       recentProjects={recentProjects}
       onOpenProject={openProject}
       onDeleteProject={deleteSavedProject}
+      onImportFile={importFromLanding}
       notice={notice}
     />
   );
