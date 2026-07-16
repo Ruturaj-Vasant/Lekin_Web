@@ -976,7 +976,9 @@ Each entry should follow this format:
   Chromium suite passed all 12 implemented user flows with four explicitly
   unbuilt product flows skipped. A Chromium screenshot was inspected to confirm
   the larger metadata and editable job-name layout visually.
-- Status: verified on the feature branch and ready to merge and publish.
+- Delivery: merged to `main` as `5c653a2`, pushed, and published privately
+  from that exact source. No co-author trailer was added.
+- Status: verified, merged, pushed, and published.
 
 ## [2026-07-15] Surface already-computed results data (Job Details, Machine Sequence, weighted metrics)
 - Branch: `feat/results-detail`, created from `main` (not from
