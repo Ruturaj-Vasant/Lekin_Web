@@ -285,9 +285,14 @@ Each entry should follow this format:
   matches what `ARCHITECTURE.md` documents as pinned, even though `master`
   has since moved further ahead with docs/example-only changes that don't
   affect the installable package.
-- Tests added: none (build/packaging step, not application code). Verified
-  manually: wheel file listing, `__version__` string inside it, and the
-  SHA-256 checksum recorded alongside it.
-- Status: merged (this branch is small and mechanical; no open design
-  question to hold it in review for — flagging for your awareness rather
-  than blocking on review).
+- Tests added: none (build/packaging step, not application code).
+  Independent review verified the wheel's ZIP integrity and SHA-256 digest,
+  installed it without dependencies into a clean virtual environment,
+  confirmed `lekinpy.__version__ == "0.2.0"`, and successfully ran FCFS,
+  SPT, EDD, and WSPT against a two-job/four-operation problem. All four
+  algorithms scheduled all four operations with positive durations and
+  serialized the result successfully. Every packaged Python source file was
+  also compared byte-for-byte with the `v0.2.0` tag. The checksum format is
+  now explicit in `ARCHITECTURE.md` so browser verification and future wheel
+  replacement use the same contract.
+- Status: independently tested and approved for merge.

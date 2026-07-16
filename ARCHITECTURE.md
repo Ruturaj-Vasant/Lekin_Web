@@ -654,13 +654,18 @@ follows, rather than left open:
 - A checksum file sits alongside it —
   `public/vendor/lekinpy-0.2.0-py3-none-any.whl.sha256` — and the adapter
   verifies it before `micropip.install()` (defense against a corrupted or
-  silently-replaced asset).
+  silently-replaced asset). Its format is exactly one lowercase,
+  64-character SHA-256 hex digest plus a trailing newline; it intentionally
+  omits a filename so the browser adapter can compare the fetched text
+  directly with the digest it computes from the wheel bytes.
 - **Replace process, documented here so it's not tribal knowledge**: (1) on
   `lekin-library`, build the wheel from the tagged commit
   (`python -m build`), (2) copy the resulting `.whl` into
   `lekin-web/public/vendor/`, replacing the old version-stamped file (never
   overwrite in place — old and new versions can coexist under different
-  filenames if a rollback is needed), (3) regenerate the `.sha256` file,
+  filenames if a rollback is needed), (3) regenerate the `.sha256` file in
+  the raw-digest format above (for example,
+  `shasum -a 256 <wheel> | awk '{print $1}' > <wheel>.sha256`),
   (4) update the `PINNED_LEKINPY_VERSION` constant the adapter reads the
   filename/checksum from, (5) record the bump in `lekin-web_DECISIONS.md`.
   This is a manual, deliberate step tied to a specific `lekin-library` tag
