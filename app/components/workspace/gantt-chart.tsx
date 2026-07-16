@@ -3,6 +3,7 @@ import type { ProblemDefinition } from "../../../lib/schema/problem";
 import type { Schedule } from "../../../lib/schema/schedule";
 import type { ScheduledOperation } from "../../../lib/schema/schedule";
 import type { DragRejection } from "../../../lib/scheduling/recalculate";
+import { timelineGeometry } from "../../../lib/scheduling/timeline-geometry";
 import { useState, type DragEvent, type KeyboardEvent, type MouseEvent } from "react";
 
 type DropCandidate = { machineId: string; sequencePosition: number; requestedStartTime: number; rejection: DragRejection | null };
@@ -22,11 +23,17 @@ type Props = {
   problem: ProblemDefinition;
   dragMessage: string | null;
   manualStartConstraints: Record<string, number>;
+  canUndo: boolean;
+  canRedo: boolean;
+  canReset: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
+  onReset: () => void;
   onCheckMove: (scheduledOperationId: string, machineId: string, sequencePosition: number) => DragRejection | null;
   onMoveOperation: (scheduledOperationId: string, machineId: string, sequencePosition: number, requestedStartTime: number | null) => MoveResult;
 };
 
-export function GanttChart({ schedule, problem, dragMessage, manualStartConstraints, onCheckMove, onMoveOperation }: Props) {
+export function GanttChart({ schedule, problem, dragMessage, manualStartConstraints, canUndo, canRedo, canReset, onUndo, onRedo, onReset, onCheckMove, onMoveOperation }: Props) {
   const [draggedOperationId, setDraggedOperationId] = useState<string | null>(null);
   const [candidate, setCandidate] = useState<DropCandidate | null>(null);
   const [edit, setEdit] = useState<EditState | null>(null);
@@ -169,9 +176,13 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
           <span className="time-scale">Time units</span>
           <button type="button" aria-label="Zoom out timeline" disabled={zoom <= 1} onClick={() => setZoom((value) => Math.max(1, Number((value - 0.25).toFixed(2))))}>−</button>
           <strong>{Math.round(zoom * 100)}%</strong>
-          <button type="button" aria-label="Zoom in timeline" disabled={zoom >= 3} onClick={() => setZoom((value) => Math.min(3, Number((value + 0.25).toFixed(2))))}>+</button>
+          <button type="button" aria-label="Zoom in timeline" onClick={() => setZoom((value) => Number((value + 0.25).toFixed(2)))}>+</button>
           <button type="button" onClick={() => setZoom(1)}>Fit</button>
           <button type="button" aria-pressed={showIdle} onClick={() => setShowIdle((value) => !value)}>Idle time</button>
+          <span className="toolbar-separator" aria-hidden="true" />
+          <button type="button" onClick={onUndo} disabled={!canUndo}>↶ Undo</button>
+          <button type="button" onClick={onRedo} disabled={!canRedo}>↷ Redo</button>
+          <button type="button" onClick={onReset} disabled={!canReset}>Reset schedule</button>
         </div>
       </div>
       <div className="legend">{problem.jobs.map((job) => <span key={job.jobId}><i style={{ background: colors.get(job.jobId) }} />{job.jobId}</span>)}<span className="legend-note">Time units</span></div>
@@ -205,7 +216,9 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
           })}</div>}
           {candidate && <div className={`time-preview${candidate.rejection ? " time-preview-invalid" : ""}`} style={{ left: `${(candidate.requestedStartTime / makespan) * 100}%` }}><span>{candidate.requestedStartTime}</span></div>}
           {cursorTime !== null && !candidate && <div className="cursor-time" style={{ left: `${(cursorTime / makespan) * 100}%` }}><span>{cursorTime}</span></div>}
-          {machineSchedules.flatMap((machine, machineIndex) => machine.operations.map((operation) => (
+          {machineSchedules.flatMap((machine, machineIndex) => machine.operations.map((operation) => {
+            const geometry = timelineGeometry(operation.startTime, operation.endTime, makespan);
+            return (
             <div
               key={operation.scheduledOperationId}
               className={`bar${operation.manuallyModified ? " bar-manual" : ""}${draggedOperationId === operation.scheduledOperationId ? " bar-dragging" : ""}`}
@@ -223,12 +236,11 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
               }}
               onDragStart={(event) => { setDraggedOperationId(operation.scheduledOperationId); event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("text/plain", operation.scheduledOperationId); }}
               onDragEnd={() => { setDraggedOperationId(null); setCandidate(null); }}
-              style={{ background: colors.get(operation.jobId), left: `${(operation.startTime / makespan) * 100}%`, width: `${Math.max(1, ((operation.endTime - operation.startTime) / makespan) * 100)}%`, top: `${42 + machineIndex * 72}px` }}
-              title={`${operation.jobId} operation ${operation.operationIndex + 1}: ${operation.startTime}–${operation.endTime}`}
+              style={{ background: colors.get(operation.jobId), left: `${geometry.leftPercent}%`, width: `${geometry.widthPercent}%`, top: `${42 + machineIndex * 72}px` }}
             >
               <i className="drag-handle" aria-hidden="true">⋮⋮</i><span>{operation.jobId} · O{operation.operationIndex + 1}</span><small>{operation.startTime}–{operation.endTime} · {operation.endTime - operation.startTime}u</small>
               <button type="button" draggable={false} className="operation-edit-trigger" aria-label={`Edit ${operation.scheduledOperationId}`} onClick={(event) => { event.stopPropagation(); openEditor(operation); }}>Edit</button>
-              <div className="operation-hover-card" role="tooltip">
+              <div className={`operation-hover-card${machineIndex >= Math.ceil(machineSchedules.length / 2) ? " operation-hover-card-above" : ""}`} role="tooltip">
                 <strong>{operation.jobId} · Operation {operation.operationIndex + 1}</strong>
                 <span>{operation.machineId} · {machine.workcenterId}</span>
                 <dl>
@@ -239,7 +251,8 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
                 </dl>
               </div>
             </div>
-          )))}
+            );
+          }))}
           {!schedule && <p className="gantt-empty">No schedule yet</p>}
         </div>
       </div>

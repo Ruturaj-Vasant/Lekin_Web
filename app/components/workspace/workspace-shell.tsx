@@ -324,9 +324,6 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             downloadProblemFile(problem);
             setSaveFeedback("Problem exported.");
           }}>↓ Export</button>
-          <button type="button" onClick={undoManualEdit} disabled={undoStack.length === 0}>↶ Undo</button>
-          <button type="button" onClick={redoManualEdit} disabled={redoStack.length === 0}>↷ Redo</button>
-          <button type="button" onClick={resetManualEdits} disabled={!manualBaseResult || undoStack.length === 0}>Reset schedule</button>
           <span className="divider" />
           <button type="button">Help</button>
         </div>
@@ -379,6 +376,12 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             problem={problem}
             dragMessage={dragMessage}
             manualStartConstraints={manualStartConstraints}
+            canUndo={undoStack.length > 0}
+            canRedo={redoStack.length > 0}
+            canReset={Boolean(manualBaseResult) && undoStack.length > 0}
+            onUndo={undoManualEdit}
+            onRedo={redoManualEdit}
+            onReset={resetManualEdits}
             onCheckMove={checkManualMove}
             onMoveOperation={moveScheduledOperation}
           />
