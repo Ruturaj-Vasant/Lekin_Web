@@ -13,7 +13,11 @@ test.describe("landing and workspace shell", () => {
 
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
     await expect(page.getByRole("complementary", { name: "Problem setup" })).toBeVisible();
-    await expect(page.getByLabel("Problem name")).toHaveValue("Sample job shop");
+    const problemName = page.getByLabel("Problem name");
+    await expect(problemName).toHaveValue("Sample job shop");
+    await problemName.fill("My scheduling experiment");
+    await expect(page.locator(".project strong")).toHaveText("My scheduling experiment");
+    await expect(page.locator(".breadcrumb")).toContainText("My scheduling experiment");
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");
     await expect(page.locator(".bar")).toHaveCount(0);
     await expectNoBrowserErrors(errors);
