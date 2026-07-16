@@ -11,6 +11,7 @@
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run lint && npm run build",
     "test:unit": "vitest run",
+    "test:types": "tsc --noEmit -p tsconfig.lib.json",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {

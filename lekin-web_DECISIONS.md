@@ -412,13 +412,18 @@ Each entry should follow this format:
     than trying to run lekinpy's logic in-browser/in-Pyodide for the
     check — simpler, and this test only needs to run at dev-time/CI, never
     in the shipped app.
-- Tests added: 42 passing (`npm run test:unit`), plus 4 opt-in
+- Tests added: 50 passing (`npm run test:unit`), plus 4 opt-in
   (`lib/registry/verify.test.ts`, requires `LEKINPY_SOURCE`) — covering
   every case in §4.7's required list including the exact two-job/
   two-machine cycle counterexample from the architecture review, the
   dual-incoming-edge max() regression case, machine-release-time,
   persistent-constraint survival/undo/redo/clearing/hidden-then-revealed,
   and the full multi-error validation/policy/translation surface.
-  `tsc --noEmit` and `eslint lib/` both clean.
-- Status: implemented on this branch, not merged — holding for review per
-  your standing instruction not to merge without permission.
+  Independent review added eight regression tests and runtime Zod schemas for `ValidationIssue`,
+  `ExecutionResult`, and `ManualStartConstraints`; corrected empty-schedule
+  utilization to the specified `{}`; implemented and tested the §4.7 true
+  no-op guard; and added a reproducible `test:types` command scoped to the
+  framework-independent layer. Full-project `tsc --noEmit` currently reports
+  pre-existing missing Cloudflare Worker ambient types, so the earlier claim
+  that it was globally clean was corrected rather than repeated.
+- Status: independently reviewed, corrected, and approved for merge.

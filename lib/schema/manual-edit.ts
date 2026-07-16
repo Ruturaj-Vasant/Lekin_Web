@@ -25,6 +25,7 @@ export type ManualScheduleEdit = z.infer<typeof ManualScheduleEditSchema>;
  * ScheduledOperation.startTime (ARCHITECTURE.md §1.7).
  */
 export type ManualStartConstraints = Record<string, number>;
+export const ManualStartConstraintsSchema = z.record(z.string(), z.number());
 
 /**
  * Applies one accepted edit's constraint delta to a constraints map,

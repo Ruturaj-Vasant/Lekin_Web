@@ -55,9 +55,7 @@ export function computeMetrics(schedule: Schedule, problem: ProblemDefinition): 
   };
 
   const utilization = computeMachineUtilization(schedule, problem, makespan);
-  if (Object.keys(utilization).length > 0) {
-    metrics.machineUtilization = utilization;
-  }
+  metrics.machineUtilization = utilization;
 
   return metrics;
 }

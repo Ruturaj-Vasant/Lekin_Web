@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ValidationIssue } from "./issue";
+import { ValidationIssueSchema } from "./issue";
 import { ProblemDefinitionSchema } from "./problem";
 import { ScheduleSchema, MetricsSchema } from "./schedule";
 
@@ -69,26 +69,52 @@ export type PolicyViolation = z.infer<typeof PolicyViolationSchema>;
 export const EXECUTION_STATUSES = ["completed", "rejected", "invalid", "error"] as const;
 export type ExecutionStatus = (typeof EXECUTION_STATUSES)[number];
 
-/**
- * ExecutionResult itself is produced by the adapter (not user input), so we
- * define the TS interface directly rather than a Zod schema whose every
- * field would need re-deriving from ValidationIssue (which lives in a
- * plain .ts file, not built from Zod). A Zod schema for persisted/exported
- * results can be layered on later if round-tripping through JSON import
- * needs it (PRODUCT_SPEC §17); not needed yet.
- */
-export interface ExecutionResult {
-  executionId: string;
-  executionMode: "browser" | "backend";
-  algorithmId: string;
-  algorithmVersion: string;
-  lekinpyVersion: string;
-  schemaVersion: "1.0.0";
-  status: ExecutionStatus;
-  runtimeMs: number;
-  schedule: z.infer<typeof ScheduleSchema> | null;
-  metrics: z.infer<typeof MetricsSchema> | null;
-  validationIssues: ValidationIssue[];
-  policyViolation: PolicyViolation | null;
-  warnings: string[];
-}
+export const ExecutionResultSchema = z.object({
+  executionId: z.string(),
+  executionMode: z.enum(["browser", "backend"]),
+  algorithmId: z.string(),
+  algorithmVersion: z.string(),
+  lekinpyVersion: z.string(),
+  schemaVersion: z.literal("1.0.0"),
+  status: z.enum(EXECUTION_STATUSES),
+  runtimeMs: z.number(),
+  schedule: ScheduleSchema.nullable(),
+  metrics: MetricsSchema.nullable(),
+  validationIssues: z.array(ValidationIssueSchema),
+  policyViolation: PolicyViolationSchema.nullable(),
+  warnings: z.array(z.string()),
+}).superRefine((result, context) => {
+  const completed = result.status === "completed";
+  if (completed && (result.schedule === null || result.metrics === null)) {
+    context.addIssue({
+      code: "custom",
+      path: result.schedule === null ? ["schedule"] : ["metrics"],
+      message: "A completed execution must include both schedule and metrics.",
+    });
+  }
+  if (!completed && (result.schedule !== null || result.metrics !== null)) {
+    context.addIssue({
+      code: "custom",
+      path: result.schedule !== null ? ["schedule"] : ["metrics"],
+      message: "Only a completed execution may include schedule or metrics.",
+    });
+  }
+
+  const hasValidationError = result.validationIssues.some((issue) => issue.severity === "error");
+  if ((result.status === "invalid") !== hasValidationError) {
+    context.addIssue({
+      code: "custom",
+      path: ["validationIssues"],
+      message: "Validation errors must be present if and only if status is invalid.",
+    });
+  }
+
+  if ((result.status === "rejected") !== (result.policyViolation !== null)) {
+    context.addIssue({
+      code: "custom",
+      path: ["policyViolation"],
+      message: "A policy violation must be present if and only if status is rejected.",
+    });
+  }
+});
+export type ExecutionResult = z.infer<typeof ExecutionResultSchema>;

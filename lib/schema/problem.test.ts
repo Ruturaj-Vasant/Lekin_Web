@@ -63,6 +63,15 @@ describe("validateProblemDefinition", () => {
     expect(issues.some((i) => i.code === "INCONSISTENT_MACHINE_WORKCENTER")).toBe(true);
   });
 
+  it("flags a machine listed more than once by the same workcenter", () => {
+    const problem = validProblem();
+    problem.workcenters[0]!.machineIds.push("M1");
+    const issues = validateProblemDefinition(problem);
+    expect(issues.some(
+      (issue) => issue.code === "INCONSISTENT_MACHINE_WORKCENTER" && issue.machineId === "M1",
+    )).toBe(true);
+  });
+
   it("flags an incorrect operationIndex", () => {
     const problem = validProblem();
     problem.jobs[0]!.operations[1]!.operationIndex = 5;

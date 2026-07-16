@@ -118,6 +118,23 @@ export interface RecalculateResult {
 }
 
 /**
+ * ARCHITECTURE.md §4.4 no-op guard. Call this before recording an edit or
+ * invoking recalculate(): an unchanged slot with the same persisted manual
+ * start constraint is not an edit. A constraint change in the same slot is.
+ */
+export function isNoOpEdit(
+  edit: ManualScheduleEdit,
+  manualStartConstraints: ManualStartConstraints,
+): boolean {
+  const currentConstraint = manualStartConstraints[edit.scheduledOperationId] ?? null;
+  return (
+    edit.from.machineId === edit.to.machineId &&
+    edit.from.sequencePosition === edit.to.sequencePosition &&
+    edit.to.requestedStartTime === currentConstraint
+  );
+}
+
+/**
  * ARCHITECTURE.md §4.5 — Recalculation algorithm.
  *
  * Callers MUST call checkDropValidity() first and only invoke this for an

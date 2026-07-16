@@ -208,6 +208,23 @@ export function collectStructuralIssues(problem: ProblemDefinition): ValidationI
         }),
       );
     }
+
+    const seenListedMachineIds = new Set<string>();
+    wc.machineIds.forEach((machineId, machineIndex) => {
+      if (seenListedMachineIds.has(machineId)) {
+        issues.push(
+          makeIssue({
+            code: "INCONSISTENT_MACHINE_WORKCENTER",
+            message: `Workcenter '${wc.workcenterId}' lists machine '${machineId}' more than once.`,
+            path: addr("workcenters", wcIndex, "machineIds", machineIndex),
+            source: "schema",
+            workcenterId: wc.workcenterId,
+            machineId,
+          }),
+        );
+      }
+      seenListedMachineIds.add(machineId);
+    });
   });
 
   // --- Machines: duplicates (global), numeric ---

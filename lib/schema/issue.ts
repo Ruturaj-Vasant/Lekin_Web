@@ -1,19 +1,20 @@
-import type { ValidationErrorCode } from "./codes";
-import { severityForCode } from "./codes";
+import { z } from "zod";
+import { severityForCode, VALIDATION_ERROR_CODES } from "./codes";
 
 /** ARCHITECTURE.md §1.4 — ValidationIssue. */
-export interface ValidationIssue {
-  code: ValidationErrorCode;
-  message: string;
+export const ValidationIssueSchema = z.object({
+  code: z.enum(VALIDATION_ERROR_CODES),
+  message: z.string(),
   /** Zod-issue-path style, e.g. ["jobs", 2, "operations", 1, "processingTime"]. */
-  path: Array<string | number>;
-  source: "schema" | "library" | "schedule";
-  severity: "error" | "warning";
-  jobId?: string;
-  operationIndex?: number;
-  workcenterId?: string;
-  machineId?: string;
-}
+  path: z.array(z.union([z.string(), z.number()])),
+  source: z.enum(["schema", "library", "schedule"]),
+  severity: z.enum(["error", "warning"]),
+  jobId: z.string().optional(),
+  operationIndex: z.number().optional(),
+  workcenterId: z.string().optional(),
+  machineId: z.string().optional(),
+});
+export type ValidationIssue = z.infer<typeof ValidationIssueSchema>;
 
 export type ValidationIssueInput = Omit<ValidationIssue, "severity"> & {
   severity?: "error" | "warning";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkDropValidity, recalculate, type DragRejection } from "./recalculate";
+import { checkDropValidity, isNoOpEdit, recalculate, type DragRejection } from "./recalculate";
 import { applyConstraintDelta, type ManualScheduleEdit, type ManualStartConstraints } from "../schema/manual-edit";
 import type { ProblemDefinition } from "../schema/problem";
 import type { Schedule } from "../schema/schedule";
@@ -445,22 +445,38 @@ describe("recalculate — persistent manual-start constraints", () => {
 });
 
 describe("recalculate — no-op drop", () => {
-  it("dropping onto the same (machine, position) with the same constraint changes nothing", () => {
-    const problem = basicProblem();
-    const schedule = basicSchedule();
-    const check = checkDropValidity(schedule, problem, "A-O0", "M1", 0);
-    expect(check.valid).toBe(true);
-    // Caller-level responsibility per §4.4: no ManualScheduleEdit should be
-    // recorded for a true no-op; recalculate() itself is still safe to call
-    // and should reproduce the identical schedule.
+  it("identifies the same slot and persisted constraint before an edit is recorded", () => {
     const theEdit = edit({
       scheduledOperationId: "A-O0",
       from: { machineId: "M1", sequencePosition: 0, requestedStartTime: null },
       to: { machineId: "M1", sequencePosition: 0, requestedStartTime: null },
     });
-    const { schedule: next } = recalculate(schedule, theEdit, {}, problem);
-    const a0 = next.machines.find((m) => m.machineId === "M1")!.operations[0]!;
-    expect(a0.startTime).toBe(0);
-    expect(a0.endTime).toBe(5);
+    expect(isNoOpEdit(theEdit, {})).toBe(true);
+  });
+
+  it("does not treat a same-slot constraint change or clear as a no-op", () => {
+    const change = edit({
+      scheduledOperationId: "A-O0",
+      from: { machineId: "M1", sequencePosition: 0, requestedStartTime: null },
+      to: { machineId: "M1", sequencePosition: 0, requestedStartTime: 10 },
+    });
+    expect(isNoOpEdit(change, {})).toBe(false);
+
+    const clear = edit({
+      scheduledOperationId: "A-O0",
+      from: { machineId: "M1", sequencePosition: 0, requestedStartTime: 10 },
+      to: { machineId: "M1", sequencePosition: 0, requestedStartTime: null },
+    });
+    expect(isNoOpEdit(clear, { "A-O0": 10 })).toBe(false);
+  });
+
+  it("uses the persisted constraint map as the no-op source of truth", () => {
+    const unchanged = edit({
+      scheduledOperationId: "A-O0",
+      from: { machineId: "M1", sequencePosition: 0, requestedStartTime: 10 },
+      to: { machineId: "M1", sequencePosition: 0, requestedStartTime: 10 },
+    });
+    expect(isNoOpEdit(unchanged, { "A-O0": 10 })).toBe(true);
+    expect(isNoOpEdit(unchanged, {})).toBe(false);
   });
 });

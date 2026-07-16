@@ -65,5 +65,6 @@ On an accepted drag-and-drop:
 
 ```
 npm run test:unit                                  # hermetic, no Python needed
+npm run test:types                                 # strict typecheck scoped to lib/
 LEKINPY_SOURCE=../lekin-library npm run test:unit -- lib/registry/verify.test.ts  # opt-in drift guard
 ```
