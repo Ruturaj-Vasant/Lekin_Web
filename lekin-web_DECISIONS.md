@@ -248,3 +248,46 @@ Each entry should follow this format:
 - Tests added: none (architecture-only pass); the implementation acceptance
   tests are specified in §4.7.
 - Status: in review — ready for final user approval before implementation.
+
+## [2026-07-15] Pin the lekinpy v0.2.0 wheel per ARCHITECTURE.md §2.3
+- Branch: `chore/pin-lekinpy-wheel`
+- Phase: 1 (unblocks the execution adapter, not yet built)
+- What changed:
+  - Executed §2.3's already-decided (v1.1) wheel-hosting process for the
+    first time: checked out `lekin-library`'s `v0.2.0` tag in detached
+    HEAD (resolves to commit `a3fee48` — the annotated tag object's own
+    SHA is `34c9cad`, distinct from the commit it points to; noted here
+    since it's easy to confuse the two), ran a clean `python -m build
+    --wheel`, verified the resulting wheel's contents (only `lekinpy/`
+    package files and `.dist-info`, no `docs`/`examples`/`tests`, matching
+    `pyproject.toml`'s exclusions) and that `__version__ == "0.2.0"`
+    inside it.
+  - Added `public/vendor/lekinpy-0.2.0-py3-none-any.whl` and
+    `public/vendor/lekinpy-0.2.0-py3-none-any.whl.sha256`
+    (`e374e3d33049513947a943383838227ec383a6f2e2e1356b85c9e8234c1eacea`)
+    to this repo.
+  - Fixed a stale commit hash in `ARCHITECTURE.md`'s "Pinned dependency"
+    line (`adf6e07` → `a3fee48`) — the original hash I recorded no longer
+    resolves in `lekin-library` (likely rewritten by history changes on
+    that repo, e.g. matplotlib becoming a core dependency and other
+    commits landing after the fact); the tag itself still points at the
+    same logical commit (same message, same content), just a different
+    hash. Updated §2.3 from "Decision" to "Done" now that the asset
+    actually exists.
+- Why: this was the last fully-specified, non-UI, cross-repo prerequisite
+  blocking the execution adapter (§2). No decision left to make here —
+  §2.3 (v1.1) already fixed the path convention, checksum requirement, and
+  replace process; this entry just executes it.
+- Alternatives considered / tradeoffs: none — implementation of an already
+  approved decision, not a new design choice. Built from `lekin-library`'s
+  tagged commit in detached HEAD specifically (rather than whatever
+  `master` happened to be at) so the wheel's provenance is unambiguous and
+  matches what `ARCHITECTURE.md` documents as pinned, even though `master`
+  has since moved further ahead with docs/example-only changes that don't
+  affect the installable package.
+- Tests added: none (build/packaging step, not application code). Verified
+  manually: wheel file listing, `__version__` string inside it, and the
+  SHA-256 checksum recorded alongside it.
+- Status: merged (this branch is small and mechanical; no open design
+  question to hold it in review for — flagging for your awareness rather
+  than blocking on review).

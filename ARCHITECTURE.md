@@ -36,7 +36,7 @@ drag-and-drop-logic contract for `lekin-web`. It does not contain UI code,
 styling, or layout — that is Codex's job, built against this document plus
 `PRODUCT_SPEC.md`.
 
-**Pinned dependency**: `lekinpy` `v0.2.0` (tag `v0.2.0`, commit `adf6e07` on
+**Pinned dependency**: `lekinpy` `v0.2.0` (tag `v0.2.0`, commit `a3fee48` on
 `lekin-library`'s `master`). Every schema and behavior claim below was
 verified by reading `lekinpy`'s actual source at that commit, not by
 assuming `PRODUCT_SPEC.md`'s placeholder shapes are correct. Where they
@@ -636,10 +636,15 @@ per PRODUCT_SPEC §11.
 
 ### 2.3 Decision: the wheel is a versioned same-origin static asset
 
+**Done**: `public/vendor/lekinpy-0.2.0-py3-none-any.whl` and its
+`.sha256` are in this repo (branch `chore/pin-lekinpy-wheel`), built from
+`lekin-library` commit `a3fee48` (tag `v0.2.0`). `micropip.install()`
+integration itself is still pending — that's part of building the
+execution adapter (§2.2) — but the asset it will load is in place.
+
 `lekinpy` is not published to PyPI (`pyproject.toml` has no publish target
-configured, and `dist/lekinpy-0.2.0-py3-none-any.whl` is a local,
-git-ignored build artifact today). Pyodide's `micropip.install()` needs a
-URL. Resolved as follows, rather than left open:
+configured). Pyodide's `micropip.install()` needs a URL. Resolved as
+follows, rather than left open:
 
 - The built wheel is checked into `lekin-web` at a version-stamped path:
   `public/vendor/lekinpy-0.2.0-py3-none-any.whl`. `BrowserExecutionAdapter`
