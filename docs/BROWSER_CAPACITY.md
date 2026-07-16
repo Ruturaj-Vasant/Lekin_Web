@@ -18,12 +18,12 @@ Measured on 2026-07-16 in headless Chromium on an Apple Silicon Mac using Node 2
 
 | Jobs | Operations | Machines | Workcenters | Import and initial render | Warm algorithm and Gantt update | DOM elements |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 25 | 100 | 20 | 10 | 66 ms | 37 to 60 ms | 4,484 |
-| 50 | 250 | 30 | 15 | 83 ms | 71 to 81 ms | 11,374 |
-| 80 | 400 | 40 | 20 | 169 ms | 106 to 117 ms | 19,964 |
-| 100 | 500 | 50 | 25 | 283 ms | 152 to 154 ms | 27,655 |
+| 25 | 100 | 20 | 10 | 53 ms | 49 to 54 ms | 6,275 |
+| 50 | 250 | 30 | 15 | 85 ms | 76 to 96 ms | 15,660 |
+| 80 | 400 | 40 | 20 | 189 ms | 118 to 141 ms | 26,772 |
+| 100 | 500 | 50 | 25 | 316 ms | 167 to 178 ms | 36,206 |
 
-The first run on a newly loaded page took 2.4 to 4.4 seconds because it includes downloading and initializing Pyodide and installing the pinned lekinpy wheel. That cold-start cost did not grow materially with problem size. Once initialized, scheduling itself took 7 to 30 ms across the tested cases. A precise start-time edit on the 500-operation schedule recalculated and rendered in 79 ms.
+The first run on a newly loaded page took 1.5 to 3.4 seconds when it overlapped unfinished background preparation. Once preparation completed, subsequent scheduling and Gantt updates took 49 to 178 ms. The execution runtime displayed by the app now measures the algorithm phase separately from Pyodide and wheel initialization. A precise start-time edit on the richer 500-operation Gantt recalculated and rendered in 102 ms.
 
 These figures are measurements from one machine, not guarantees for every browser or device. That is why the recommended range is lower than the tested hard ceiling.
 

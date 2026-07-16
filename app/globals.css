@@ -203,6 +203,55 @@
   .operation-editor>footer .editor-clear{grid-column:1/-1}
 }
 
+/* Gantt-first research workspace */
+.workspace{background:#f8f8fa}
+.app-body{grid-template-columns:340px minmax(0,1fr)}
+.canvas{padding:18px 20px 44px}
+.canvas-head{margin-bottom:12px}
+.canvas-head h1{font-size:20px}
+.gantt-card{border-color:#dedee7;border-radius:10px;box-shadow:0 1px 3px #20152c0a,0 8px 24px #20152c08}
+.gantt-head{min-height:78px;padding:15px 18px;gap:18px}
+.gantt-head h2{margin:5px 0 3px;font-size:19px}
+.gantt-head small{color:var(--muted);font-size:10px}
+.chart-toolbar{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.chart-toolbar button{height:32px;min-width:32px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:white;color:#4e4e57;font-size:11px;font-weight:600}
+.chart-toolbar button:hover{border-color:#cfc3d7;background:#faf7fc;color:var(--violet)}
+.chart-toolbar button[aria-pressed=true]{border-color:#c9aede;background:var(--violet-soft);color:var(--violet)}
+.chart-toolbar button:disabled{opacity:.35;cursor:default}
+.chart-toolbar strong{min-width:36px;text-align:center;color:var(--muted);font:600 9px var(--font-geist-mono)}
+.time-scale{margin-right:5px;padding:5px 8px;border-radius:5px;background:#f5f3f7;color:var(--muted);font-size:9px;font-weight:650;text-transform:uppercase;letter-spacing:.05em}
+.legend{min-height:42px;align-items:center;padding:0 18px;overflow-x:auto}
+.legend span{white-space:nowrap}
+.gantt{grid-template-columns:145px minmax(650px,1fr)}
+.machine-labels>span{height:72px;padding:9px 14px 8px 18px;justify-content:center}
+.machine-labels>span>b{font-size:11px}
+.machine-labels>span>small{font-size:8px}
+.machine-labels>span>em{margin-top:4px;color:var(--muted);font-size:8px;font-style:normal;font-weight:500}
+.machine-labels meter{width:100%;height:5px;margin-top:3px;border:0;background:#eee;border-radius:8px;overflow:hidden}
+.machine-labels meter::-webkit-meter-bar{height:5px;border:0;background:#eeeeF2;border-radius:8px}
+.machine-labels meter::-webkit-meter-optimum-value{background:#6eaa88;border-radius:8px}
+.grid-line-minor{background:#f0f0f4!important}
+.timeline .grid{z-index:0}
+.idle-layer{position:absolute;inset:0;z-index:1;pointer-events:none}
+.idle-segment{position:absolute;height:38px;display:grid;place-items:center;border:1px dashed #dedee5;border-radius:4px;background:repeating-linear-gradient(135deg,#fafafd,#fafafd 5px,#f3f3f7 5px,#f3f3f7 6px);color:#aaaab3;font:600 7px var(--font-geist-mono);font-style:normal;overflow:hidden;white-space:nowrap}
+.cursor-time{position:absolute;z-index:5;top:30px;bottom:0;width:1px;background:#70439b99;pointer-events:none}
+.cursor-time span{position:absolute;top:-26px;left:50%;transform:translateX(-50%);padding:3px 6px;border-radius:5px;background:var(--violet);color:white;font:700 8px var(--font-geist-mono)}
+.bar:hover,.bar:focus,.bar:focus-within{z-index:9;overflow:visible}
+.operation-hover-card{position:absolute;display:none;z-index:20;left:50%;top:46px;width:210px;padding:12px;transform:translateX(-50%);border:1px solid #ddd8e2;border-radius:7px;background:white;color:var(--ink);box-shadow:0 12px 28px #20152c2e;pointer-events:none}
+.bar:hover .operation-hover-card,.bar:focus .operation-hover-card,.bar:focus-within .operation-hover-card{display:block}
+.operation-hover-card>strong{display:block;font-size:11px}
+.operation-hover-card>span{display:block;margin-top:3px;color:var(--muted);font-size:9px;font-weight:400}
+.operation-hover-card dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0}
+.operation-hover-card dl div{display:block}
+.operation-hover-card dt{color:var(--muted);font-size:8px}
+.operation-hover-card dd{margin:2px 0 0;font-size:10px;font-weight:650}
+.metrics{grid-template-columns:repeat(6,minmax(0,1fr));border-radius:9px;box-shadow:0 1px 3px #20152c08}
+.metrics article{min-width:0;padding:13px 16px}
+.metrics strong{font-size:19px;margin:4px 0 0}
+.details-card{border-radius:9px}
+@media(max-width:1200px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.metrics article:nth-child(3){border-right:0}.metrics article:nth-child(-n+3){border-bottom:1px solid var(--line)}}
+@media(max-width:760px){.gantt-head{align-items:flex-start;flex-direction:column}.chart-toolbar{width:100%}.gantt{grid-template-columns:112px minmax(650px,1fr)}.machine-labels>span{padding-left:12px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics article:nth-child(odd){border-right:1px solid var(--line)}.metrics article:nth-child(even){border-right:0}.metrics article:nth-child(-n+4){border-bottom:1px solid var(--line)}}
+
 /* One shared numeric scale for ticks, grid lines, bars, and drag previews. */
 .timeline .ticks{position:relative;display:block;padding:0}
 .timeline .ticks span{position:absolute;top:50%;transform:translate(-50%,-50%)}
