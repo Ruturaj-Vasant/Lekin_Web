@@ -1061,4 +1061,6 @@ Each entry should follow this format:
   are not yet promoted into the always-visible top Metrics row. Algorithm
   comparison, persistence/import-export, and Gantt drag editing remain later
   milestones.
-- Status: independently accepted and ready to merge.
+- Delivery: merged to `main` as `780d5f7` and pushed to `origin/main`; no
+  co-author trailer was added.
+- Status: independently accepted, merged, pushed, and ready to publish.
