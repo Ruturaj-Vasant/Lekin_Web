@@ -332,3 +332,22 @@ Each entry should follow this format:
     bundles and report thousands of irrelevant findings.
   - Re-ran lint and the production build after cleanup.
 - Status: merged to `main` in merge commit `ed67632`.
+
+## [2026-07-15] Isolate the browser UI shell for parallel core development
+- Branch: `feat/browser-ui-shell`
+- Phase: 1, React/browser integration foundation
+- What changed:
+  - Split the original monolithic `app/page.tsx` into focused landing,
+    workspace, problem-sidebar, metrics, Gantt, and detail-tab components.
+  - Moved representative schedule data into an explicitly presentation-only
+    fixture module. It does not define or duplicate the shared schema and is
+    intended to be replaced by `ExecutionResult` once the core adapter lands.
+  - Added button types, navigation labels, tab semantics, selected-tab state,
+    and descriptive labels around chart controls and imported files.
+- Why: Claude is implementing framework-independent schema, registry, adapter,
+  and scheduling logic in parallel. Keeping this branch entirely under
+  `app/components/` gives the browser work a stable integration surface while
+  preventing either branch from editing the other's files.
+- Tests added: none; this is behavior-preserving component decomposition.
+- Status: in progress — must not merge until the core branch interfaces are
+  reviewed and the two branches are integrated deliberately.
