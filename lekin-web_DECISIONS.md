@@ -951,6 +951,33 @@ Each entry should follow this format:
   refreshed from the same verified source.
 - Status: verified, merged, pushed, and published.
 
+## [2026-07-16] Editable entity names and sidebar readability
+- Branch: `feat/editable-entity-names`, created from clean current `main`.
+- Reversed the earlier Problem Editor decision that kept Job, Workcenter, and
+  Machine IDs fixed after creation. The product owner explicitly requires users
+  to name these entities directly, so delete-and-recreate is no longer accepted
+  as the editing model.
+- Added cascade-safe immutable rename transitions:
+  - Job rename regenerates every derived `operationId` for that job;
+  - Workcenter rename updates its own ID plus every Machine and Operation
+    `workcenterId` reference;
+  - Machine rename updates its own ID plus every containing Workcenter's
+    `machineIds` list.
+- Exposed all three entity names as editable labeled inputs. Existing duplicate
+  ID and cross-reference validation remains the final defense against invalid
+  user input, while ordinary renames preserve references immediately.
+- Increased the operation-count, due-date, and weight summary text from tiny
+  muted metadata to 12 px semibold high-contrast text. Entity name inputs use
+  clear focus treatment and larger readable text.
+- Added three pure cascade tests and a browser flow that renames one Job,
+  Workcenter, and Machine and verifies dependent references and run eligibility.
+- Verification under Node 22.23.1: 130 unit and contract tests passed with four
+  opt-in skips; type checks, ESLint, and the production build passed; the full
+  Chromium suite passed all 12 implemented user flows with four explicitly
+  unbuilt product flows skipped. A Chromium screenshot was inspected to confirm
+  the larger metadata and editable job-name layout visually.
+- Status: verified on the feature branch and ready to merge and publish.
+
 ## [2026-07-15] Surface already-computed results data (Job Details, Machine Sequence, weighted metrics)
 - Branch: `feat/results-detail`, created from `main` (not from
   `feat/problem-editor`, which had already been independently reviewed and
