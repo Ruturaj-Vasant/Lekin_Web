@@ -36,7 +36,7 @@ drag-and-drop-logic contract for `lekin-web`. It does not contain UI code,
 styling, or layout — that is Codex's job, built against this document plus
 `PRODUCT_SPEC.md`.
 
-**Pinned dependency**: `lekinpy` `v0.2.0` (tag `v0.2.0`, commit `adf6e07` on
+**Pinned dependency**: `lekinpy` `v0.2.0` (tag `v0.2.0`, commit `a3fee48` on
 `lekin-library`'s `master`). Every schema and behavior claim below was
 verified by reading `lekinpy`'s actual source at that commit, not by
 assuming `PRODUCT_SPEC.md`'s placeholder shapes are correct. Where they
@@ -636,10 +636,15 @@ per PRODUCT_SPEC §11.
 
 ### 2.3 Decision: the wheel is a versioned same-origin static asset
 
+**Done**: `public/vendor/lekinpy-0.2.0-py3-none-any.whl` and its
+`.sha256` are in this repo (branch `chore/pin-lekinpy-wheel`), built from
+`lekin-library` commit `a3fee48` (tag `v0.2.0`). `micropip.install()`
+integration itself is still pending — that's part of building the
+execution adapter (§2.2) — but the asset it will load is in place.
+
 `lekinpy` is not published to PyPI (`pyproject.toml` has no publish target
-configured, and `dist/lekinpy-0.2.0-py3-none-any.whl` is a local,
-git-ignored build artifact today). Pyodide's `micropip.install()` needs a
-URL. Resolved as follows, rather than left open:
+configured). Pyodide's `micropip.install()` needs a URL. Resolved as
+follows, rather than left open:
 
 - The built wheel is checked into `lekin-web` at a version-stamped path:
   `public/vendor/lekinpy-0.2.0-py3-none-any.whl`. `BrowserExecutionAdapter`
@@ -649,13 +654,18 @@ URL. Resolved as follows, rather than left open:
 - A checksum file sits alongside it —
   `public/vendor/lekinpy-0.2.0-py3-none-any.whl.sha256` — and the adapter
   verifies it before `micropip.install()` (defense against a corrupted or
-  silently-replaced asset).
+  silently-replaced asset). Its format is exactly one lowercase,
+  64-character SHA-256 hex digest plus a trailing newline; it intentionally
+  omits a filename so the browser adapter can compare the fetched text
+  directly with the digest it computes from the wheel bytes.
 - **Replace process, documented here so it's not tribal knowledge**: (1) on
   `lekin-library`, build the wheel from the tagged commit
   (`python -m build`), (2) copy the resulting `.whl` into
   `lekin-web/public/vendor/`, replacing the old version-stamped file (never
   overwrite in place — old and new versions can coexist under different
-  filenames if a rollback is needed), (3) regenerate the `.sha256` file,
+  filenames if a rollback is needed), (3) regenerate the `.sha256` file in
+  the raw-digest format above (for example,
+  `shasum -a 256 <wheel> | awk '{print $1}' > <wheel>.sha256`),
   (4) update the `PINNED_LEKINPY_VERSION` constant the adapter reads the
   filename/checksum from, (5) record the bump in `lekin-web_DECISIONS.md`.
   This is a manual, deliberate step tied to a specific `lekin-library` tag
