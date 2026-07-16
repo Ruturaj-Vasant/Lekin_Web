@@ -1145,4 +1145,6 @@ Each entry should follow this format:
   library type checks, ESLint, and the production build passed. The complete
   Chromium suite passed all 11 implemented flows with four explicitly unbuilt
   product flows skipped.
-- Status: verified on the feature branch and ready to merge and publish.
+- Delivery: merged to `main` as `8283759`, pushed, and published privately
+  from that exact source. No co-author trailer was added.
+- Status: verified, merged, pushed, and published.
