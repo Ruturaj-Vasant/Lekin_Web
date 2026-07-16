@@ -628,7 +628,7 @@ Each entry should follow this format:
   lint, and production build passed. The real Playwright rerun executed all
   four algorithms on port 3000 and proved the FCFS and EDD rendered schedules
   differ from SPT while cancellation still works.
-- Status: verified and ready to merge.
+- Status: verified and merged to `main`.
 
 ## [2026-07-15] Browser execution adapter and first real schedule rendering
 - Branch: `feat/browser-execution-adapter`
