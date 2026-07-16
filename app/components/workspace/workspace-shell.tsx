@@ -204,7 +204,7 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     machineId: string,
     sequencePosition: number,
     requestedStartTime: number | null,
-  ): { accepted: boolean; message: string } {
+  ): { accepted: boolean; message: string; scheduledStartTime?: number } {
     if (!result?.schedule || !result.metrics) return { accepted: false, message: "Run an algorithm before editing the schedule." };
     const operation = findScheduledOperation(scheduledOperationId);
     if (!operation) return { accepted: false, message: `Operation ${scheduledOperationId} is not in the active schedule.` };
@@ -233,9 +233,16 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     setManualStartConstraints(recalculated.manualStartConstraints);
     setResult(nextResult);
     setResultFor({ problem, algorithmId: nextResult.algorithmId });
-    const message = `Moved ${scheduledOperationId} to ${machineId}, position ${sequencePosition + 1}.`;
+    const scheduledStartTime = nextResult.schedule?.machines.flatMap((item) => item.operations).find(
+      (item) => item.scheduledOperationId === scheduledOperationId,
+    )?.startTime;
+    const message = requestedStartTime !== null && scheduledStartTime !== undefined
+      ? scheduledStartTime === requestedStartTime
+        ? `Moved ${scheduledOperationId} from time ${operation.startTime} to ${scheduledStartTime}.`
+        : `Requested start ${requestedStartTime}; scheduled at ${scheduledStartTime} after precedence, machine order, and release constraints were recalculated.`
+      : `Moved ${scheduledOperationId} to ${machineId}, position ${sequencePosition + 1}.`;
     setDragMessage(message);
-    return { accepted: true, message };
+    return { accepted: true, message, scheduledStartTime };
   }
 
   function undoManualEdit() {
@@ -365,6 +372,7 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
             schedule={result?.schedule ?? null}
             problem={problem}
             dragMessage={dragMessage}
+            manualStartConstraints={manualStartConstraints}
             onCheckMove={checkManualMove}
             onMoveOperation={moveScheduledOperation}
           />
