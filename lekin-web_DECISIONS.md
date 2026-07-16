@@ -1085,4 +1085,6 @@ Each entry should follow this format:
 - Repository audit: before the change, local and remote branch lists both
   contained only `main`; every previously completed feature/review branch was
   already merged and removed.
-- Status: implemented and verified; awaiting merge and publication.
+- Delivery: merged to `main` and pushed to `origin/main` with no co-author
+  trailer; the private hosted build was refreshed from the same source.
+- Status: verified, merged, pushed, and published.
