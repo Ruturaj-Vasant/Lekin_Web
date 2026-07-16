@@ -610,6 +610,41 @@ Each entry should follow this format:
 - Status: both completed feature branches are merged to `main`; combined
   non-browser verification and private publication are complete.
 
+## [2026-07-15] Playwright end-to-end browser test foundation
+- Branch: `test/e2e-playwright` (not merged)
+- Phase: cross-cutting browser verification
+- What changed:
+  - Added Playwright Test with a Chromium project and a production-server
+    harness. The suite builds and starts the vinext application itself, uses
+    one deterministic worker, and retains traces, screenshots, and video only
+    when a test fails.
+  - Added fast tests for landing content, sample-workspace navigation,
+    algorithm registry options, empty-result states, detail tabs, return
+    navigation, and keyboard activation.
+  - Added a real—not mocked—browser execution test. It cold-loads Pyodide in
+    the Web Worker, observes the pinned wheel and checksum requests, executes
+    SPT, FCFS, EDD, and WSPT, and checks the rendered eight operations,
+    non-empty metrics, validation state, and execution details after every
+    run. A separate test verifies cancellation returns the UI to a runnable
+    state.
+  - Added explicit `fixme` specifications for the product flows that do not
+    exist yet: editing, import/export, persistence, comparisons, and Gantt
+    drag-and-drop. These serve as a visible acceptance backlog and prevent the
+    test report from implying those controls are functional.
+- Why: unit and fixture tests establish scheduling correctness, but they do
+  not prove that the production bundle, Worker, CDN runtime, wheel integrity
+  check, React state, and rendered results compose successfully in a browser.
+- Verification:
+  - The first run correctly exposed three overly strict text locators while
+    simultaneously proving that real SPT execution completed and rendered a
+    makespan of 29 with all eight operations. The locators were corrected to
+    assert the status component rather than a text-node implementation detail.
+  - Final run: 6 implemented browser flows passed; 6 future product flows were
+    explicitly skipped as `fixme`; all four algorithms executed through real
+    Pyodide with no browser console or page errors.
+- Status: test foundation complete on its feature branch; awaiting the
+  Problem Editor branch so the first two `fixme` flows can be implemented.
+
 ## [2026-07-15] Browser execution adapter and first real schedule rendering
 - Branch: `feat/browser-execution-adapter`
 - Phase: 1, browser execution integration (not merged)
