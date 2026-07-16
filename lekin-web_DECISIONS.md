@@ -248,3 +248,29 @@ Each entry should follow this format:
 - Tests added: none (architecture-only pass); the implementation acceptance
   tests are specified in §4.7.
 - Status: in review — ready for final user approval before implementation.
+
+## [2026-07-15] Phase 1 UI foundation: landing screen and workspace shell
+- Branch: `feat/workspace-shell`
+- Phase: 1, first visual implementation milestone
+- What changed:
+  - Replaced the generic starter preview with the LEKIN Lab landing screen and
+    a responsive, desktop-first scheduling workspace shell.
+  - Established the approved neutral visual system: warm off-white canvas,
+    white work surfaces, restrained NYU violet accents, compact typography,
+    muted semantic colors, and dense research-tool information hierarchy.
+  - Added static but representative views for problem setup, algorithm choice,
+    schedule metrics, a read-only machine Gantt chart, machine sequence, and
+    the remaining detail tabs so later functionality has clear component
+    boundaries to plug into.
+  - Added only safe shell interactions: entering/leaving the workspace,
+    selecting detail tabs, expanding setup sections, and invoking the native
+    file chooser. No scheduling result is fabricated by an execution adapter.
+  - Updated project metadata, favicon, package identity, and README.
+- Boundary deliberately preserved: this branch does not implement Pyodide,
+  schema/registry wiring, schedule execution, persistence, or Gantt
+  drag-and-drop. Those remain separate milestones governed by
+  `ARCHITECTURE.md`.
+- Verification: ESLint passes; the production vinext build completes; the
+  development server returns HTTP 200 and server-renders the LEKIN landing
+  content.
+- Status: implemented, awaiting review before merge.
