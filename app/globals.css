@@ -209,3 +209,6 @@
 .timeline .ticks .tick-last{transform:translate(-100%,-50%)}
 .timeline .grid{background:none}
 .grid-line{position:absolute;top:0;bottom:0;width:1px;background:#eee;pointer-events:none}
+.timeline .grid{z-index:3;pointer-events:none}
+.timeline .grid-line{background:#dedee4}
+.timeline .bar{z-index:2}
