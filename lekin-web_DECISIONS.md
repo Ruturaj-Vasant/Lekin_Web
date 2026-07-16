@@ -617,7 +617,9 @@ Each entry should follow this format:
   - Added Playwright Test with a Chromium project and a production-server
     harness. The suite builds and starts the vinext application itself, uses
     one deterministic worker, and retains traces, screenshots, and video only
-    when a test fails.
+    when a test fails. `PLAYWRIGHT_BASE_URL` can target an already-running
+    server, which allowed the exact localhost instance reported by a user to
+    be distinguished from a clean-build result.
   - Added fast tests for landing content, sample-workspace navigation,
     algorithm registry options, empty-result states, detail tabs, return
     navigation, and keyboard activation.
@@ -642,6 +644,11 @@ Each entry should follow this format:
   - Final run: 6 implemented browser flows passed; 6 future product flows were
     explicitly skipped as `fixme`; all four algorithms executed through real
     Pyodide with no browser console or page errors.
+  - Follow-up diagnosis found a stale localhost production process serving
+    HTML whose hashed JavaScript asset no longer existed after another build
+    replaced `dist/`. The same tests failed against that exact server before
+    workspace navigation, then passed 2/2 against a clean isolated `main`
+    server on the same port after restart.
 - Status: test foundation complete on its feature branch; awaiting the
   Problem Editor branch so the first two `fixme` flows can be implemented.
 
