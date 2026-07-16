@@ -152,6 +152,7 @@ export function ProblemSidebar({
                     <select
                       value={operation.workcenterId}
                       disabled={running}
+                      aria-label={`Workcenter for operation ${operation.operationIndex}`}
                       onChange={(event) =>
                         dispatch({
                           type: "updateOperation",
@@ -204,7 +205,7 @@ export function ProblemSidebar({
                       </button>
                       <button
                         type="button"
-                        aria-label="Remove operation"
+                        aria-label={`Remove ${job.jobId} operation ${operation.operationIndex}`}
                         disabled={running}
                         onClick={() => dispatch({ type: "removeOperation", jobId: job.jobId, operationIndex: operation.operationIndex })}
                       >
@@ -229,6 +230,7 @@ export function ProblemSidebar({
                 className="remove-button"
                 type="button"
                 disabled={running}
+                aria-label={`Delete job ${job.jobId}`}
                 onClick={() => dispatch({ type: "removeJob", jobId: job.jobId })}
               >
                 Delete job
@@ -274,6 +276,7 @@ export function ProblemSidebar({
                   className="remove-button"
                   type="button"
                   disabled={running}
+                  aria-label={`Delete workcenter ${wc.workcenterId}`}
                   onClick={() => dispatch({ type: "removeWorkcenter", workcenterId: wc.workcenterId })}
                 >
                   ✕
@@ -303,6 +306,7 @@ export function ProblemSidebar({
                 <select
                   value={machine.workcenterId}
                   disabled={running}
+                  aria-label={`Workcenter for machine ${machine.machineId}`}
                   onChange={(event) => dispatch({ type: "updateMachine", machineId: machine.machineId, patch: { workcenterId: event.target.value } })}
                 >
                   {problem.workcenters.map((wc) => (
@@ -332,6 +336,7 @@ export function ProblemSidebar({
                   className="remove-button"
                   type="button"
                   disabled={running}
+                  aria-label={`Delete machine ${machine.machineId}`}
                   onClick={() => dispatch({ type: "removeMachine", machineId: machine.machineId })}
                 >
                   ✕

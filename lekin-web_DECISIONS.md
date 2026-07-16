@@ -884,3 +884,50 @@ Each entry should follow this format:
   - `lekin-library` untouched, as required.
 - Status: implemented on `feat/problem-editor`, not merged, not pushed, not
   deleted — ready for independent Codex review.
+
+## [2026-07-16] Independent Problem Editor review and browser acceptance
+- Branch: `feat/problem-editor`
+- Integration reviewed: merged current `main` (including the corrected
+  comparison sample) and `test/e2e-playwright` into the editor branch. The
+  only source conflict was this persistent log; all historical entries were
+  retained.
+- Review result: the pure reducer and React wiring match the documented
+  scope. The live `ProblemDefinition` is passed to the execution adapter;
+  machine/workcenter membership is updated on both sides; operation order
+  changes reindex identifiers; blocking validation controls Run; and an
+  existing result is cleared immediately when either the problem or selected
+  algorithm changes.
+- Review correction: operation and machine workcenter selects, plus entity
+  delete buttons, did not have entity-specific accessible names. Added those
+  names so screen-reader/keyboard users and browser automation can identify
+  the exact operation, job, workcenter, or machine being changed. No domain
+  behavior changed.
+- Browser acceptance added:
+  - create and edit a fourth job, add/reorder/remove operations, observe
+    `EMPTY_OPERATIONS` and `NON_POSITIVE_PROCESSING_TIME` inline and in the
+    Validation tab, repair the problem, then execute it through real Pyodide
+    and render all nine operations;
+  - add a workcenter, observe `EMPTY_MACHINE_LIST`, add and move a machine
+    into it, delete it, delete a referenced workcenter, and observe the
+    expected `MISSING_WORKCENTER_REFERENCE` blocking state;
+  - execute a schedule, edit processing time, prove the old Gantt/metrics
+    clear immediately, rerun, change algorithms, prove the result clears
+    again, and rerun to a real FCFS result.
+  These replace the first two editor `fixme` placeholders. Import/export,
+  persistence, comparison history, and Gantt drag-and-drop remain explicit
+  skipped backlog items because those product capabilities do not exist yet.
+- Independent verification under Node 22:
+  - 121 unit/contract tests passed; four opt-in tests skipped in the general
+    run, then the same four registry-drift tests passed live against
+    `../lekin-library`;
+  - library TypeScript checking, ESLint, fixture reproduction, and the
+    production vinext build passed;
+  - 9 implemented Chromium end-to-end flows passed, including all four real
+    lekinpy algorithms, cancellation, editor validation, custom-problem
+    execution, and stale-result reruns; four not-yet-built product flows were
+    explicitly skipped;
+  - visual QA at 1440×1000 confirmed the real Gantt renders eight operations
+    across four machine lanes with the expected metrics and machine sequence
+    table, without clipping or overlap.
+- Status: independently accepted; ready to commit, merge to `main`, push, and
+  publish.
