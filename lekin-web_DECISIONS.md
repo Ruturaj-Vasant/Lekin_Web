@@ -247,7 +247,7 @@ Each entry should follow this format:
     request because of precedence or machine constraints.
 - Tests added: none (architecture-only pass); the implementation acceptance
   tests are specified in §4.7.
-- Status: in review — ready for final user approval before implementation.
+- Status: approved and merged to `main` in architecture merge `6861d5c`.
 
 ## [2026-07-15] Pin the lekinpy v0.2.0 wheel per ARCHITECTURE.md §2.3
 - Branch: `chore/pin-lekinpy-wheel`
@@ -295,7 +295,7 @@ Each entry should follow this format:
   also compared byte-for-byte with the `v0.2.0` tag. The checksum format is
   now explicit in `ARCHITECTURE.md` so browser verification and future wheel
   replacement use the same contract.
-- Status: independently tested and approved for merge.
+- Status: merged to `main` in merge commit `0c9cf9a`.
 
 ## [2026-07-15] Phase 1 UI foundation: landing screen and workspace shell
 - Branch: `feat/workspace-shell`
@@ -331,4 +331,4 @@ Each entry should follow this format:
     this, running the local server caused ESLint to scan generated vendor
     bundles and report thousands of irrelevant findings.
   - Re-ran lint and the production build after cleanup.
-- Status: independently reviewed and approved for merge.
+- Status: merged to `main` in merge commit `ed67632`.
