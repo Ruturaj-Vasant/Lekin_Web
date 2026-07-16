@@ -10,6 +10,7 @@ type LandingScreenProps = {
   recentProjects: ProjectSummary[];
   onOpenProject: (problemId: string) => void;
   onDeleteProject: (problemId: string) => void;
+  onImportFile: (file: File) => void;
   notice?: string | null;
 };
 
@@ -30,6 +31,7 @@ export function LandingScreen({
   recentProjects,
   onOpenProject,
   onDeleteProject,
+  onImportFile,
   notice,
 }: LandingScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null);
@@ -70,15 +72,19 @@ export function LandingScreen({
           type="button"
           onClick={() => fileInput.current?.click()}
         >
-          ↑ Import a LEKIN or JSON file
+          ↑ Import a LEKIN Lab JSON file
         </button>
         <input
           ref={fileInput}
           type="file"
-          accept=".json,.job,.mch,.seq"
+          accept=".json,.lekin.json,application/json"
           hidden
-          aria-label="Import a LEKIN or JSON file"
-          onChange={onOpenExample}
+          aria-label="Import a LEKIN Lab JSON file"
+          onChange={(event) => {
+            const file = event.currentTarget.files?.[0];
+            if (file) onImportFile(file);
+            event.currentTarget.value = "";
+          }}
         />
       </section>
 

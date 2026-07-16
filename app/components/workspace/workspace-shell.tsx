@@ -21,10 +21,12 @@ import { GanttChart } from "./gantt-chart";
 import { MetricsRow } from "./metrics-row";
 import { ProblemSidebar } from "./problem-sidebar";
 import { ScheduleSummary } from "./schedule-summary";
+import { downloadProblemFile, readProblemFile } from "../../import-export/browser-problem-files";
 
 export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: ProblemDefinition; onClose: () => void }) {
   const engine = useRef<BrowserExecutionEngine | null>(null);
   const activeExecution = useRef<string | null>(null);
+  const importInput = useRef<HTMLInputElement | null>(null);
   const [problem, dispatch] = useReducer(problemEditorReducer, initialProblem);
   const [algorithmId, setAlgorithmId] = useState("spt");
   const [result, setResult] = useState<ExecutionResult | null>(null);
@@ -135,9 +137,9 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     setProgress(null);
   }
 
-  function createNewProblem() {
+  function replaceProblem(nextProblem: ProblemDefinition) {
     cancel();
-    dispatch({ type: "replaceProblem", problem: createBlankProblem() });
+    dispatch({ type: "replaceProblem", problem: nextProblem });
     setAlgorithmId("spt");
     setResult(null);
     setResultFor(null);
@@ -148,6 +150,20 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     setRedoStack([]);
     setDragMessage(null);
     setSidebarCollapsed(false);
+  }
+
+  function createNewProblem() {
+    replaceProblem(createBlankProblem());
+  }
+
+  async function importProblemFile(file: File) {
+    const imported = await readProblemFile(file);
+    if (imported.ok) {
+      replaceProblem(imported.problem);
+      setSaveFeedback(`Imported ${imported.problem.name}.`);
+    } else {
+      setSaveFeedback(`Import failed: ${imported.message}`);
+    }
   }
 
   function selectComparisonResult(selected: ExecutionResult) {
@@ -273,12 +289,27 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
         </div>
         <div className="app-actions">
           <button type="button" onClick={createNewProblem}>＋ New</button>
-          <button type="button">⇧ Import</button>
+          <button type="button" onClick={() => importInput.current?.click()}>⇧ Import</button>
+          <input
+            ref={importInput}
+            type="file"
+            accept=".json,.lekin.json,application/json"
+            aria-label="Import a LEKIN Lab JSON file"
+            hidden
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              if (file) void importProblemFile(file);
+              event.currentTarget.value = "";
+            }}
+          />
           <button type="button" onClick={saveLocally}>⤓ Save locally</button>
           {saveFeedback && (
             <span className="save-feedback" role="status">{saveFeedback}</span>
           )}
-          <button type="button">↓ Export</button>
+          <button type="button" onClick={() => {
+            downloadProblemFile(problem);
+            setSaveFeedback("Problem exported.");
+          }}>↓ Export</button>
           <button type="button" onClick={undoManualEdit} disabled={undoStack.length === 0}>↶ Undo</button>
           <button type="button" onClick={redoManualEdit} disabled={redoStack.length === 0}>↷ Redo</button>
           <button type="button" onClick={resetManualEdits} disabled={!manualBaseResult || undoStack.length === 0}>Reset schedule</button>
