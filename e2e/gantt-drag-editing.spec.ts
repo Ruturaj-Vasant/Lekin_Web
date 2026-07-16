@@ -6,6 +6,28 @@ async function dragToLane(source: Locator, lane: Locator, x: number) {
 }
 
 test.describe("manual Gantt editing", () => {
+  test("aligns a time-9 operation with the time-9 tick and grid line", async ({ page }) => {
+    test.setTimeout(150_000);
+    await openExample(page);
+    await page.getByRole("button", { name: "Run schedule" }).click();
+    await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+
+    await page.getByLabel("Edit J-102-O0").click();
+    const dialog = page.getByRole("dialog", { name: "J-102 · Operation 1" });
+    await dialog.getByLabel("Requested start time").fill("9");
+    await dialog.getByRole("button", { name: "Apply change" }).click();
+    await expect(page.getByRole("status")).toContainText(/Moved J-102-O0 from time \d+ to 9/);
+
+    const barBox = await page.getByLabel("Drag J-102-O0").boundingBox();
+    const tickBox = await page.locator('.ticks [data-time="9"]').boundingBox();
+    const lineBox = await page.locator('.grid-line[data-time="9"]').boundingBox();
+    expect(barBox).not.toBeNull();
+    expect(tickBox).not.toBeNull();
+    expect(lineBox).not.toBeNull();
+    expect(Math.abs(barBox!.x - (tickBox!.x + tickBox!.width / 2))).toBeLessThan(1.5);
+    expect(Math.abs(barBox!.x - lineBox!.x)).toBeLessThan(1.5);
+  });
+
   test("edits an exact start time by right-click and clears it with undo support", async ({ page }) => {
     test.setTimeout(150_000);
     await openExample(page);
