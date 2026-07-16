@@ -947,4 +947,6 @@ Each entry should follow this format:
   unit tests passed with four opt-in skips; TypeScript, ESLint, production
   build, and all 9 implemented Chromium acceptance flows passed (four
   not-yet-built product flows remain explicitly skipped).
-- Status: verified and ready to merge.
+- Delivery: merged to `main` and pushed to `origin/main`. The hosted build was
+  refreshed from the same verified source.
+- Status: verified, merged, pushed, and published.
