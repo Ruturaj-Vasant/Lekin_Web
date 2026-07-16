@@ -308,7 +308,7 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             ref={importInput}
             type="file"
             accept=".json,.lekin.json,application/json"
-            aria-label="Import a LEKIN Lab JSON file"
+            aria-label="Import a LEKIN JSON file"
             hidden
             onChange={(event) => {
               const file = event.currentTarget.files?.[0];

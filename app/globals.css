@@ -224,7 +224,7 @@
 .legend{min-height:42px;align-items:center;padding:0 18px;overflow-x:auto}
 .legend span{white-space:nowrap}
 .gantt{grid-template-columns:132px minmax(650px,1fr)}
-.gantt .timeline{width:100%;margin-left:0}
+.gantt .timeline{width:auto;margin-left:0;margin-right:16px}
 .gantt .machine-labels{border-right:0}
 .machine-labels>span{height:72px;padding:9px 14px 8px 18px;justify-content:center}
 .machine-labels>span>b{font-size:11px}
@@ -268,3 +268,37 @@
 .timeline .bar{z-index:4}
 .timeline .bar:hover,.timeline .bar:focus,.timeline .bar:focus-within{z-index:100}
 .timeline .operation-hover-card{z-index:101}
+
+/* Targeted readability without changing Gantt row geometry. */
+:root{--muted:#50515a}
+.project small{font:600 13px var(--font-geist-sans);letter-spacing:0;color:#3f414a}
+.app-actions button{font-size:13px;font-weight:600;color:#3f414a}
+.canvas-head p{font-size:14px;font-weight:500;color:var(--muted)}
+.gantt-head small{font-size:13px;font-weight:600;color:var(--muted)}
+.operation-heading strong{font-size:13px;font-weight:700}
+.machine-labels>span{padding:5px 12px 5px 16px}
+.machine-labels>span>b{font-size:12px}
+.machine-labels>span>small{margin-top:2px;font-size:10px;font-weight:600;color:var(--muted)}
+.machine-labels>span>em{margin-top:2px;font-size:10px;font-weight:650;color:var(--muted)}
+.machine-labels meter{margin-top:2px}
+.tabs button{padding:15px 14px 13px;font-size:13px;font-weight:600}
+.tabs button span{font-size:11px}
+.schedule-summary>header{align-items:center;padding:22px 24px 18px}
+.schedule-summary .section-kicker{font-size:12px}
+.schedule-summary h2{font-size:20px}
+.schedule-summary header p{font-size:13px;font-weight:500}
+.schedule-summary code{font-size:12px}
+.summary-grid article{min-height:98px;padding:20px 24px;gap:6px 16px}
+.summary-grid article>span{font-size:15px}
+.summary-grid article>span sub{font-size:.72em;line-height:0;vertical-align:sub}
+.summary-grid article>strong{font-size:28px}
+.summary-grid article>small{font-size:13px;font-weight:500;color:var(--muted)}
+.tab-empty{padding:24px;font-size:14px;font-weight:500;line-height:1.55;color:var(--muted)}
+.sidebar>.field-label{gap:9px;font-size:12px;font-weight:700}
+.sidebar>.field-label>input{height:44px;padding:10px 12px;font-size:15px;font-weight:600}
+.sidebar>details{padding:17px 0}
+.sidebar>details>summary{font-size:15px;font-weight:700}
+.sidebar>details>summary em{padding:3px 8px;font-size:12px;font-weight:700}
+.sidebar>details>summary b{font-size:17px;color:var(--muted)}
+.sidebar>details>.field-label{gap:9px;margin-top:14px;font-size:12px;font-weight:700}
+.sidebar>details>.field-label>select{height:44px;padding:10px 12px;font-size:14px;font-weight:600}

@@ -34,7 +34,7 @@ test.describe("real in-browser scheduling", () => {
       await page.getByRole("button", { name: "Run schedule" }).click();
       await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
       await expect(page.locator(".bar")).toHaveCount(8);
-      await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).not.toHaveText("-");
+      await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).not.toHaveText("-");
       scheduleFingerprints.set(id, await page.locator(".bar").evaluateAll((bars) => bars.map((bar) => {
         const element = bar as HTMLElement;
         return `${element.innerText}|${element.style.left}|${element.style.top}`;
@@ -73,11 +73,11 @@ test.describe("real in-browser scheduling", () => {
 
     const summary = page.locator(".schedule-summary");
     const expectedSummary = new Map([
-      ["Time", "0"], ["C_max", "16"], ["T_max", "0"], ["ΣU_j", "0"],
-      ["ΣC_j", "40"], ["ΣT_j", "0"], ["ΣwC_j", "75"], ["ΣwT_j", "0"],
+      ["timeStart", "0"], ["makespan", "16"], ["maxTardiness", "0"], ["tardyJobCount", "0"],
+      ["totalCompletionTime", "40"], ["totalTardiness", "0"], ["weightedCompletionTime", "75"], ["weightedTardiness", "0"],
     ]);
-    for (const [symbol, value] of expectedSummary) {
-      const item = summary.locator("article").filter({ hasText: symbol });
+    for (const [metric, value] of expectedSummary) {
+      const item = summary.locator(`article[data-metric="${metric}"]`);
       await expect(item.locator("strong")).toHaveText(value);
     }
 
@@ -128,7 +128,7 @@ test.describe("real in-browser scheduling", () => {
     // Selecting an earlier comparison restores its complete visible result.
     await sptRow.getByRole("button", { name: "SPT" }).click();
     await expect(algorithm).toHaveValue("spt");
-    await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).toContainText("16");
+    await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).toContainText("16");
     await page.getByRole("tab", { name: "Execution" }).click();
     await expect(details.getByText(/^SPT completed locally/)).toBeVisible();
 

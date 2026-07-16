@@ -7,9 +7,7 @@ export function Brand({ asButton = false, onClick }: BrandProps) {
   const content = (
     <>
       <span className="brand-mark">L</span>
-      <span>
-        LEKIN <b>Lab</b>
-      </span>
+      <span>LEKIN</span>
     </>
   );
 
@@ -22,7 +20,7 @@ export function Brand({ asButton = false, onClick }: BrandProps) {
   }
 
   return (
-    <a className="brand" href="#" aria-label="LEKIN Lab home">
+    <a className="brand" href="#" aria-label="LEKIN home">
       {content}
     </a>
   );

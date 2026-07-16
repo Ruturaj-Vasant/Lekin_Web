@@ -1,18 +1,19 @@
 import type { Metrics } from "../../../lib/schema/schedule";
+import type { ReactNode } from "react";
 
 const SUMMARY_FIELDS: Array<{
   key: keyof Pick<Metrics, "timeStart" | "makespan" | "maxTardiness" | "tardyJobCount" | "totalCompletionTime" | "totalTardiness" | "weightedCompletionTime" | "weightedTardiness">;
-  symbol: string;
+  symbol: ReactNode;
   label: string;
 }> = [
   { key: "timeStart", symbol: "Time", label: "Schedule start" },
-  { key: "makespan", symbol: "C_max", label: "Makespan" },
-  { key: "maxTardiness", symbol: "T_max", label: "Maximum tardiness" },
-  { key: "tardyJobCount", symbol: "ΣU_j", label: "Tardy jobs" },
-  { key: "totalCompletionTime", symbol: "ΣC_j", label: "Total completion" },
-  { key: "totalTardiness", symbol: "ΣT_j", label: "Total tardiness" },
-  { key: "weightedCompletionTime", symbol: "ΣwC_j", label: "Weighted completion" },
-  { key: "weightedTardiness", symbol: "ΣwT_j", label: "Weighted tardiness" },
+  { key: "makespan", symbol: <>C<sub>max</sub></>, label: "Makespan" },
+  { key: "maxTardiness", symbol: <>T<sub>max</sub></>, label: "Maximum tardiness" },
+  { key: "tardyJobCount", symbol: <>ΣU<sub>j</sub></>, label: "Tardy jobs" },
+  { key: "totalCompletionTime", symbol: <>ΣC<sub>j</sub></>, label: "Total completion" },
+  { key: "totalTardiness", symbol: <>ΣT<sub>j</sub></>, label: "Total tardiness" },
+  { key: "weightedCompletionTime", symbol: <>ΣwC<sub>j</sub></>, label: "Weighted completion" },
+  { key: "weightedTardiness", symbol: <>ΣwT<sub>j</sub></>, label: "Weighted tardiness" },
 ];
 
 export function ScheduleSummary({ metrics }: { metrics: Metrics | null }) {
@@ -27,7 +28,7 @@ export function ScheduleSummary({ metrics }: { metrics: Metrics | null }) {
       </header>
       <div className="summary-grid">
         {SUMMARY_FIELDS.map((field) => (
-          <article key={field.key}>
+          <article key={field.key} data-metric={field.key}>
             <span>{field.symbol}</span>
             <strong>{metrics ? metrics[field.key] : "-"}</strong>
             <small>{field.label}</small>
