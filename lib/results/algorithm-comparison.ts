@@ -1,4 +1,5 @@
 import type { ExecutionResult } from "../schema/algorithm";
+import { getAlgorithmDefinition } from "../registry";
 
 export const COMPARISON_METRICS = [
   "makespan",
@@ -17,6 +18,7 @@ export interface AlgorithmComparisonRow {
   totalTardiness: number | null;
   weightedTardiness: number | null;
   totalCompletionTime: number | null;
+  limitations: string[];
 }
 
 export interface AlgorithmComparisonResult {
@@ -36,16 +38,27 @@ export interface AlgorithmComparisonResult {
  * invariant) and is excluded from bestByMetric but still shown as a row.
  */
 export function buildAlgorithmComparison(results: readonly ExecutionResult[]): AlgorithmComparisonResult {
-  const rows: AlgorithmComparisonRow[] = results.map((result) => ({
-    algorithmId: result.algorithmId,
-    status: result.status,
-    feasible: result.status === "completed",
-    runtimeMs: result.runtimeMs,
-    makespan: result.metrics?.makespan ?? null,
-    totalTardiness: result.metrics?.totalTardiness ?? null,
-    weightedTardiness: result.metrics?.weightedTardiness ?? null,
-    totalCompletionTime: result.metrics?.totalCompletionTime ?? null,
-  }));
+  const rows: AlgorithmComparisonRow[] = results.map((result) => {
+    const definition = getAlgorithmDefinition(result.algorithmId);
+    const limitations = definition
+      ? [
+          ...(!definition.supportsWeights ? ["Ignores job weights"] : []),
+          ...(!definition.supportsReleaseTimes ? ["Ignores release times"] : []),
+          ...(!definition.libraryMetadata.supportsMultiOperation ? ["Single-operation jobs only"] : []),
+        ]
+      : ["Registry metadata unavailable"];
+    return {
+      algorithmId: result.algorithmId,
+      status: result.status,
+      feasible: result.status === "completed",
+      runtimeMs: result.runtimeMs,
+      makespan: result.metrics?.makespan ?? null,
+      totalTardiness: result.metrics?.totalTardiness ?? null,
+      weightedTardiness: result.metrics?.weightedTardiness ?? null,
+      totalCompletionTime: result.metrics?.totalCompletionTime ?? null,
+      limitations,
+    };
+  });
 
   const bestByMetric: AlgorithmComparisonResult["bestByMetric"] = {};
   for (const metric of COMPARISON_METRICS) {

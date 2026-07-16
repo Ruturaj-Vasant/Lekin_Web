@@ -1280,3 +1280,30 @@ Each entry should follow this format:
   pending the separate persistence milestone).
 - Status: implemented on `feat/algorithm-comparison`, not merged, not
   pushed, not deleted.
+
+## [2026-07-16] Codex review completion for algorithm comparison
+- Reviewed `3c24559` independently after merging current `main` into the
+  isolated feature worktree. The history replacement, same-problem scoping,
+  feasible-only best-value selection, and real Pyodide comparison results were
+  correct.
+- Blocking gap found: the handoff explicitly left comparison rows read-only,
+  despite the accepted task requiring users to select an earlier run and show
+  its Gantt chart and details. Added selectable algorithm buttons, active-row
+  highlighting, and full restoration of the selected run's algorithm picker,
+  Gantt, top metrics, schedule summary, machine/job details, and execution tab.
+- Second acceptance gap closed: PRODUCT_SPEC section 19 requires algorithm
+  limitations. Added a registry-derived Limitations column. The current
+  FCFS/SPT/EDD definitions state that they ignore job weights; WSPT reports no
+  limitation. The values come from the versioned registry rather than duplicated
+  UI constants.
+- Extended real-browser coverage to select the earlier SPT result after FCFS,
+  verify the picker and makespan restore to SPT, verify SPT execution details,
+  and confirm rerunning still replaces rather than duplicates its row. Added a
+  unit test for registry-derived limitations.
+- Verification under Node 22.23.1: 143 unit and contract tests passed with four
+  opt-in skips; type checks, ESLint, and the production build passed; the full
+  Chromium suite passed all 15 implemented flows with three explicitly unbuilt
+  product flows skipped. The rendered comparison table was inspected from the
+  Chromium run and the selected SPT row, restored metrics, and limitations were
+  visually coherent.
+- Status: independently accepted and ready to merge and publish.

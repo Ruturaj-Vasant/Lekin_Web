@@ -11,6 +11,7 @@ type Props = {
   validationIssues: ValidationIssue[];
   problem: ProblemDefinition;
   comparisonResults: ExecutionResult[];
+  onSelectComparisonResult: (result: ExecutionResult) => void;
 };
 
 const METRIC_LABELS: Record<ComparisonMetric, string> = {
@@ -20,7 +21,7 @@ const METRIC_LABELS: Record<ComparisonMetric, string> = {
   totalCompletionTime: "Total completion",
 };
 
-export function DetailTabs({ result, validationIssues, problem, comparisonResults }: Props) {
+export function DetailTabs({ result, validationIssues, problem, comparisonResults, onSelectComparisonResult }: Props) {
   const [activeTab, setActiveTab] = useState("Machine sequence");
   const schedule = result?.schedule ?? null;
   const errorCount = validationIssues.filter((issue) => issue.severity === "error").length;
@@ -81,6 +82,7 @@ export function DetailTabs({ result, validationIssues, problem, comparisonResult
               <th>Algorithm</th>
               <th>Status</th>
               <th>Runtime</th>
+              <th>Limitations</th>
               {COMPARISON_METRICS.map((metric) => (
                 <th key={metric}>{METRIC_LABELS[metric]}</th>
               ))}
@@ -88,10 +90,23 @@ export function DetailTabs({ result, validationIssues, problem, comparisonResult
           </thead>
           <tbody>
             {comparisonRows.map((row) => (
-              <tr key={row.algorithmId}>
-                <td>{row.algorithmId.toUpperCase()}</td>
+              <tr key={row.algorithmId} className={result?.algorithmId === row.algorithmId ? "comparison-active" : undefined}>
+                <td>
+                  <button
+                    type="button"
+                    className="comparison-select"
+                    aria-pressed={result?.algorithmId === row.algorithmId}
+                    onClick={() => {
+                      const selected = comparisonResults.find((candidate) => candidate.algorithmId === row.algorithmId);
+                      if (selected) onSelectComparisonResult(selected);
+                    }}
+                  >
+                    {row.algorithmId.toUpperCase()}
+                  </button>
+                </td>
                 <td className={row.feasible ? "success-text" : "issue-warning"}>{row.status}</td>
                 <td>{row.runtimeMs} ms</td>
+                <td>{row.limitations.length ? row.limitations.join(", ") : "None"}</td>
                 {COMPARISON_METRICS.map((metric) => (
                   <td key={metric} className={bestByMetric[metric] === row.algorithmId ? "success-text" : undefined}>
                     {row[metric] === null ? "n/a" : row[metric]}

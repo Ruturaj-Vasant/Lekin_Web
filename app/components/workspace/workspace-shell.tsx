@@ -84,6 +84,12 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     setSidebarCollapsed(false);
   }
 
+  function selectComparisonResult(selected: ExecutionResult) {
+    setAlgorithmId(selected.algorithmId);
+    setResult(selected);
+    setResultFor({ problem, algorithmId: selected.algorithmId });
+  }
+
   const stateLabel = running
     ? "Running locally"
     : result?.status === "completed"
@@ -158,7 +164,13 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
           <MetricsRow metrics={result?.metrics ?? null} jobCount={problem.jobs.length} />
           <GanttChart schedule={result?.schedule ?? null} problem={problem} />
           <ScheduleSummary metrics={result?.metrics ?? null} />
-          <DetailTabs result={result} validationIssues={validationIssues} problem={problem} comparisonResults={comparisonResults} />
+          <DetailTabs
+            result={result}
+            validationIssues={validationIssues}
+            problem={problem}
+            comparisonResults={comparisonResults}
+            onSelectComparisonResult={selectComparisonResult}
+          />
         </div>
       </div>
     </main>

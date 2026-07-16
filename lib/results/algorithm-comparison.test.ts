@@ -96,4 +96,10 @@ describe("buildAlgorithmComparison", () => {
 
     expect(bestByMetric.makespan).toBe("fcfs");
   });
+
+  it("surfaces limitations from the versioned algorithm registry", () => {
+    const { rows } = buildAlgorithmComparison([completed("fcfs"), completed("wspt")]);
+    expect(rows[0]!.limitations).toEqual(["Ignores job weights"]);
+    expect(rows[1]!.limitations).toEqual([]);
+  });
 });

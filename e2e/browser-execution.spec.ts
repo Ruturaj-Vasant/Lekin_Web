@@ -107,10 +107,17 @@ test.describe("real in-browser scheduling", () => {
     const sptRow = rows.filter({ hasText: "SPT" });
     const fcfsRow = rows.filter({ hasText: "FCFS" });
     await expect(sptRow.getByText("16 (best)")).toBeVisible();
-    await expect(fcfsRow.locator("td").nth(3)).toHaveText("21");
+    await expect(fcfsRow.getByText("Ignores job weights")).toBeVisible();
+    await expect(fcfsRow.locator("td").nth(4)).toHaveText("21");
+
+    // Selecting an earlier comparison restores its complete visible result.
+    await sptRow.getByRole("button", { name: "SPT" }).click();
+    await expect(algorithm).toHaveValue("spt");
+    await expect(page.locator(".metrics article").first().locator("strong")).toContainText("16");
+    await page.getByRole("tab", { name: "Execution" }).click();
+    await expect(details.getByText(/^SPT completed locally/)).toBeVisible();
 
     // rerunning SPT on the same problem replaces its row rather than duplicating it
-    await algorithm.selectOption("spt");
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
     await page.getByRole("tab", { name: "Algorithm comparison" }).click();
