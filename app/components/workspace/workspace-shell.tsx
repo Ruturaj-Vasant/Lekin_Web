@@ -18,7 +18,6 @@ import { getBrowserLocalStorage } from "../../persistence/browser-storage";
 import { Brand } from "../brand";
 import { DetailTabs } from "./detail-tabs";
 import { GanttChart } from "./gantt-chart";
-import { MetricsRow } from "./metrics-row";
 import { ProblemSidebar } from "./problem-sidebar";
 import { ScheduleSummary } from "./schedule-summary";
 import { downloadProblemFile, readProblemFile } from "../../import-export/browser-problem-files";
@@ -383,7 +382,7 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             onCheckMove={checkManualMove}
             onMoveOperation={moveScheduledOperation}
           />
-          <MetricsRow metrics={result?.metrics ?? null} jobCount={problem.jobs.length} />
+          <ScheduleSummary metrics={result?.metrics ?? null} />
           <DetailTabs
             result={result}
             validationIssues={validationIssues}
@@ -391,7 +390,6 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             comparisonResults={comparisonResults}
             onSelectComparisonResult={selectComparisonResult}
           />
-          <ScheduleSummary metrics={result?.metrics ?? null} />
         </div>
       </div>
     </main>

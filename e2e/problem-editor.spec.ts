@@ -10,6 +10,7 @@ function entityDetails(page: import("@playwright/test").Page, id: string): Locat
 test.describe("problem editor", () => {
   test("renames jobs, workcenters, and machines while preserving references", async ({ page }) => {
     await openExample(page);
+    await page.getByText(/^Jobs/).click();
 
     let job = entityDetails(page, "J-101");
     await job.getByLabel("Job name J-101").fill("Rush order");
@@ -31,6 +32,7 @@ test.describe("problem editor", () => {
   test("renders structured editor cards and a working collapse rail", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await openExample(page);
+    await page.getByText(/^Jobs/).click();
 
     const sidebar = page.getByRole("complementary", { name: "Problem setup" });
     const sidebarBox = await sidebar.boundingBox();
@@ -81,6 +83,7 @@ test.describe("problem editor", () => {
     test.setTimeout(180_000);
     const errors = monitorBrowserErrors(page);
     await openExample(page);
+    await page.getByText(/^Jobs/).click();
 
     await page.getByRole("button", { name: "Add job" }).click();
     const job = entityDetails(page, "J-1");
@@ -124,6 +127,7 @@ test.describe("problem editor", () => {
   test("keeps workcenter and machine membership consistent and reports destructive edits", async ({ page }) => {
     const errors = monitorBrowserErrors(page);
     await openExample(page);
+    await page.getByText(/^Jobs/).click();
 
     await page.getByText(/^Workcenters/).click();
     await page.getByRole("button", { name: "Add workcenter" }).click();
@@ -152,23 +156,24 @@ test.describe("problem editor", () => {
     test.setTimeout(240_000);
     const errors = monitorBrowserErrors(page);
     await openExample(page);
+    await page.getByText(/^Jobs/).click();
 
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
     await expect(page.locator(".bar")).toHaveCount(8);
-    const originalMakespan = await page.locator(".metrics article").first().locator("strong").innerText();
+    const originalMakespan = await page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong").innerText();
 
     const firstJob = entityDetails(page, "J-101");
     await firstJob.locator(".job-summary-meta").click();
     await firstJob.getByLabel("Processing time for operation 0").fill("9");
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");
     await expect(page.locator(".bar")).toHaveCount(0);
-    await expect(page.locator(".metrics article").first().locator("strong")).toHaveText("-");
+    await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).toHaveText("-");
 
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
     await expect(page.locator(".bar")).toHaveCount(8);
-    await expect(page.locator(".metrics article").first().locator("strong")).not.toHaveText(originalMakespan);
+    await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).not.toHaveText(originalMakespan);
 
     await page.getByLabel("Dispatching rule").selectOption("fcfs");
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");

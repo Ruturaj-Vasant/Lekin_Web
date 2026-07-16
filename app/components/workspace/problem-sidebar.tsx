@@ -101,7 +101,7 @@ export function ProblemSidebar({
         />
       </label>
 
-      <details open>
+      <details>
         <summary>
           <span>
             Jobs <em>{problem.jobs.length}</em>
