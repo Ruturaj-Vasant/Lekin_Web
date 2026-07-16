@@ -929,5 +929,7 @@ Each entry should follow this format:
   - visual QA at 1440×1000 confirmed the real Gantt renders eight operations
     across four machine lanes with the expected metrics and machine sequence
     table, without clipping or overlap.
-- Status: independently accepted; ready to commit, merge to `main`, push, and
-  publish.
+- Delivery: merged to `main` as `071f106`, pushed to `origin/main`, and
+  published privately at `https://lekin-lab-workbench.rvt2018.chatgpt.site`.
+  The merge commit contains no co-author trailer.
+- Status: independently accepted, merged, pushed, and published.
