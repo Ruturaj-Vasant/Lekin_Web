@@ -68,8 +68,12 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
   useEffect(() => {
     const storage = getBrowserLocalStorage();
     if (!storage) return;
-    saveProject(storage, problem);
-    setLastActiveProjectId(storage, problem.problemId);
+    const saved = saveProject(storage, problem);
+    if (saved.ok) {
+      setLastActiveProjectId(storage, problem.problemId);
+    } else {
+      queueMicrotask(() => setSaveFeedback(`Autosave failed: ${saved.error}`));
+    }
   }, [problem]);
 
   useEffect(() => {

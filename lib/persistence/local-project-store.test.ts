@@ -104,6 +104,20 @@ describe("saveProject / loadProject", () => {
     if (!result.ok) expect(result.reason).toBe("invalid-schema");
   });
 
+  it("rejects an envelope whose metadata does not match its nested problem", () => {
+    const storage = fakeStorage({
+      [`lekin-lab:v${STORAGE_FORMAT_VERSION}:project:p1`]: JSON.stringify({
+        formatVersion: STORAGE_FORMAT_VERSION,
+        problemId: "p1",
+        name: "Misleading name",
+        savedAt: new Date().toISOString(),
+        problem: problem("p2", "Actual name"),
+      }),
+    });
+    const result = loadProject(storage, "p1");
+    expect(result).toMatchObject({ ok: false, reason: "malformed" });
+  });
+
   it("returns a storage-error result rather than throwing when setItem fails", () => {
     const storage: KeyValueStorage = {
       getItem: () => null,

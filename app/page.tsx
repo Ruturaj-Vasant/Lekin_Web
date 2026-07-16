@@ -80,6 +80,8 @@ export default function Home() {
   }
 
   function closeWorkspace() {
+    const storage = getBrowserLocalStorage();
+    if (storage) clearLastActiveProjectId(storage);
     setInitialProblem(null);
     refreshRecentProjects();
   }

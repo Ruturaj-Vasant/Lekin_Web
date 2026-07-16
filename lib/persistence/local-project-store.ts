@@ -123,6 +123,17 @@ export function loadProject(storage: KeyValueStorage, problemId: string): LoadPr
   if (!problem.success) {
     return { ok: false, reason: "invalid-schema", message: "Saved project data failed validation and could not be restored." };
   }
+  if (
+    envelope.data.problemId !== problemId ||
+    envelope.data.problemId !== problem.data.problemId ||
+    envelope.data.name !== problem.data.name
+  ) {
+    return {
+      ok: false,
+      reason: "malformed",
+      message: "Saved project metadata does not match the stored problem.",
+    };
+  }
 
   return { ok: true, problem: problem.data };
 }

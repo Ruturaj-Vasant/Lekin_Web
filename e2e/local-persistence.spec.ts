@@ -42,6 +42,18 @@ test.describe("local persistence", () => {
     await expect(page.getByRole("region", { name: "Recent projects" })).toHaveCount(0);
   });
 
+  test("stays on the landing page after the user explicitly returns there", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /Create new problem/ }).click();
+    await page.getByLabel("Problem name").fill("Return to landing");
+    await page.getByRole("button", { name: /LEKIN Lab/ }).click();
+
+    await page.reload();
+
+    await expect(page.getByRole("button", { name: "Open example" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Recent projects" }).getByLabel("Open Return to landing")).toBeVisible();
+  });
+
   test("creating New makes a separate blank project instead of overwriting the saved one", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: /Create new problem/ }).click();
