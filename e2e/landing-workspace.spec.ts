@@ -16,6 +16,8 @@ test.describe("landing and workspace shell", () => {
     await page.goto("/");
 
     await expect(page).toHaveTitle("LEKIN - Scheduling Research Workbench");
+    await expect(page.locator(".landing-nav")).toHaveCSS("height", "60px");
+    await expect(page.locator(".hero")).toHaveCSS("padding-top", "72px");
     await expect(page.getByRole("heading", { name: /Build, run, and understand/ })).toBeVisible();
     await expect(page.getByRole("region", { name: "LEKIN features" }).getByRole("article")).toHaveCount(3);
     await page.getByRole("button", { name: "Open example" }).click();
@@ -65,6 +67,28 @@ test.describe("landing and workspace shell", () => {
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
   });
 
+  test("provides working About and Help guidance with project credits", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("link", { name: "About" }).click();
+    await expect(page.getByRole("heading", { name: "From Python library to interactive workbench" })).toBeVisible();
+
+    await expect(page.getByRole("link", { name: "Documentation" })).toHaveCount(0);
+    await expect(page.getByText(/extends the lekinpy Python scheduling library/)).toBeVisible();
+
+    await page.getByRole("link", { name: "Help" }).click();
+    await expect(page).toHaveURL(/#help$/);
+    await expect(page.getByRole("heading", { name: "LEKIN Python library" })).toBeVisible();
+    await expect(page.getByText("Common questions", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Browser first", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Visit the LEKIN Python page" })).toHaveAttribute("href", "https://github.com/mpinedo170/Lekin_Python");
+    await expect(page.getByText("Michael Pinedo", { exact: true })).toBeVisible();
+    await expect(page.getByText("Andrew Feldman", { exact: true })).toBeVisible();
+    await expect(page.getByText("Ruturaj Tambe", { exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "mpinedo@stern.nyu.edu" })).toHaveAttribute("href", "mailto:mpinedo@stern.nyu.edu");
+    await expect(page.getByRole("link", { name: "rvt2018@nyu.edu" })).toHaveAttribute("href", "mailto:rvt2018@nyu.edu");
+  });
+
   test("clears the current workspace with the New button", async ({ page }) => {
     await openExample(page);
     await page.getByLabel("Problem name").fill("Temporary experiment");
@@ -87,6 +111,7 @@ test.describe("landing and workspace shell", () => {
     await expect(page.getByRole("button", { name: /New/ })).toBeVisible();
     await expect(page.getByRole("button", { name: /Import/ })).toBeVisible();
     await expect(page.getByRole("button", { name: /Export/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Help" })).toHaveCount(0);
 
     await page.getByRole("button", { name: "Collapse problem setup panel" }).click();
     await expect(page.getByRole("button", { name: "Expand problem setup panel" })).toBeVisible();

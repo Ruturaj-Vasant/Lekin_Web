@@ -87,7 +87,7 @@
 .save-feedback{font-size:10px;color:var(--success);white-space:nowrap;padding:0 4px}
 .landing-notice{max-width:640px;margin:0 auto 0;padding:11px 16px;border:1px solid #e2c9bd;background:#fdf6f2;color:#8f5a3f;font-size:12px;border-radius:7px;text-align:left}
 .scheduler-preparation{display:flex;align-items:center;gap:7px;margin:16px 0 0;color:var(--muted);font-size:11px}.scheduler-preparation span{width:7px;height:7px;border-radius:50%;background:#c5a36a;box-shadow:0 0 0 3px #f4ead8}.scheduler-ready{color:var(--success)}.scheduler-ready span{background:var(--success);box-shadow:0 0 0 3px #e2f1e9}.scheduler-error span{background:var(--warning);box-shadow:0 0 0 3px #fae8e2}.engine-state{font-size:9px!important}.engine-ready{background:#edf6f1!important;color:var(--success)!important}.engine-loading-runtime,.engine-verifying-wheel,.engine-installing-wheel,.engine-idle{background:#f8f1e5!important;color:#8a6530!important}.engine-error{background:#faece7!important;color:var(--warning)!important}
-.recent-projects{max-width:900px;margin:36px auto 0;padding:0 24px;text-align:left}
+.recent-projects{max-width:900px;margin:36px auto 56px;padding:0 24px;text-align:left}
 .recent-projects h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:650;margin:0 0 12px}
 .recent-project-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .recent-project-list li{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:7px;background:white}
@@ -97,6 +97,9 @@
 .recent-project-open small{font-size:10px;color:var(--muted)}
 .recent-project-delete{border:0;background:none;color:var(--warning);font-size:11px;padding:8px 14px;flex-shrink:0}
 .recent-project-delete:hover{text-decoration:underline}
+.recent-project-limit-note{margin:12px 0 0;color:var(--muted);font-size:12px}
+.landing-nav{height:60px}
+.hero{min-height:520px;padding:72px 24px 68px}
 @media(max-width:680px){.recent-projects{padding:0 16px}}
 
 /* Usability refinements */
@@ -302,3 +305,22 @@
 .sidebar>details>summary b{font-size:17px;color:var(--muted)}
 .sidebar>details>.field-label{gap:9px;margin-top:14px;font-size:12px;font-weight:700}
 .sidebar>details>.field-label>select{height:44px;padding:10px 12px;font-size:14px;font-weight:600}
+.information-section{max-width:1120px;margin:0 auto;padding:64px 24px;border-top:1px solid var(--line)}
+.project-information{display:grid;grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr);align-items:start;gap:56px}
+.information-heading{max-width:520px;padding-top:18px}
+.information-heading h2{margin:12px 0 16px;font-size:34px;line-height:1.12;letter-spacing:-.035em}
+.information-heading>p{margin:0;color:var(--muted);font-size:16px;line-height:1.7}
+.credits-panel{padding:28px 30px;border:1px solid var(--line);border-radius:10px;background:white;box-shadow:0 8px 28px #20152c0a}
+.credits-panel h3{margin:10px 0 8px;font-size:20px}
+.credits-panel p{margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.6}
+.credits-panel a{color:var(--violet);font-weight:650;text-underline-offset:3px}
+.credits-panel dl{display:flex;flex-direction:column;gap:0;margin:24px 0 0;padding-top:4px;border-top:1px solid var(--line)}
+.credits-panel dl div{min-width:0}
+.credits-panel dt{color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.credits-panel dd{margin:5px 0 0;font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.credit-row{padding:16px 0;border-bottom:1px solid #f0eef2}
+.credit-row:last-child{padding-bottom:0;border-bottom:0}
+.credit-row dd{display:flex;align-items:center;justify-content:space-between;gap:18px}
+@media(max-width:900px){.project-information{grid-template-columns:1fr;gap:34px}.information-heading{max-width:700px;padding-top:0}}
+@media(max-width:760px){.information-section{padding:48px 20px}.information-heading h2{font-size:28px}.credits-panel{padding:24px}}
+@media(max-width:520px){.credit-row dd{align-items:flex-start;flex-direction:column;gap:4px}}

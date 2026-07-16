@@ -73,6 +73,25 @@ test.describe("local persistence", () => {
     await expect(recent.getByLabel("Open Second project")).toBeVisible();
   });
 
+  test("shows only the five most recently saved projects", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /Create new problem/ }).click();
+
+    for (let index = 1; index <= 6; index += 1) {
+      if (index > 1) await page.getByRole("button", { name: /New/ }).click();
+      await page.getByLabel("Problem name").fill(`Project ${index}`);
+      await page.getByRole("button", { name: /Save locally/ }).click();
+      await expect(page.locator(".save-feedback")).toContainText("Saved locally.");
+    }
+
+    await page.getByRole("button", { name: /LEKIN/ }).click();
+    const recent = page.getByRole("region", { name: "Recent projects" });
+    await expect(recent.locator(".recent-project-open")).toHaveCount(5);
+    await expect(recent.getByLabel("Open Project 6")).toBeVisible();
+    await expect(recent.getByLabel("Open Project 1")).toHaveCount(0);
+    await expect(recent.getByText("Showing the five most recently saved projects.")).toBeVisible();
+  });
+
   test("does not restore stale schedules or comparison history when a refreshed project reopens", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Open example" }).click();

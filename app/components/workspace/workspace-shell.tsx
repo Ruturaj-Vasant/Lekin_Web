@@ -324,8 +324,6 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             downloadProblemFile(problem);
             setSaveFeedback("Problem exported.");
           }}>↓ Export</button>
-          <span className="divider" />
-          <button type="button">Help</button>
         </div>
       </header>
       <div className={`app-body${sidebarCollapsed ? " sidebar-collapsed" : ""}`}>
