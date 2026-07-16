@@ -15,6 +15,8 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "fixture:generate": "tsx scripts/fixtures/generate-real-execution-fixture.ts",
     "fixture:check": "tsx scripts/fixtures/generate-real-execution-fixture.ts --check",
+    "benchmark:browser": "playwright test --config playwright.benchmark.config.ts",
+    "example:large": "tsx scripts/benchmarks/generate-large-problem.ts",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed"
   },

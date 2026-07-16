@@ -1,0 +1,5344 @@
+{
+  "format": "lekin-lab.problem",
+  "formatVersion": 1,
+  "exportedAt": "2026-07-16T00:00:00.000Z",
+  "problemId": "large-100j-500o",
+  "name": "Large browser study (100 jobs, 500 operations)",
+  "schemaVersion": "1.0.0",
+  "problem": {
+    "schemaVersion": "1.0.0",
+    "problemId": "large-100j-500o",
+    "name": "Large browser study (100 jobs, 500 operations)",
+    "jobs": [
+      {
+        "jobId": "J-001",
+        "release": 0,
+        "due": 45,
+        "weight": 1,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-001-O1",
+            "workcenterId": "WC-01",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-001-O2",
+            "workcenterId": "WC-12",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-001-O3",
+            "workcenterId": "WC-23",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-001-O4",
+            "workcenterId": "WC-09",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-001-O5",
+            "workcenterId": "WC-20",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-002",
+        "release": 1,
+        "due": 92,
+        "weight": 2,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-002-O1",
+            "workcenterId": "WC-08",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-002-O2",
+            "workcenterId": "WC-19",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-002-O3",
+            "workcenterId": "WC-05",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-002-O4",
+            "workcenterId": "WC-16",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-002-O5",
+            "workcenterId": "WC-02",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-003",
+        "release": 2,
+        "due": 79,
+        "weight": 3,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-003-O1",
+            "workcenterId": "WC-15",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-003-O2",
+            "workcenterId": "WC-01",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-003-O3",
+            "workcenterId": "WC-12",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-003-O4",
+            "workcenterId": "WC-23",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-003-O5",
+            "workcenterId": "WC-09",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-004",
+        "release": 3,
+        "due": 126,
+        "weight": 4,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-004-O1",
+            "workcenterId": "WC-22",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-004-O2",
+            "workcenterId": "WC-08",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-004-O3",
+            "workcenterId": "WC-19",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-004-O4",
+            "workcenterId": "WC-05",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-004-O5",
+            "workcenterId": "WC-16",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-005",
+        "release": 4,
+        "due": 83,
+        "weight": 5,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-005-O1",
+            "workcenterId": "WC-04",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-005-O2",
+            "workcenterId": "WC-15",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-005-O3",
+            "workcenterId": "WC-01",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-005-O4",
+            "workcenterId": "WC-12",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-005-O5",
+            "workcenterId": "WC-23",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-006",
+        "release": 5,
+        "due": 70,
+        "weight": 1,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-006-O1",
+            "workcenterId": "WC-11",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-006-O2",
+            "workcenterId": "WC-22",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-006-O3",
+            "workcenterId": "WC-08",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-006-O4",
+            "workcenterId": "WC-19",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-006-O5",
+            "workcenterId": "WC-05",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-007",
+        "release": 6,
+        "due": 117,
+        "weight": 2,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-007-O1",
+            "workcenterId": "WC-18",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-007-O2",
+            "workcenterId": "WC-04",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-007-O3",
+            "workcenterId": "WC-15",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-007-O4",
+            "workcenterId": "WC-01",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-007-O5",
+            "workcenterId": "WC-12",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-008",
+        "release": 7,
+        "due": 74,
+        "weight": 3,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-008-O1",
+            "workcenterId": "WC-25",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-008-O2",
+            "workcenterId": "WC-11",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-008-O3",
+            "workcenterId": "WC-22",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-008-O4",
+            "workcenterId": "WC-08",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-008-O5",
+            "workcenterId": "WC-19",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-009",
+        "release": 0,
+        "due": 113,
+        "weight": 4,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-009-O1",
+            "workcenterId": "WC-07",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-009-O2",
+            "workcenterId": "WC-18",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-009-O3",
+            "workcenterId": "WC-04",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-009-O4",
+            "workcenterId": "WC-15",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-009-O5",
+            "workcenterId": "WC-01",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-010",
+        "release": 1,
+        "due": 100,
+        "weight": 5,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-010-O1",
+            "workcenterId": "WC-14",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-010-O2",
+            "workcenterId": "WC-25",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-010-O3",
+            "workcenterId": "WC-11",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-010-O4",
+            "workcenterId": "WC-22",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-010-O5",
+            "workcenterId": "WC-08",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-011",
+        "release": 2,
+        "due": 57,
+        "weight": 1,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-011-O1",
+            "workcenterId": "WC-21",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-011-O2",
+            "workcenterId": "WC-07",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-011-O3",
+            "workcenterId": "WC-18",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-011-O4",
+            "workcenterId": "WC-04",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-011-O5",
+            "workcenterId": "WC-15",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-012",
+        "release": 3,
+        "due": 104,
+        "weight": 2,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-012-O1",
+            "workcenterId": "WC-03",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-012-O2",
+            "workcenterId": "WC-14",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-012-O3",
+            "workcenterId": "WC-25",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-012-O4",
+            "workcenterId": "WC-11",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-012-O5",
+            "workcenterId": "WC-22",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-013",
+        "release": 4,
+        "due": 91,
+        "weight": 3,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-013-O1",
+            "workcenterId": "WC-10",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-013-O2",
+            "workcenterId": "WC-21",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-013-O3",
+            "workcenterId": "WC-07",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-013-O4",
+            "workcenterId": "WC-18",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-013-O5",
+            "workcenterId": "WC-04",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-014",
+        "release": 5,
+        "due": 138,
+        "weight": 4,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-014-O1",
+            "workcenterId": "WC-17",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-014-O2",
+            "workcenterId": "WC-03",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-014-O3",
+            "workcenterId": "WC-14",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-014-O4",
+            "workcenterId": "WC-25",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-014-O5",
+            "workcenterId": "WC-11",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-015",
+        "release": 6,
+        "due": 95,
+        "weight": 5,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-015-O1",
+            "workcenterId": "WC-24",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-015-O2",
+            "workcenterId": "WC-10",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-015-O3",
+            "workcenterId": "WC-21",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-015-O4",
+            "workcenterId": "WC-07",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-015-O5",
+            "workcenterId": "WC-18",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-016",
+        "release": 7,
+        "due": 82,
+        "weight": 1,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-016-O1",
+            "workcenterId": "WC-06",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-016-O2",
+            "workcenterId": "WC-17",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-016-O3",
+            "workcenterId": "WC-03",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-016-O4",
+            "workcenterId": "WC-14",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-016-O5",
+            "workcenterId": "WC-25",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-017",
+        "release": 0,
+        "due": 121,
+        "weight": 2,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-017-O1",
+            "workcenterId": "WC-13",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-017-O2",
+            "workcenterId": "WC-24",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-017-O3",
+            "workcenterId": "WC-10",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-017-O4",
+            "workcenterId": "WC-21",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-017-O5",
+            "workcenterId": "WC-07",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-018",
+        "release": 1,
+        "due": 61,
+        "weight": 3,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-018-O1",
+            "workcenterId": "WC-20",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-018-O2",
+            "workcenterId": "WC-06",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-018-O3",
+            "workcenterId": "WC-17",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-018-O4",
+            "workcenterId": "WC-03",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-018-O5",
+            "workcenterId": "WC-14",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-019",
+        "release": 2,
+        "due": 108,
+        "weight": 4,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-019-O1",
+            "workcenterId": "WC-02",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-019-O2",
+            "workcenterId": "WC-13",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-019-O3",
+            "workcenterId": "WC-24",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-019-O4",
+            "workcenterId": "WC-10",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-019-O5",
+            "workcenterId": "WC-21",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-020",
+        "release": 3,
+        "due": 95,
+        "weight": 5,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-020-O1",
+            "workcenterId": "WC-09",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-020-O2",
+            "workcenterId": "WC-20",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-020-O3",
+            "workcenterId": "WC-06",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-020-O4",
+            "workcenterId": "WC-17",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-020-O5",
+            "workcenterId": "WC-03",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-021",
+        "release": 4,
+        "due": 52,
+        "weight": 1,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-021-O1",
+            "workcenterId": "WC-16",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-021-O2",
+            "workcenterId": "WC-02",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-021-O3",
+            "workcenterId": "WC-13",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-021-O4",
+            "workcenterId": "WC-24",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-021-O5",
+            "workcenterId": "WC-10",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-022",
+        "release": 5,
+        "due": 99,
+        "weight": 2,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-022-O1",
+            "workcenterId": "WC-23",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-022-O2",
+            "workcenterId": "WC-09",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-022-O3",
+            "workcenterId": "WC-20",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-022-O4",
+            "workcenterId": "WC-06",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-022-O5",
+            "workcenterId": "WC-17",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-023",
+        "release": 6,
+        "due": 86,
+        "weight": 3,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-023-O1",
+            "workcenterId": "WC-05",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-023-O2",
+            "workcenterId": "WC-16",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-023-O3",
+            "workcenterId": "WC-02",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-023-O4",
+            "workcenterId": "WC-13",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-023-O5",
+            "workcenterId": "WC-24",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-024",
+        "release": 7,
+        "due": 133,
+        "weight": 4,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-024-O1",
+            "workcenterId": "WC-12",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-024-O2",
+            "workcenterId": "WC-23",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-024-O3",
+            "workcenterId": "WC-09",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-024-O4",
+            "workcenterId": "WC-20",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-024-O5",
+            "workcenterId": "WC-06",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-025",
+        "release": 0,
+        "due": 82,
+        "weight": 5,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-025-O1",
+            "workcenterId": "WC-19",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-025-O2",
+            "workcenterId": "WC-05",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-025-O3",
+            "workcenterId": "WC-16",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-025-O4",
+            "workcenterId": "WC-02",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-025-O5",
+            "workcenterId": "WC-13",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-026",
+        "release": 1,
+        "due": 69,
+        "weight": 1,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-026-O1",
+            "workcenterId": "WC-01",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-026-O2",
+            "workcenterId": "WC-12",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-026-O3",
+            "workcenterId": "WC-23",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-026-O4",
+            "workcenterId": "WC-09",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-026-O5",
+            "workcenterId": "WC-20",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-027",
+        "release": 2,
+        "due": 116,
+        "weight": 2,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-027-O1",
+            "workcenterId": "WC-08",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-027-O2",
+            "workcenterId": "WC-19",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-027-O3",
+            "workcenterId": "WC-05",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-027-O4",
+            "workcenterId": "WC-16",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-027-O5",
+            "workcenterId": "WC-02",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-028",
+        "release": 3,
+        "due": 73,
+        "weight": 3,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-028-O1",
+            "workcenterId": "WC-15",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-028-O2",
+            "workcenterId": "WC-01",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-028-O3",
+            "workcenterId": "WC-12",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-028-O4",
+            "workcenterId": "WC-23",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-028-O5",
+            "workcenterId": "WC-09",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-029",
+        "release": 4,
+        "due": 120,
+        "weight": 4,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-029-O1",
+            "workcenterId": "WC-22",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-029-O2",
+            "workcenterId": "WC-08",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-029-O3",
+            "workcenterId": "WC-19",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-029-O4",
+            "workcenterId": "WC-05",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-029-O5",
+            "workcenterId": "WC-16",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-030",
+        "release": 5,
+        "due": 107,
+        "weight": 5,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-030-O1",
+            "workcenterId": "WC-04",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-030-O2",
+            "workcenterId": "WC-15",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-030-O3",
+            "workcenterId": "WC-01",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-030-O4",
+            "workcenterId": "WC-12",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-030-O5",
+            "workcenterId": "WC-23",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-031",
+        "release": 6,
+        "due": 64,
+        "weight": 1,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-031-O1",
+            "workcenterId": "WC-11",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-031-O2",
+            "workcenterId": "WC-22",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-031-O3",
+            "workcenterId": "WC-08",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-031-O4",
+            "workcenterId": "WC-19",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-031-O5",
+            "workcenterId": "WC-05",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-032",
+        "release": 7,
+        "due": 111,
+        "weight": 2,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-032-O1",
+            "workcenterId": "WC-18",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-032-O2",
+            "workcenterId": "WC-04",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-032-O3",
+            "workcenterId": "WC-15",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-032-O4",
+            "workcenterId": "WC-01",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-032-O5",
+            "workcenterId": "WC-12",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-033",
+        "release": 0,
+        "due": 90,
+        "weight": 3,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-033-O1",
+            "workcenterId": "WC-25",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-033-O2",
+            "workcenterId": "WC-11",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-033-O3",
+            "workcenterId": "WC-22",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-033-O4",
+            "workcenterId": "WC-08",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-033-O5",
+            "workcenterId": "WC-19",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-034",
+        "release": 1,
+        "due": 137,
+        "weight": 4,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-034-O1",
+            "workcenterId": "WC-07",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-034-O2",
+            "workcenterId": "WC-18",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-034-O3",
+            "workcenterId": "WC-04",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-034-O4",
+            "workcenterId": "WC-15",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-034-O5",
+            "workcenterId": "WC-01",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-035",
+        "release": 2,
+        "due": 77,
+        "weight": 5,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-035-O1",
+            "workcenterId": "WC-14",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-035-O2",
+            "workcenterId": "WC-25",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-035-O3",
+            "workcenterId": "WC-11",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-035-O4",
+            "workcenterId": "WC-22",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-035-O5",
+            "workcenterId": "WC-08",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-036",
+        "release": 3,
+        "due": 64,
+        "weight": 1,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-036-O1",
+            "workcenterId": "WC-21",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-036-O2",
+            "workcenterId": "WC-07",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-036-O3",
+            "workcenterId": "WC-18",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-036-O4",
+            "workcenterId": "WC-04",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-036-O5",
+            "workcenterId": "WC-15",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-037",
+        "release": 4,
+        "due": 111,
+        "weight": 2,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-037-O1",
+            "workcenterId": "WC-03",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-037-O2",
+            "workcenterId": "WC-14",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-037-O3",
+            "workcenterId": "WC-25",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-037-O4",
+            "workcenterId": "WC-11",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-037-O5",
+            "workcenterId": "WC-22",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-038",
+        "release": 5,
+        "due": 68,
+        "weight": 3,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-038-O1",
+            "workcenterId": "WC-10",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-038-O2",
+            "workcenterId": "WC-21",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-038-O3",
+            "workcenterId": "WC-07",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-038-O4",
+            "workcenterId": "WC-18",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-038-O5",
+            "workcenterId": "WC-04",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-039",
+        "release": 6,
+        "due": 115,
+        "weight": 4,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-039-O1",
+            "workcenterId": "WC-17",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-039-O2",
+            "workcenterId": "WC-03",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-039-O3",
+            "workcenterId": "WC-14",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-039-O4",
+            "workcenterId": "WC-25",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-039-O5",
+            "workcenterId": "WC-11",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-040",
+        "release": 7,
+        "due": 102,
+        "weight": 5,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-040-O1",
+            "workcenterId": "WC-24",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-040-O2",
+            "workcenterId": "WC-10",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-040-O3",
+            "workcenterId": "WC-21",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-040-O4",
+            "workcenterId": "WC-07",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-040-O5",
+            "workcenterId": "WC-18",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-041",
+        "release": 0,
+        "due": 51,
+        "weight": 1,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-041-O1",
+            "workcenterId": "WC-06",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-041-O2",
+            "workcenterId": "WC-17",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-041-O3",
+            "workcenterId": "WC-03",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-041-O4",
+            "workcenterId": "WC-14",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-041-O5",
+            "workcenterId": "WC-25",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-042",
+        "release": 1,
+        "due": 98,
+        "weight": 2,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-042-O1",
+            "workcenterId": "WC-13",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-042-O2",
+            "workcenterId": "WC-24",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-042-O3",
+            "workcenterId": "WC-10",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-042-O4",
+            "workcenterId": "WC-21",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-042-O5",
+            "workcenterId": "WC-07",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-043",
+        "release": 2,
+        "due": 85,
+        "weight": 3,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-043-O1",
+            "workcenterId": "WC-20",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-043-O2",
+            "workcenterId": "WC-06",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-043-O3",
+            "workcenterId": "WC-17",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-043-O4",
+            "workcenterId": "WC-03",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-043-O5",
+            "workcenterId": "WC-14",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-044",
+        "release": 3,
+        "due": 132,
+        "weight": 4,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-044-O1",
+            "workcenterId": "WC-02",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-044-O2",
+            "workcenterId": "WC-13",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-044-O3",
+            "workcenterId": "WC-24",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-044-O4",
+            "workcenterId": "WC-10",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-044-O5",
+            "workcenterId": "WC-21",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-045",
+        "release": 4,
+        "due": 89,
+        "weight": 5,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-045-O1",
+            "workcenterId": "WC-09",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-045-O2",
+            "workcenterId": "WC-20",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-045-O3",
+            "workcenterId": "WC-06",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-045-O4",
+            "workcenterId": "WC-17",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-045-O5",
+            "workcenterId": "WC-03",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-046",
+        "release": 5,
+        "due": 76,
+        "weight": 1,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-046-O1",
+            "workcenterId": "WC-16",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-046-O2",
+            "workcenterId": "WC-02",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-046-O3",
+            "workcenterId": "WC-13",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-046-O4",
+            "workcenterId": "WC-24",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-046-O5",
+            "workcenterId": "WC-10",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-047",
+        "release": 6,
+        "due": 123,
+        "weight": 2,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-047-O1",
+            "workcenterId": "WC-23",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-047-O2",
+            "workcenterId": "WC-09",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-047-O3",
+            "workcenterId": "WC-20",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-047-O4",
+            "workcenterId": "WC-06",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-047-O5",
+            "workcenterId": "WC-17",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-048",
+        "release": 7,
+        "due": 80,
+        "weight": 3,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-048-O1",
+            "workcenterId": "WC-05",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-048-O2",
+            "workcenterId": "WC-16",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-048-O3",
+            "workcenterId": "WC-02",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-048-O4",
+            "workcenterId": "WC-13",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-048-O5",
+            "workcenterId": "WC-24",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-049",
+        "release": 0,
+        "due": 119,
+        "weight": 4,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-049-O1",
+            "workcenterId": "WC-12",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-049-O2",
+            "workcenterId": "WC-23",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-049-O3",
+            "workcenterId": "WC-09",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-049-O4",
+            "workcenterId": "WC-20",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-049-O5",
+            "workcenterId": "WC-06",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-050",
+        "release": 1,
+        "due": 106,
+        "weight": 5,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-050-O1",
+            "workcenterId": "WC-19",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-050-O2",
+            "workcenterId": "WC-05",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-050-O3",
+            "workcenterId": "WC-16",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-050-O4",
+            "workcenterId": "WC-02",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-050-O5",
+            "workcenterId": "WC-13",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-051",
+        "release": 2,
+        "due": 63,
+        "weight": 1,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-051-O1",
+            "workcenterId": "WC-01",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-051-O2",
+            "workcenterId": "WC-12",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-051-O3",
+            "workcenterId": "WC-23",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-051-O4",
+            "workcenterId": "WC-09",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-051-O5",
+            "workcenterId": "WC-20",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-052",
+        "release": 3,
+        "due": 93,
+        "weight": 2,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-052-O1",
+            "workcenterId": "WC-08",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-052-O2",
+            "workcenterId": "WC-19",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-052-O3",
+            "workcenterId": "WC-05",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-052-O4",
+            "workcenterId": "WC-16",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-052-O5",
+            "workcenterId": "WC-02",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-053",
+        "release": 4,
+        "due": 80,
+        "weight": 3,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-053-O1",
+            "workcenterId": "WC-15",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-053-O2",
+            "workcenterId": "WC-01",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-053-O3",
+            "workcenterId": "WC-12",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-053-O4",
+            "workcenterId": "WC-23",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-053-O5",
+            "workcenterId": "WC-09",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-054",
+        "release": 5,
+        "due": 127,
+        "weight": 4,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-054-O1",
+            "workcenterId": "WC-22",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-054-O2",
+            "workcenterId": "WC-08",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-054-O3",
+            "workcenterId": "WC-19",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-054-O4",
+            "workcenterId": "WC-05",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-054-O5",
+            "workcenterId": "WC-16",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-055",
+        "release": 6,
+        "due": 84,
+        "weight": 5,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-055-O1",
+            "workcenterId": "WC-04",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-055-O2",
+            "workcenterId": "WC-15",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-055-O3",
+            "workcenterId": "WC-01",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-055-O4",
+            "workcenterId": "WC-12",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-055-O5",
+            "workcenterId": "WC-23",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-056",
+        "release": 7,
+        "due": 71,
+        "weight": 1,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-056-O1",
+            "workcenterId": "WC-11",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-056-O2",
+            "workcenterId": "WC-22",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-056-O3",
+            "workcenterId": "WC-08",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-056-O4",
+            "workcenterId": "WC-19",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-056-O5",
+            "workcenterId": "WC-05",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-057",
+        "release": 0,
+        "due": 110,
+        "weight": 2,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-057-O1",
+            "workcenterId": "WC-18",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-057-O2",
+            "workcenterId": "WC-04",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-057-O3",
+            "workcenterId": "WC-15",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-057-O4",
+            "workcenterId": "WC-01",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-057-O5",
+            "workcenterId": "WC-12",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-058",
+        "release": 1,
+        "due": 67,
+        "weight": 3,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-058-O1",
+            "workcenterId": "WC-25",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-058-O2",
+            "workcenterId": "WC-11",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-058-O3",
+            "workcenterId": "WC-22",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-058-O4",
+            "workcenterId": "WC-08",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-058-O5",
+            "workcenterId": "WC-19",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-059",
+        "release": 2,
+        "due": 114,
+        "weight": 4,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-059-O1",
+            "workcenterId": "WC-07",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-059-O2",
+            "workcenterId": "WC-18",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-059-O3",
+            "workcenterId": "WC-04",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-059-O4",
+            "workcenterId": "WC-15",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-059-O5",
+            "workcenterId": "WC-01",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-060",
+        "release": 3,
+        "due": 101,
+        "weight": 5,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-060-O1",
+            "workcenterId": "WC-14",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-060-O2",
+            "workcenterId": "WC-25",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-060-O3",
+            "workcenterId": "WC-11",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-060-O4",
+            "workcenterId": "WC-22",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-060-O5",
+            "workcenterId": "WC-08",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-061",
+        "release": 4,
+        "due": 58,
+        "weight": 1,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-061-O1",
+            "workcenterId": "WC-21",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-061-O2",
+            "workcenterId": "WC-07",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-061-O3",
+            "workcenterId": "WC-18",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-061-O4",
+            "workcenterId": "WC-04",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-061-O5",
+            "workcenterId": "WC-15",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-062",
+        "release": 5,
+        "due": 105,
+        "weight": 2,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-062-O1",
+            "workcenterId": "WC-03",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-062-O2",
+            "workcenterId": "WC-14",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-062-O3",
+            "workcenterId": "WC-25",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-062-O4",
+            "workcenterId": "WC-11",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-062-O5",
+            "workcenterId": "WC-22",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-063",
+        "release": 6,
+        "due": 92,
+        "weight": 3,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-063-O1",
+            "workcenterId": "WC-10",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-063-O2",
+            "workcenterId": "WC-21",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-063-O3",
+            "workcenterId": "WC-07",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-063-O4",
+            "workcenterId": "WC-18",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-063-O5",
+            "workcenterId": "WC-04",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-064",
+        "release": 7,
+        "due": 139,
+        "weight": 4,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-064-O1",
+            "workcenterId": "WC-17",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-064-O2",
+            "workcenterId": "WC-03",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-064-O3",
+            "workcenterId": "WC-14",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-064-O4",
+            "workcenterId": "WC-25",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-064-O5",
+            "workcenterId": "WC-11",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-065",
+        "release": 0,
+        "due": 88,
+        "weight": 5,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-065-O1",
+            "workcenterId": "WC-24",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-065-O2",
+            "workcenterId": "WC-10",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-065-O3",
+            "workcenterId": "WC-21",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-065-O4",
+            "workcenterId": "WC-07",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-065-O5",
+            "workcenterId": "WC-18",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-066",
+        "release": 1,
+        "due": 75,
+        "weight": 1,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-066-O1",
+            "workcenterId": "WC-06",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-066-O2",
+            "workcenterId": "WC-17",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-066-O3",
+            "workcenterId": "WC-03",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-066-O4",
+            "workcenterId": "WC-14",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-066-O5",
+            "workcenterId": "WC-25",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-067",
+        "release": 2,
+        "due": 122,
+        "weight": 2,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-067-O1",
+            "workcenterId": "WC-13",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-067-O2",
+            "workcenterId": "WC-24",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-067-O3",
+            "workcenterId": "WC-10",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-067-O4",
+            "workcenterId": "WC-21",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-067-O5",
+            "workcenterId": "WC-07",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-068",
+        "release": 3,
+        "due": 79,
+        "weight": 3,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-068-O1",
+            "workcenterId": "WC-20",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-068-O2",
+            "workcenterId": "WC-06",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-068-O3",
+            "workcenterId": "WC-17",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-068-O4",
+            "workcenterId": "WC-03",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-068-O5",
+            "workcenterId": "WC-14",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-069",
+        "release": 4,
+        "due": 109,
+        "weight": 4,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-069-O1",
+            "workcenterId": "WC-02",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-069-O2",
+            "workcenterId": "WC-13",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-069-O3",
+            "workcenterId": "WC-24",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-069-O4",
+            "workcenterId": "WC-10",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-069-O5",
+            "workcenterId": "WC-21",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-070",
+        "release": 5,
+        "due": 96,
+        "weight": 5,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-070-O1",
+            "workcenterId": "WC-09",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-070-O2",
+            "workcenterId": "WC-20",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-070-O3",
+            "workcenterId": "WC-06",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-070-O4",
+            "workcenterId": "WC-17",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-070-O5",
+            "workcenterId": "WC-03",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-071",
+        "release": 6,
+        "due": 53,
+        "weight": 1,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-071-O1",
+            "workcenterId": "WC-16",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-071-O2",
+            "workcenterId": "WC-02",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-071-O3",
+            "workcenterId": "WC-13",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-071-O4",
+            "workcenterId": "WC-24",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-071-O5",
+            "workcenterId": "WC-10",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-072",
+        "release": 7,
+        "due": 100,
+        "weight": 2,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-072-O1",
+            "workcenterId": "WC-23",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-072-O2",
+            "workcenterId": "WC-09",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-072-O3",
+            "workcenterId": "WC-20",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-072-O4",
+            "workcenterId": "WC-06",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-072-O5",
+            "workcenterId": "WC-17",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-073",
+        "release": 0,
+        "due": 79,
+        "weight": 3,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-073-O1",
+            "workcenterId": "WC-05",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-073-O2",
+            "workcenterId": "WC-16",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-073-O3",
+            "workcenterId": "WC-02",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-073-O4",
+            "workcenterId": "WC-13",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-073-O5",
+            "workcenterId": "WC-24",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-074",
+        "release": 1,
+        "due": 126,
+        "weight": 4,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-074-O1",
+            "workcenterId": "WC-12",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-074-O2",
+            "workcenterId": "WC-23",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-074-O3",
+            "workcenterId": "WC-09",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-074-O4",
+            "workcenterId": "WC-20",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-074-O5",
+            "workcenterId": "WC-06",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-075",
+        "release": 2,
+        "due": 83,
+        "weight": 5,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-075-O1",
+            "workcenterId": "WC-19",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-075-O2",
+            "workcenterId": "WC-05",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-075-O3",
+            "workcenterId": "WC-16",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-075-O4",
+            "workcenterId": "WC-02",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-075-O5",
+            "workcenterId": "WC-13",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-076",
+        "release": 3,
+        "due": 70,
+        "weight": 1,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-076-O1",
+            "workcenterId": "WC-01",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-076-O2",
+            "workcenterId": "WC-12",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-076-O3",
+            "workcenterId": "WC-23",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-076-O4",
+            "workcenterId": "WC-09",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-076-O5",
+            "workcenterId": "WC-20",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-077",
+        "release": 4,
+        "due": 117,
+        "weight": 2,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-077-O1",
+            "workcenterId": "WC-08",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-077-O2",
+            "workcenterId": "WC-19",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-077-O3",
+            "workcenterId": "WC-05",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-077-O4",
+            "workcenterId": "WC-16",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-077-O5",
+            "workcenterId": "WC-02",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-078",
+        "release": 5,
+        "due": 74,
+        "weight": 3,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-078-O1",
+            "workcenterId": "WC-15",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-078-O2",
+            "workcenterId": "WC-01",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-078-O3",
+            "workcenterId": "WC-12",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-078-O4",
+            "workcenterId": "WC-23",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-078-O5",
+            "workcenterId": "WC-09",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-079",
+        "release": 6,
+        "due": 121,
+        "weight": 4,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-079-O1",
+            "workcenterId": "WC-22",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-079-O2",
+            "workcenterId": "WC-08",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-079-O3",
+            "workcenterId": "WC-19",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-079-O4",
+            "workcenterId": "WC-05",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-079-O5",
+            "workcenterId": "WC-16",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-080",
+        "release": 7,
+        "due": 108,
+        "weight": 5,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-080-O1",
+            "workcenterId": "WC-04",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-080-O2",
+            "workcenterId": "WC-15",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-080-O3",
+            "workcenterId": "WC-01",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-080-O4",
+            "workcenterId": "WC-12",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-080-O5",
+            "workcenterId": "WC-23",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-081",
+        "release": 0,
+        "due": 57,
+        "weight": 1,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-081-O1",
+            "workcenterId": "WC-11",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-081-O2",
+            "workcenterId": "WC-22",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-081-O3",
+            "workcenterId": "WC-08",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-081-O4",
+            "workcenterId": "WC-19",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-081-O5",
+            "workcenterId": "WC-05",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-082",
+        "release": 1,
+        "due": 104,
+        "weight": 2,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-082-O1",
+            "workcenterId": "WC-18",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-082-O2",
+            "workcenterId": "WC-04",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-082-O3",
+            "workcenterId": "WC-15",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-082-O4",
+            "workcenterId": "WC-01",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-082-O5",
+            "workcenterId": "WC-12",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-083",
+        "release": 2,
+        "due": 91,
+        "weight": 3,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-083-O1",
+            "workcenterId": "WC-25",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-083-O2",
+            "workcenterId": "WC-11",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-083-O3",
+            "workcenterId": "WC-22",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-083-O4",
+            "workcenterId": "WC-08",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-083-O5",
+            "workcenterId": "WC-19",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-084",
+        "release": 3,
+        "due": 138,
+        "weight": 4,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-084-O1",
+            "workcenterId": "WC-07",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-084-O2",
+            "workcenterId": "WC-18",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-084-O3",
+            "workcenterId": "WC-04",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-084-O4",
+            "workcenterId": "WC-15",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-084-O5",
+            "workcenterId": "WC-01",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-085",
+        "release": 4,
+        "due": 95,
+        "weight": 5,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-085-O1",
+            "workcenterId": "WC-14",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-085-O2",
+            "workcenterId": "WC-25",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-085-O3",
+            "workcenterId": "WC-11",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-085-O4",
+            "workcenterId": "WC-22",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-085-O5",
+            "workcenterId": "WC-08",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-086",
+        "release": 5,
+        "due": 65,
+        "weight": 1,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-086-O1",
+            "workcenterId": "WC-21",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-086-O2",
+            "workcenterId": "WC-07",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-086-O3",
+            "workcenterId": "WC-18",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-086-O4",
+            "workcenterId": "WC-04",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-086-O5",
+            "workcenterId": "WC-15",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-087",
+        "release": 6,
+        "due": 112,
+        "weight": 2,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-087-O1",
+            "workcenterId": "WC-03",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-087-O2",
+            "workcenterId": "WC-14",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-087-O3",
+            "workcenterId": "WC-25",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-087-O4",
+            "workcenterId": "WC-11",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-087-O5",
+            "workcenterId": "WC-22",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-088",
+        "release": 7,
+        "due": 69,
+        "weight": 3,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-088-O1",
+            "workcenterId": "WC-10",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-088-O2",
+            "workcenterId": "WC-21",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-088-O3",
+            "workcenterId": "WC-07",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-088-O4",
+            "workcenterId": "WC-18",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-088-O5",
+            "workcenterId": "WC-04",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-089",
+        "release": 0,
+        "due": 108,
+        "weight": 4,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-089-O1",
+            "workcenterId": "WC-17",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-089-O2",
+            "workcenterId": "WC-03",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-089-O3",
+            "workcenterId": "WC-14",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-089-O4",
+            "workcenterId": "WC-25",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-089-O5",
+            "workcenterId": "WC-11",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-090",
+        "release": 1,
+        "due": 95,
+        "weight": 5,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-090-O1",
+            "workcenterId": "WC-24",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-090-O2",
+            "workcenterId": "WC-10",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-090-O3",
+            "workcenterId": "WC-21",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-090-O4",
+            "workcenterId": "WC-07",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-090-O5",
+            "workcenterId": "WC-18",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-091",
+        "release": 2,
+        "due": 52,
+        "weight": 1,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-091-O1",
+            "workcenterId": "WC-06",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-091-O2",
+            "workcenterId": "WC-17",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-091-O3",
+            "workcenterId": "WC-03",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-091-O4",
+            "workcenterId": "WC-14",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-091-O5",
+            "workcenterId": "WC-25",
+            "processingTime": 1,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-092",
+        "release": 3,
+        "due": 99,
+        "weight": 2,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-092-O1",
+            "workcenterId": "WC-13",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-092-O2",
+            "workcenterId": "WC-24",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-092-O3",
+            "workcenterId": "WC-10",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-092-O4",
+            "workcenterId": "WC-21",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-092-O5",
+            "workcenterId": "WC-07",
+            "processingTime": 4,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-093",
+        "release": 4,
+        "due": 86,
+        "weight": 3,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-093-O1",
+            "workcenterId": "WC-20",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-093-O2",
+            "workcenterId": "WC-06",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-093-O3",
+            "workcenterId": "WC-17",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-093-O4",
+            "workcenterId": "WC-03",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-093-O5",
+            "workcenterId": "WC-14",
+            "processingTime": 7,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-094",
+        "release": 5,
+        "due": 133,
+        "weight": 4,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-094-O1",
+            "workcenterId": "WC-02",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-094-O2",
+            "workcenterId": "WC-13",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-094-O3",
+            "workcenterId": "WC-24",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-094-O4",
+            "workcenterId": "WC-10",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-094-O5",
+            "workcenterId": "WC-21",
+            "processingTime": 10,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-095",
+        "release": 6,
+        "due": 90,
+        "weight": 5,
+        "rgb": [
+          196,
+          156,
+          65
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-095-O1",
+            "workcenterId": "WC-09",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-095-O2",
+            "workcenterId": "WC-20",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-095-O3",
+            "workcenterId": "WC-06",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-095-O4",
+            "workcenterId": "WC-17",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-095-O5",
+            "workcenterId": "WC-03",
+            "processingTime": 3,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-096",
+        "release": 7,
+        "due": 77,
+        "weight": 1,
+        "rgb": [
+          67,
+          140,
+          156
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-096-O1",
+            "workcenterId": "WC-16",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-096-O2",
+            "workcenterId": "WC-02",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-096-O3",
+            "workcenterId": "WC-13",
+            "processingTime": 6,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-096-O4",
+            "workcenterId": "WC-24",
+            "processingTime": 1,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-096-O5",
+            "workcenterId": "WC-10",
+            "processingTime": 6,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-097",
+        "release": 0,
+        "due": 116,
+        "weight": 2,
+        "rgb": [
+          75,
+          111,
+          164
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-097-O1",
+            "workcenterId": "WC-23",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-097-O2",
+            "workcenterId": "WC-09",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-097-O3",
+            "workcenterId": "WC-20",
+            "processingTime": 9,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-097-O4",
+            "workcenterId": "WC-06",
+            "processingTime": 4,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-097-O5",
+            "workcenterId": "WC-17",
+            "processingTime": 9,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-098",
+        "release": 1,
+        "due": 73,
+        "weight": 3,
+        "rgb": [
+          196,
+          116,
+          76
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-098-O1",
+            "workcenterId": "WC-05",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-098-O2",
+            "workcenterId": "WC-16",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-098-O3",
+            "workcenterId": "WC-02",
+            "processingTime": 2,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-098-O4",
+            "workcenterId": "WC-13",
+            "processingTime": 7,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-098-O5",
+            "workcenterId": "WC-24",
+            "processingTime": 2,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-099",
+        "release": 2,
+        "due": 120,
+        "weight": 4,
+        "rgb": [
+          85,
+          151,
+          123
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-099-O1",
+            "workcenterId": "WC-12",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-099-O2",
+            "workcenterId": "WC-23",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-099-O3",
+            "workcenterId": "WC-09",
+            "processingTime": 5,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-099-O4",
+            "workcenterId": "WC-20",
+            "processingTime": 10,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-099-O5",
+            "workcenterId": "WC-06",
+            "processingTime": 5,
+            "status": "A"
+          }
+        ]
+      },
+      {
+        "jobId": "J-100",
+        "release": 3,
+        "due": 107,
+        "weight": 5,
+        "rgb": [
+          129,
+          95,
+          160
+        ],
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J-100-O1",
+            "workcenterId": "WC-19",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J-100-O2",
+            "workcenterId": "WC-05",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J-100-O3",
+            "workcenterId": "WC-16",
+            "processingTime": 8,
+            "status": "A"
+          },
+          {
+            "operationIndex": 3,
+            "operationId": "J-100-O4",
+            "workcenterId": "WC-02",
+            "processingTime": 3,
+            "status": "A"
+          },
+          {
+            "operationIndex": 4,
+            "operationId": "J-100-O5",
+            "workcenterId": "WC-13",
+            "processingTime": 8,
+            "status": "A"
+          }
+        ]
+      }
+    ],
+    "workcenters": [
+      {
+        "workcenterId": "WC-01",
+        "release": 1,
+        "status": "A",
+        "machineIds": [
+          "M-01-1",
+          "M-01-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-02",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-02-1",
+          "M-02-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-03",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-03-1",
+          "M-03-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-04",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-04-1",
+          "M-04-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-05",
+        "release": 1,
+        "status": "A",
+        "machineIds": [
+          "M-05-1",
+          "M-05-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-06",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-06-1",
+          "M-06-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-07",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-07-1",
+          "M-07-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-08",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-08-1",
+          "M-08-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-09",
+        "release": 1,
+        "status": "A",
+        "machineIds": [
+          "M-09-1",
+          "M-09-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-10",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-10-1",
+          "M-10-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-11",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-11-1",
+          "M-11-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-12",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-12-1",
+          "M-12-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-13",
+        "release": 1,
+        "status": "A",
+        "machineIds": [
+          "M-13-1",
+          "M-13-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-14",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-14-1",
+          "M-14-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-15",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-15-1",
+          "M-15-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-16",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-16-1",
+          "M-16-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-17",
+        "release": 1,
+        "status": "A",
+        "machineIds": [
+          "M-17-1",
+          "M-17-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-18",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-18-1",
+          "M-18-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-19",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-19-1",
+          "M-19-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-20",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-20-1",
+          "M-20-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-21",
+        "release": 1,
+        "status": "A",
+        "machineIds": [
+          "M-21-1",
+          "M-21-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-22",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-22-1",
+          "M-22-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-23",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-23-1",
+          "M-23-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-24",
+        "release": 0,
+        "status": "A",
+        "machineIds": [
+          "M-24-1",
+          "M-24-2"
+        ]
+      },
+      {
+        "workcenterId": "WC-25",
+        "release": 1,
+        "status": "A",
+        "machineIds": [
+          "M-25-1",
+          "M-25-2"
+        ]
+      }
+    ],
+    "machines": [
+      {
+        "machineId": "M-01-1",
+        "workcenterId": "WC-01",
+        "release": 1,
+        "status": "A"
+      },
+      {
+        "machineId": "M-01-2",
+        "workcenterId": "WC-01",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-02-1",
+        "workcenterId": "WC-02",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-02-2",
+        "workcenterId": "WC-02",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-03-1",
+        "workcenterId": "WC-03",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-03-2",
+        "workcenterId": "WC-03",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-04-1",
+        "workcenterId": "WC-04",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-04-2",
+        "workcenterId": "WC-04",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-05-1",
+        "workcenterId": "WC-05",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-05-2",
+        "workcenterId": "WC-05",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-06-1",
+        "workcenterId": "WC-06",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-06-2",
+        "workcenterId": "WC-06",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-07-1",
+        "workcenterId": "WC-07",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-07-2",
+        "workcenterId": "WC-07",
+        "release": 1,
+        "status": "A"
+      },
+      {
+        "machineId": "M-08-1",
+        "workcenterId": "WC-08",
+        "release": 1,
+        "status": "A"
+      },
+      {
+        "machineId": "M-08-2",
+        "workcenterId": "WC-08",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-09-1",
+        "workcenterId": "WC-09",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-09-2",
+        "workcenterId": "WC-09",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-10-1",
+        "workcenterId": "WC-10",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-10-2",
+        "workcenterId": "WC-10",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-11-1",
+        "workcenterId": "WC-11",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-11-2",
+        "workcenterId": "WC-11",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-12-1",
+        "workcenterId": "WC-12",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-12-2",
+        "workcenterId": "WC-12",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-13-1",
+        "workcenterId": "WC-13",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-13-2",
+        "workcenterId": "WC-13",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-14-1",
+        "workcenterId": "WC-14",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-14-2",
+        "workcenterId": "WC-14",
+        "release": 1,
+        "status": "A"
+      },
+      {
+        "machineId": "M-15-1",
+        "workcenterId": "WC-15",
+        "release": 1,
+        "status": "A"
+      },
+      {
+        "machineId": "M-15-2",
+        "workcenterId": "WC-15",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-16-1",
+        "workcenterId": "WC-16",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-16-2",
+        "workcenterId": "WC-16",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-17-1",
+        "workcenterId": "WC-17",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-17-2",
+        "workcenterId": "WC-17",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-18-1",
+        "workcenterId": "WC-18",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-18-2",
+        "workcenterId": "WC-18",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-19-1",
+        "workcenterId": "WC-19",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-19-2",
+        "workcenterId": "WC-19",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-20-1",
+        "workcenterId": "WC-20",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-20-2",
+        "workcenterId": "WC-20",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-21-1",
+        "workcenterId": "WC-21",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-21-2",
+        "workcenterId": "WC-21",
+        "release": 1,
+        "status": "A"
+      },
+      {
+        "machineId": "M-22-1",
+        "workcenterId": "WC-22",
+        "release": 1,
+        "status": "A"
+      },
+      {
+        "machineId": "M-22-2",
+        "workcenterId": "WC-22",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-23-1",
+        "workcenterId": "WC-23",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-23-2",
+        "workcenterId": "WC-23",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-24-1",
+        "workcenterId": "WC-24",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-24-2",
+        "workcenterId": "WC-24",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-25-1",
+        "workcenterId": "WC-25",
+        "release": 0,
+        "status": "A"
+      },
+      {
+        "machineId": "M-25-2",
+        "workcenterId": "WC-25",
+        "release": 0,
+        "status": "A"
+      }
+    ]
+  }
+}

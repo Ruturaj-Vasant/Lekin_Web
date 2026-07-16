@@ -12,7 +12,11 @@ export interface BrowserExecutionPolicy {
   maxInputFileSizeMb: number;
 }
 
-/** Illustrative defaults per PRODUCT_SPEC §9 - freeze real numbers only after benchmarking. */
+/**
+ * Hard browser ceilings, benchmarked in Chromium on 2026-07-16.
+ * See docs/BROWSER_CAPACITY.md for the test shape, timings, and the lower
+ * recommended working range used for ordinary interactive studies.
+ */
 export const DEFAULT_BROWSER_EXECUTION_POLICY: BrowserExecutionPolicy = {
   enabled: true,
   maxJobs: 100,
