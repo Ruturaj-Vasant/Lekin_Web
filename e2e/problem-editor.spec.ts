@@ -8,6 +8,39 @@ function entityDetails(page: import("@playwright/test").Page, id: string): Locat
 }
 
 test.describe("problem editor", () => {
+  test("keeps job, workcenter, and machine controls readable without sidebar overflow", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await openExample(page);
+
+    const sidebar = page.getByRole("complementary", { name: "Problem setup" });
+    const sidebarBox = await sidebar.boundingBox();
+    expect(sidebarBox?.width).toBeGreaterThanOrEqual(300);
+
+    const firstJob = entityDetails(page, "J-101");
+    await firstJob.locator("summary").click();
+    for (const label of ["Release", "Due", "Weight"]) {
+      const box = await firstJob.getByLabel(label).boundingBox();
+      expect(box?.width, `${label} job control width`).toBeGreaterThanOrEqual(70);
+    }
+    expect((await firstJob.getByLabel("Workcenter for operation 0").boundingBox())?.width).toBeGreaterThanOrEqual(112);
+
+    await page.getByText(/^Workcenters/).click();
+    const firstWorkcenter = page.locator(".workcenter-fields").first();
+    for (const input of await firstWorkcenter.locator("input").all()) {
+      expect((await input.boundingBox())?.width).toBeGreaterThanOrEqual(82);
+    }
+
+    await page.getByText(/^Machines/).click();
+    const firstMachine = page.locator(".machine-fields").first();
+    expect((await firstMachine.locator("select").boundingBox())?.width).toBeGreaterThanOrEqual(112);
+    for (const input of await firstMachine.locator("input").all()) {
+      expect((await input.boundingBox())?.width).toBeGreaterThanOrEqual(74);
+    }
+
+    const overflows = await sidebar.evaluate((element) => element.scrollWidth > element.clientWidth + 1);
+    expect(overflows).toBe(false);
+  });
+
   test("creates, edits, reorders, validates, and schedules jobs and operations", async ({ page }) => {
     test.setTimeout(180_000);
     const errors = monitorBrowserErrors(page);
