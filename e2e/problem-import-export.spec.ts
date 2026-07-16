@@ -18,6 +18,7 @@ test.describe("problem import and export", () => {
 
     await page.getByRole("button", { name: /LEKIN Lab/ }).click();
     await page.getByLabel("Import a LEKIN Lab JSON file").setInputFiles(exportedPath!);
+    await page.getByText(/^Jobs/).click();
     await expect(page.getByLabel("Problem name")).toHaveValue("Round trip study");
     await expect(page.getByText("J-101", { exact: true })).toBeVisible();
 
