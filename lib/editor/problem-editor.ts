@@ -9,7 +9,7 @@ import { makeOperationId } from "../schema/schedule";
  *
  * Scope decision (documented in lekin-web_DECISIONS.md): identity fields
  * (Job.jobId, Workcenter.workcenterId, Machine.machineId) are set at
- * creation time and are NOT editable afterward — only settable via the
+ * creation time and are NOT editable afterward - only settable via the
  * "add" functions below. This removes an entire class of cascade-rename
  * ambiguity (what happens to every Operation.workcenterId /
  * Machine.workcenterId reference when an id is renamed) without reducing
@@ -117,7 +117,7 @@ export function removeJob(problem: ProblemDefinition, jobId: string): ProblemDef
 }
 
 // ---------------------------------------------------------------------------
-// Operations (nested under a job) — operationIndex/operationId are always
+// Operations (nested under a job) - operationIndex/operationId are always
 // recomputed from array position after any add/remove/move, per
 // ARCHITECTURE.md §1.1 ("operationIndex must be assigned by list position
 // and never reordered independently of the array").
@@ -265,7 +265,7 @@ export function removeMachine(problem: ProblemDefinition, machineId: string): Pr
 }
 
 // ---------------------------------------------------------------------------
-// Reducer — a thin, still-framework-independent dispatch layer over the
+// Reducer - a thin, still-framework-independent dispatch layer over the
 // functions above, so app/ only needs `useReducer(problemEditorReducer, ...)`
 // plus JSX; every actual transition is defined and tested here.
 // ---------------------------------------------------------------------------

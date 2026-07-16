@@ -1,7 +1,7 @@
 import type { AlgorithmDefinition } from "../schema/algorithm";
 
 /**
- * ARCHITECTURE.md §1.5 — Algorithm registry.
+ * ARCHITECTURE.md §1.5 - Algorithm registry.
  *
  * `libraryMetadata` for each entry must stay byte-identical (mod
  * snake_case -> camelCase) to the pinned lekinpy v0.2.0 build's
@@ -13,11 +13,11 @@ import type { AlgorithmDefinition } from "../schema/algorithm";
  *   edd:  {id: "edd",  display_name: "Earliest Due Date",         supports_multi_operation: true, version: "1.0.0"}
  *   wspt: {id: "wspt", display_name: "Weighted Shortest Processing Time", supports_multi_operation: true, version: "1.0.0"}
  *
- * Everything else on AlgorithmDefinition is a web-owned addition — lekinpy's
+ * Everything else on AlgorithmDefinition is a web-owned addition - lekinpy's
  * plugin contract is deliberately minimal (see lekin-library_DECISIONS.md
  * item 5) and has no concept of shortName/description/problemTypes/etc.
  *
- * No auto-discovery exists (rejected in lekinpy item 5 — "no decorators or
+ * No auto-discovery exists (rejected in lekinpy item 5 - "no decorators or
  * entry-point magic yet"), so this file must be updated by hand whenever
  * lekin-library's pinned version changes. See verify.ts for the drift guard.
  */

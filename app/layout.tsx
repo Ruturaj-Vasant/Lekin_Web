@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LEKIN Lab — Scheduling Research Workbench",
+  title: "LEKIN Lab - Scheduling Research Workbench",
   description: "Build, run, compare, and understand production schedules in your browser.",
   icons: {
     icon: "/favicon.svg",

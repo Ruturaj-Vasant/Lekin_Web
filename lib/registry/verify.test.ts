@@ -3,13 +3,13 @@ import { describe, expect, it } from "vitest";
 import { ALGORITHM_REGISTRY } from "./algorithms";
 
 /**
- * Registry-drift guard — ARCHITECTURE.md §1.5.
+ * Registry-drift guard - ARCHITECTURE.md §1.5.
  *
  * Imports the real lekinpy source and compares every registry entry's
  * `libraryMetadata` against the actual `SchedulingAlgorithm.metadata` dict,
  * byte-for-byte (mod snake_case -> camelCase). There is no auto-discovery
  * (lekinpy item 5 explicitly rejected that), so ALGORITHM_REGISTRY is
- * hand-maintained — this is what catches it going stale the next time
+ * hand-maintained - this is what catches it going stale the next time
  * lekin-library is retagged.
  *
  * Opt-in, not part of the default `npm run test:unit`: requires a local

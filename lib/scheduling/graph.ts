@@ -2,7 +2,7 @@ import type { ProblemDefinition } from "../schema/problem";
 import { makeOperationId } from "../schema/schedule";
 
 /**
- * ARCHITECTURE.md §4.2 — The precedence graph.
+ * ARCHITECTURE.md §4.2 - The precedence graph.
  *
  * Nodes: every ScheduledOperation, keyed by scheduledOperationId.
  * Two edge types, combined into one graph:
@@ -44,7 +44,7 @@ export function buildMachineSequenceEdges(queues: MachineQueues): Edge[] {
 export type TopoResult = { ok: true; order: string[] } | { ok: false; cycle: string[] };
 
 /**
- * ARCHITECTURE.md §4.3 — Kahn's algorithm: combined cycle detection +
+ * ARCHITECTURE.md §4.3 - Kahn's algorithm: combined cycle detection +
  * topological ordering in one O(V + E) pass, not two separate steps. On
  * failure, a follow-up DFS restricted to the unprocessed subgraph recovers
  * one concrete cycle path for the rejection message (§4.6).

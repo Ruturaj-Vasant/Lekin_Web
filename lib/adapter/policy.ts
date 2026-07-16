@@ -1,7 +1,7 @@
 import type { ProblemDefinition } from "../schema/problem";
 import type { AlgorithmDefinition, PolicyLimitName, PolicyViolation } from "../schema/algorithm";
 
-/** ARCHITECTURE.md §2.2 step 1 / PRODUCT_SPEC §9 — execution policy. */
+/** ARCHITECTURE.md §2.2 step 1 / PRODUCT_SPEC §9 - execution policy. */
 export interface BrowserExecutionPolicy {
   enabled: boolean;
   maxJobs: number;
@@ -12,7 +12,7 @@ export interface BrowserExecutionPolicy {
   maxInputFileSizeMb: number;
 }
 
-/** Illustrative defaults per PRODUCT_SPEC §9 — freeze real numbers only after benchmarking. */
+/** Illustrative defaults per PRODUCT_SPEC §9 - freeze real numbers only after benchmarking. */
 export const DEFAULT_BROWSER_EXECUTION_POLICY: BrowserExecutionPolicy = {
   enabled: true,
   maxJobs: 100,

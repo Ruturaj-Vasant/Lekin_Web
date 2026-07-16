@@ -2,7 +2,7 @@ import type { Metrics, Schedule } from "../schema/schedule";
 import type { ProblemDefinition } from "../schema/problem";
 
 /**
- * ARCHITECTURE.md §1.3 — Metrics, computed client-side.
+ * ARCHITECTURE.md §1.3 - Metrics, computed client-side.
  *
  * Mirrors lekinpy's Schedule.display_summary() formulas exactly (same
  * min/max-over-a-job's-ScheduledOperations approach, not the
@@ -62,7 +62,7 @@ export function computeMetrics(schedule: Schedule, problem: ProblemDefinition): 
 
 /**
  * machineUtilization denominator, precisely (ARCHITECTURE.md §1.3):
- * availableTime = makespan - machine.release, NOT the raw makespan — a
+ * availableTime = makespan - machine.release, NOT the raw makespan - a
  * machine with a late release would otherwise be penalized for time it was
  * never available to use. A machine never used, or one whose release is
  * >= makespan (degenerate/empty schedule), is omitted rather than

@@ -78,7 +78,7 @@ function edit(overrides: Partial<ManualScheduleEdit> & { from: ManualScheduleEdi
   };
 }
 
-describe("recalculate — non-cyclic single-machine reorder", () => {
+describe("recalculate - non-cyclic single-machine reorder", () => {
   it("recalculates start/end times correctly when reordering one machine's queue", () => {
     const problem = basicProblem();
     const schedule = basicSchedule();
@@ -108,7 +108,7 @@ describe("recalculate — non-cyclic single-machine reorder", () => {
   });
 });
 
-describe("recalculate — cross-machine move, no cycle", () => {
+describe("recalculate - cross-machine move, no cycle", () => {
   it("recalculates correctly when an operation moves to a different eligible machine", () => {
     const problem = basicProblem();
     problem.workcenters[0]!.machineIds = ["M1", "M1b"];
@@ -134,7 +134,7 @@ describe("recalculate — cross-machine move, no cycle", () => {
   });
 });
 
-describe("checkDropValidity — hard rejects", () => {
+describe("checkDropValidity - hard rejects", () => {
   it("rejects a workcenter-ineligible drop", () => {
     const problem = basicProblem();
     const schedule = basicSchedule();
@@ -225,7 +225,7 @@ describe("checkDropValidity — hard rejects", () => {
   });
 });
 
-describe("recalculate — dual-constrained node takes the max of both edges", () => {
+describe("recalculate - dual-constrained node takes the max of both edges", () => {
   it("an operation with both a job-predecessor and machine-predecessor uses max() of the two bounds, not either alone", () => {
     // A-O1 (job predecessor A-O0 ends at 5) is moved onto M1b behind a slow
     // unrelated operation C-O0 that ends at 20 -- the machine bound (20)
@@ -284,7 +284,7 @@ describe("recalculate — dual-constrained node takes the max of both edges", ()
   });
 });
 
-describe("recalculate — machine release time", () => {
+describe("recalculate - machine release time", () => {
   it("never starts an operation before its machine's release time, even with no earlier job/machine predecessor", () => {
     const problem = basicProblem();
     problem.machines.find((m) => m.machineId === "M2")!.release = 10;
@@ -305,7 +305,7 @@ describe("recalculate — machine release time", () => {
   });
 });
 
-describe("recalculate — requestedStartTime semantics", () => {
+describe("recalculate - requestedStartTime semantics", () => {
   it("ignores a requestedStartTime earlier than the graph-derived lower bound", () => {
     const problem = basicProblem();
     const schedule = basicSchedule();
@@ -334,7 +334,7 @@ describe("recalculate — requestedStartTime semantics", () => {
   });
 });
 
-describe("recalculate — persistent manual-start constraints", () => {
+describe("recalculate - persistent manual-start constraints", () => {
   it("a requested-start constraint survives an unrelated later edit and full recalculation", () => {
     const problem = basicProblem();
     const schedule = basicSchedule();
@@ -444,7 +444,7 @@ describe("recalculate — persistent manual-start constraints", () => {
   });
 });
 
-describe("recalculate — no-op drop", () => {
+describe("recalculate - no-op drop", () => {
   it("identifies the same slot and persisted constraint before an edit is recorded", () => {
     const theEdit = edit({
       scheduledOperationId: "A-O0",

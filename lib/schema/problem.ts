@@ -3,10 +3,10 @@ import type { ValidationIssue } from "./issue";
 import { makeIssue } from "./issue";
 
 /**
- * ARCHITECTURE.md §1.1 — Problem domain.
+ * ARCHITECTURE.md §1.1 - Problem domain.
  *
  * These Zod schemas validate STRUCTURE only (right JS types, required
- * fields present, correct nesting) — that's the "is this even shaped
+ * fields present, correct nesting) - that's the "is this even shaped
  * right" gate. All business-rule validation (duplicates, cross-references,
  * positivity, non-emptiness, rgb range, operationIndex correctness,
  * warnings) is deliberately NOT expressed as Zod refinements here; it runs
@@ -77,7 +77,7 @@ function isValidRgbComponent(n: number): boolean {
 }
 
 /**
- * Structural (blocking) business-rule checks — everything in
+ * Structural (blocking) business-rule checks - everything in
  * ARCHITECTURE.md §1.4's "what Zod should collect" list except the
  * warnings, which are collected separately (see collectProblemWarnings).
  */
@@ -328,7 +328,7 @@ const UNUSUALLY_LARGE_WEIGHT_THRESHOLD = 1000;
 const UNUSUALLY_LONG_PROCESSING_TIME_THRESHOLD = 10_000;
 const KNOWN_STATUS_VALUES = new Set(["pending", "scheduled", "in-progress", "done", "active", "inactive"]);
 
-/** Non-blocking warnings (severity: "warning") — ARCHITECTURE.md §1.4. */
+/** Non-blocking warnings (severity: "warning") - ARCHITECTURE.md §1.4. */
 export function collectProblemWarnings(problem: ProblemDefinition): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
@@ -392,13 +392,13 @@ export function collectProblemWarnings(problem: ProblemDefinition): ValidationIs
 /**
  * Full problem-editor validation pass (ARCHITECTURE.md §1.4, layer 1):
  * structural type-shape check, then business-rule + warning checks over the
- * successfully-typed data. Collects every issue in one pass — this is what
+ * successfully-typed data. Collects every issue in one pass - this is what
  * makes the editor/import flow able to show every problem at once, with
  * zero lekin-library involvement.
  *
  * Raw Zod issues (from `problem` not even satisfying the base structural
- * shape — wrong JS types, missing required keys) are mapped with a
- * best-effort code inferred from the path. This is intentionally coarse —
+ * shape - wrong JS types, missing required keys) are mapped with a
+ * best-effort code inferred from the path. This is intentionally coarse -
  * genuinely malformed input (as opposed to well-typed-but-semantically-
  * invalid input, which collectStructuralIssues above handles precisely) is
  * a rare edge case (e.g. hand-edited import JSON), not the primary

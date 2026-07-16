@@ -1,7 +1,7 @@
 import type { ProblemDefinition } from "../../../lib/schema/problem";
 
 /**
- * Real-execution fixture input — ARCHITECTURE.md §1.1.
+ * Real-execution fixture input - ARCHITECTURE.md §1.1.
  *
  * The single source of truth for the sample problem used to generate
  * test/fixtures/real-execution/fixture.json (see
@@ -25,7 +25,7 @@ import type { ProblemDefinition } from "../../../lib/schema/problem";
  *     so the machine-availability floor is exercised on more than one
  *     machine and workcenter.
  *
- * This is authored data (the INPUT), not a handwritten expected SCHEDULE —
+ * This is authored data (the INPUT), not a handwritten expected SCHEDULE -
  * the fixture's outputs are always the real lekinpy v0.2.0 execution
  * result, never asserted by hand.
  */

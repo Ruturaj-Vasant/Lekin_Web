@@ -9,8 +9,8 @@ export function MetricsRow({ metrics, jobCount }: { metrics: Metrics | null; job
     { label: "Avg. utilization", value: (average * 100).toFixed(1), unit: "%", note: `Across ${utilization.length} machines` },
     { label: "Late jobs", value: String(metrics.tardyJobCount), unit: ` / ${jobCount}`, note: `Max tardiness ${metrics.maxTardiness}` },
   ] : [
-    { label: "Makespan", value: "—", note: "Run a schedule" }, { label: "Total completion", value: "—", note: "Awaiting result" },
-    { label: "Avg. utilization", value: "—", note: "Awaiting result" }, { label: "Late jobs", value: "—", note: "Awaiting result" },
+    { label: "Makespan", value: "-", note: "Run a schedule" }, { label: "Total completion", value: "-", note: "Awaiting result" },
+    { label: "Avg. utilization", value: "-", note: "Awaiting result" }, { label: "Late jobs", value: "-", note: "Awaiting result" },
   ];
   return (
     <section className="metrics" aria-label="Schedule metrics">

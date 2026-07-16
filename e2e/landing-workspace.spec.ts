@@ -6,7 +6,7 @@ test.describe("landing and workspace shell", () => {
     const errors = monitorBrowserErrors(page);
     await page.goto("/");
 
-    await expect(page).toHaveTitle("LEKIN Lab — Scheduling Research Workbench");
+    await expect(page).toHaveTitle("LEKIN Lab - Scheduling Research Workbench");
     await expect(page.getByRole("heading", { name: /Build, run, and understand/ })).toBeVisible();
     await expect(page.getByRole("region", { name: "LEKIN Lab features" }).getByRole("article")).toHaveCount(3);
     await page.getByRole("button", { name: "Open example" }).click();
@@ -25,10 +25,10 @@ test.describe("landing and workspace shell", () => {
     await expect(algorithm).toHaveValue("spt");
     await expect(algorithm.locator("option")).toHaveCount(4);
     await expect(algorithm.locator("option")).toHaveText([
-      "SPT — Shortest processing time",
-      "FCFS — First come, first served",
-      "EDD — Earliest due date",
-      "WSPT — Weighted SPT",
+      "SPT - Shortest processing time",
+      "FCFS - First come, first served",
+      "EDD - Earliest due date",
+      "WSPT - Weighted SPT",
     ]);
     await expect(page.getByText("Run a schedule", { exact: true })).toBeVisible();
     await expect(page.getByText("No schedule yet", { exact: true })).toBeVisible();

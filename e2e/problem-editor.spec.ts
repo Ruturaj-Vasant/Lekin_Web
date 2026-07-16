@@ -94,7 +94,7 @@ test.describe("problem editor", () => {
     await firstJob.getByLabel("Processing time for operation 0").fill("9");
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");
     await expect(page.locator(".bar")).toHaveCount(0);
-    await expect(page.locator(".metrics article").first().locator("strong")).toHaveText("—");
+    await expect(page.locator(".metrics article").first().locator("strong")).toHaveText("-");
 
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** ARCHITECTURE.md §1.7 (v1.3) — Manual edits and persistent constraints. */
+/** ARCHITECTURE.md §1.7 (v1.3) - Manual edits and persistent constraints. */
 
 const PlacementSchema = z.object({
   machineId: z.string(),
@@ -20,7 +20,7 @@ export type ManualScheduleEdit = z.infer<typeof ManualScheduleEditSchema>;
 
 /**
  * WEB-ONLY, owned by ScheduleEditorState. Keyed by scheduledOperationId.
- * Absence means "start as early as the graph permits" — this is editing
+ * Absence means "start as early as the graph permits" - this is editing
  * intent, not an observed schedule result, so it's kept separate from
  * ScheduledOperation.startTime (ARCHITECTURE.md §1.7).
  */

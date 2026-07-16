@@ -1,5 +1,5 @@
 /**
- * ValidationErrorCode — ARCHITECTURE.md §1.4.
+ * ValidationErrorCode - ARCHITECTURE.md §1.4.
  *
  * Shared vocabulary across both validation layers (`source: "schema"` from
  * Zod, `source: "library"` from a mapped lekinpy exception). Codes mirrored
@@ -22,7 +22,7 @@ export const VALIDATION_ERROR_CODES = [
   "INVALID_RGB",
   "UNKNOWN_ALGORITHM_ID",
   "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION",
-  // Warnings — severity: "warning", never block execution.
+  // Warnings - severity: "warning", never block execution.
   "DUE_BEFORE_RELEASE",
   "UNUSUALLY_LARGE_WEIGHT",
   "UNUSUALLY_LONG_PROCESSING_TIME",
