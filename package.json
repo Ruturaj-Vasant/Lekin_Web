@@ -14,7 +14,9 @@
     "test:types": "tsc --noEmit -p tsconfig.lib.json",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "fixture:generate": "tsx scripts/fixtures/generate-real-execution-fixture.ts",
-    "fixture:check": "tsx scripts/fixtures/generate-real-execution-fixture.ts --check"
+    "fixture:check": "tsx scripts/fixtures/generate-real-execution-fixture.ts --check",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "next": "16.2.6",
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
+    "@playwright/test": "1.61.1",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",

@@ -630,6 +630,52 @@ Each entry should follow this format:
   differ from SPT while cancellation still works.
 - Status: verified and merged to `main`.
 
+## [2026-07-15] Playwright end-to-end browser test foundation
+- Branch: `test/e2e-playwright` (not merged)
+- Phase: cross-cutting browser verification
+- What changed:
+  - Added Playwright Test with a Chromium project and a production-server
+    harness. The suite builds and starts the vinext application itself, uses
+    one deterministic worker, and retains traces, screenshots, and video only
+    when a test fails. `PLAYWRIGHT_BASE_URL` can target an already-running
+    server, which allowed the exact localhost instance reported by a user to
+    be distinguished from a clean-build result.
+  - Added fast tests for landing content, sample-workspace navigation,
+    algorithm registry options, empty-result states, detail tabs, return
+    navigation, and keyboard activation.
+  - Added a real—not mocked—browser execution test. It cold-loads Pyodide in
+    the Web Worker, observes the pinned wheel and checksum requests, executes
+    SPT, FCFS, EDD, and WSPT, and checks the rendered eight operations,
+    non-empty metrics, validation state, and execution details after every
+    run. A separate test verifies cancellation returns the UI to a runnable
+    state.
+  - Added explicit `fixme` specifications for the product flows that do not
+    exist yet: editing, import/export, persistence, comparisons, and Gantt
+    drag-and-drop. These serve as a visible acceptance backlog and prevent the
+    test report from implying those controls are functional.
+- Why: unit and fixture tests establish scheduling correctness, but they do
+  not prove that the production bundle, Worker, CDN runtime, wheel integrity
+  check, React state, and rendered results compose successfully in a browser.
+- Verification:
+  - The first run correctly exposed three overly strict text locators while
+    simultaneously proving that real SPT execution completed and rendered a
+    makespan of 29 with all eight operations. The locators were corrected to
+    assert the status component rather than a text-node implementation detail.
+  - Final run: 6 implemented browser flows passed; 6 future product flows were
+    explicitly skipped as `fixme`; all four algorithms executed through real
+    Pyodide with no browser console or page errors.
+  - Follow-up diagnosis found a stale localhost production process serving
+    HTML whose hashed JavaScript asset no longer existed after another build
+    replaced `dist/`. The same tests failed against that exact server before
+    workspace navigation, then passed 2/2 against a clean isolated `main`
+    server on the same port after restart.
+  - The algorithm-rerun check now fingerprints rendered bar labels and
+    positions and asserts that FCFS and EDD visibly differ from SPT for the
+    comparison sample; changing only the execution label is no longer enough
+    for this test to pass.
+- Status: test foundation complete on its feature branch; awaiting the
+  Problem Editor branch so the first two `fixme` flows can be implemented.
+
 ## [2026-07-15] Browser execution adapter and first real schedule rendering
 - Branch: `feat/browser-execution-adapter`
 - Phase: 1, browser execution integration (not merged)
@@ -665,3 +711,223 @@ Each entry should follow this format:
     runtime was available in this session; the Worker/Pyodide network path
     therefore still requires a manual browser smoke test before merge.
 - Status: merged to `main` as part of the combined Phase 1 integration.
+
+## [2026-07-16] Real Problem Editor
+- Branch: `feat/problem-editor`
+- Phase: 1, editable-problem milestone
+- Ownership note: this branch touches `app/components/workspace/*.tsx` and
+  `app/globals.css`, not just `lib/`. That crosses the Claude-owns-`lib/`/
+  Codex-owns-`app/` split used since `feat/scheduling-core-lib` (see that
+  entry and `lib/README.md`) — flagging explicitly since it's a deliberate
+  deviation for this task, not an oversight. Checked first: no other
+  worktree was active and `main` had not moved since the last session, so
+  there was no live collision risk. All actual state-transition logic
+  (everything except JSX and CSS) still lives in `lib/editor/`, pure and
+  unit-tested, matching the project's established pattern regardless of
+  which side of the boundary touched it this time.
+- Pre-work verification: read `MASTER_PROMPT_v2.md`, `PRODUCT_SPEC.md`,
+  `ARCHITECTURE.md` (unchanged since the last full read), and this file, in
+  full. Confirmed directly: `main` at `51e6192`, clean, matching
+  `origin/main`; no other worktrees active; `app/execution/sample-problem.ts`
+  held the only `ProblemDefinition`, imported as a fixed constant into
+  `WorkspaceShell`; `ProblemSidebar` was 100% read-only/decorative for
+  jobs/operations/workcenters/machines — no forms, no dispatch, "＋ Add job"
+  had no handler. No inconsistency found — proceeded.
+- What changed:
+  - `lib/editor/problem-editor.ts`: pure `ProblemDefinition` state
+    transitions — `addJob`/`updateJob`/`removeJob`,
+    `addOperation`/`updateOperation`/`removeOperation`/`moveOperation`,
+    `addWorkcenter`/`updateWorkcenter`/`removeWorkcenter`,
+    `addMachine`/`updateMachine`/`removeMachine`, plus
+    `problemEditorReducer` (a thin action-dispatch layer over all of the
+    above, so `app/` only needs `useReducer(problemEditorReducer, ...)` and
+    JSX — no state-transition logic lives in a component).
+    `operationIndex`/`operationId` are recomputed from array position on
+    every add/remove/move (`reindexOperations`), per ARCHITECTURE.md §1.1.
+  - Scope decision: **entity ids (`jobId`/`workcenterId`/`machineId`) are
+    set at creation time and not editable afterward** — only settable via
+    the `add*` functions. This removes the entire cascade-rename question
+    (what happens to every reference when an id changes) without reducing
+    what's actually configurable: every non-identity field, and *which*
+    workcenter/machine something is assigned to, remains freely editable.
+  - ARCHITECTURE.md §3.1 explicitly requires the editor to keep
+    `Machine.workcenterId`/`Workcenter.machineIds` consistent "on every
+    add/edit/delete/move-machine-between-workcenters operation" — actively
+    maintained here, not left for validation: `addMachine` appends to both
+    sides; `removeMachine` cleans the machine out of its workcenter's
+    `machineIds`; `updateMachine` changing `workcenterId` relocates the
+    machine between both workcenters' lists (the literal
+    "move-machine-between-workcenters" case named in §3.1);
+    `removeWorkcenter` cascade-removes its member machines (no sensible
+    default reassignment exists, and leaving them dangling would violate
+    the same invariant). By contrast, `Operation.workcenterId` references
+    are deliberately **not** cascaded on workcenter deletion — §3.1 never
+    asks for that — so deleting a workcenter still referenced by an
+    operation is exactly the "deleting referenced entities" scenario live
+    `MISSING_WORKCENTER_REFERENCE` validation is meant to catch and surface,
+    not silently repair.
+  - `lib/editor/result-staleness.ts`: `isResultStale()`, a pure predicate
+    comparing what `(problem, algorithmId)` a stored `ExecutionResult` was
+    actually computed for against the live values (reference inequality —
+    every editor mutation returns a new `ProblemDefinition` object, so this
+    needs no deep-equality or hashing).
+  - `app/components/workspace/workspace-shell.tsx`: replaced the fixed
+    `SAMPLE_PROBLEM` constant with `useReducer(problemEditorReducer,
+    SAMPLE_PROBLEM)` (SAMPLE_PROBLEM is now only the *initial* value); live
+    validation via `useMemo(() => validateExecutionRequest(problem,
+    algorithmId), [problem, algorithmId])`; `run()` now passes the live
+    `problem`, not the constant; stale-result clearing is adjusted
+    *during render* (`if (isResultStale(...)) { setResult(null); ... }`)
+    rather than in a `useEffect` — ESLint's `react-hooks/set-state-in-effect`
+    rule caught the effect-based version (calling `setState` synchronously
+    in an effect causes an extra cascading render); switched to React's own
+    documented "adjusting state when a dependency changes" pattern instead,
+    which is also what makes `isResultStale` a plain, DOM-free unit-testable
+    function rather than logic buried in an effect body.
+  - `app/components/workspace/problem-sidebar.tsx`: real forms — Jobs
+    section with nested Operations (workcenter select, processing-time
+    input, reorder ↑/↓, delete, per-operation and per-job inline issue
+    lists via `IssuesFor`/`JobLevelIssues`, both matching on the
+    `ValidationIssue` object's own `jobId`/`operationIndex` fields rather
+    than parsing its `path`); Workcenters and Machines sections with
+    add/edit/delete and per-row issue badges (`IssueBadge`, counting only
+    `severity: "error"`); "＋ Add machine" disabled when no workcenter
+    exists yet (rather than creating an immediately-dangling machine); all
+    editing controls `disabled={running}`, matching the existing algorithm
+    selector's pattern; Run button `disabled={!running && !canRun}`,
+    relabeled "Fix validation errors to run" when blocked.
+  - `app/components/workspace/detail-tabs.tsx`: now takes a
+    `validationIssues: ValidationIssue[]` prop (the live ones) instead of
+    reading `result?.validationIssues` for the Validation tab and its badge
+    count — "live" per the task, always present (not just after a run
+    attempt), and each row now labels itself Error/Warning.
+  - `app/globals.css`: additive rules only (`.entity-row`,
+    `.entity-fields`, `.operation-row`, `.field-issues`, `.issue-badge`,
+    `.remove-button`, etc.), reusing the existing `--violet`/`--warning`/
+    `--muted`/`--line` variables and the same font-size/spacing scale as
+    `.field-label`/`.job-row`; no existing rule or breakpoint changed.
+- Why: this is the smallest slice that turns "run a fixed sample problem"
+  into "define and run your own problem," while keeping every actual
+  state-transition rule in `lib/`, pure and tested, so the form components
+  stay thin JSX wiring — consistent with how the execution adapter and
+  recalculation engine were built.
+- Alternatives considered / tradeoffs:
+  - Considered allowing entity-id rename with cascading reference updates.
+    Rejected for this branch: real complexity (every `Operation`/`Machine`
+    reference would need updating, and mid-rename states are ambiguous) for
+    a capability the task didn't explicitly require; delete-and-recreate
+    already covers the same end state. Documented as a known limitation
+    below, not silently dropped.
+  - Considered leaving `removeWorkcenter` non-cascading (matching
+    `removeMachine`'s "let validation catch it" philosophy) for
+    consistency. Rejected because ARCHITECTURE.md §3.1's invariant is
+    explicit and unconditional for Machine/Workcenter specifically — cascade
+    is what "kept consistent on every ... delete ... operation" requires
+    here, even though the *symmetric-looking* Operation/Workcenter case
+    correctly stays non-cascading (§3.1 doesn't cover it).
+  - Considered testing `isResultStale`'s usage inside `WorkspaceShell`
+    directly with a React component-testing setup. No `@testing-library/*`
+    or `jsdom`/`happy-dom` is installed (checked `package.json`/
+    `package-lock.json` first — only present as vitest's own optional peer
+    deps, not actually installed); adding a full component-testing stack
+    for one behavior was judged out of proportion to this task. Extracted
+    the decision into a plain, thoroughly unit-tested pure function instead
+    and left the one-line render-time call as thin, obviously-correct
+    wiring — same tradeoff already made for the rest of this branch's state
+    logic.
+- Tests added: 23 new (`lib/editor/problem-editor.test.ts`,
+  `lib/editor/result-staleness.test.ts`) covering every required critical
+  flow: duplicate ids (both "the editor's own id generation never produces
+  one" and "if one arises anyway, live validation still catches it, proven
+  directly rather than only inferred"), missing workcenter references
+  (deleting a still-referenced workcenter), empty operations (removing a
+  job's last operation), non-positive processing time, deleting referenced
+  entities (the workcenter-deletion case above, plus the §3.1
+  machine/workcenter cascade tests), operation reindexing (add/remove-from-
+  middle/move, each asserting both `operationIndex` and `operationId`),
+  and stale-result clearing (no-result / same-reference / any-edit /
+  algorithm-only-change, all via `isResultStale`).
+- Verification, run under Node `v22.23.1` (the required `>=22.13.0`; the
+  default Node in this environment, `v20.17.0`, cannot build the vinext
+  toolchain per the existing documented limitation above — used
+  `/opt/homebrew/Cellar/node@22/22.23.1/bin` directly, since the `node@22`
+  Homebrew `opt` symlink was pointing at the wrong Cellar path):
+  - `npm run test:unit`: 121 passed, 4 opt-in skipped (up from 98 before
+    this branch).
+  - `npm run test:types`: clean.
+  - `npm run fixture:check`: passed — unaffected by this branch, reverified
+    anyway since it shares the `lib/schema`/`lib/adapter` modules this
+    branch's forms now write through.
+  - Live registry-drift guard (`LEKINPY_SOURCE=../lekin-library`): 4/4
+    passed.
+  - `npm test` (`lint && build`) under Node `22.23.1`: both passed; the
+    production `vinext build` completes (the `pyodide.mjs` Node-builtin
+    externalization warnings are pre-existing/benign, unrelated to this
+    branch).
+  - `npx tsc --noEmit -p tsconfig.json` (full project, not just `lib/`):
+    only the pre-existing, already-documented `worker/index.ts` Cloudflare
+    ambient-type errors — no new errors from anything on this branch.
+  - `eslint` across every changed area (`lib/editor`, all four touched
+    `app/components/workspace/*.tsx`): clean. Caught one real issue along
+    the way (`react-hooks/set-state-in-effect` on the first version of the
+    stale-result-clearing logic), fixed per ESLint's own recommended
+    pattern rather than suppressed.
+- Known limitations (not implemented, matching the task's explicit
+  exclusions plus what fell out of the scope decisions above):
+  - No id rename/cascade-rename — delete and recreate instead.
+  - No persistence, import/export, comparison history, or drag-and-drop —
+    unchanged from before this branch; the app-bar's Import/Export/New
+    buttons remain inert, as they already were.
+  - No React-component-level test for `WorkspaceShell`'s render-time
+    stale-result reset specifically (the underlying decision function is
+    fully tested; the one-line call site is not, per the tradeoff above).
+  - `lekin-library` untouched, as required.
+- Status: implemented on `feat/problem-editor`, not merged, not pushed, not
+  deleted — ready for independent Codex review.
+
+## [2026-07-16] Independent Problem Editor review and browser acceptance
+- Branch: `feat/problem-editor`
+- Integration reviewed: merged current `main` (including the corrected
+  comparison sample) and `test/e2e-playwright` into the editor branch. The
+  only source conflict was this persistent log; all historical entries were
+  retained.
+- Review result: the pure reducer and React wiring match the documented
+  scope. The live `ProblemDefinition` is passed to the execution adapter;
+  machine/workcenter membership is updated on both sides; operation order
+  changes reindex identifiers; blocking validation controls Run; and an
+  existing result is cleared immediately when either the problem or selected
+  algorithm changes.
+- Review correction: operation and machine workcenter selects, plus entity
+  delete buttons, did not have entity-specific accessible names. Added those
+  names so screen-reader/keyboard users and browser automation can identify
+  the exact operation, job, workcenter, or machine being changed. No domain
+  behavior changed.
+- Browser acceptance added:
+  - create and edit a fourth job, add/reorder/remove operations, observe
+    `EMPTY_OPERATIONS` and `NON_POSITIVE_PROCESSING_TIME` inline and in the
+    Validation tab, repair the problem, then execute it through real Pyodide
+    and render all nine operations;
+  - add a workcenter, observe `EMPTY_MACHINE_LIST`, add and move a machine
+    into it, delete it, delete a referenced workcenter, and observe the
+    expected `MISSING_WORKCENTER_REFERENCE` blocking state;
+  - execute a schedule, edit processing time, prove the old Gantt/metrics
+    clear immediately, rerun, change algorithms, prove the result clears
+    again, and rerun to a real FCFS result.
+  These replace the first two editor `fixme` placeholders. Import/export,
+  persistence, comparison history, and Gantt drag-and-drop remain explicit
+  skipped backlog items because those product capabilities do not exist yet.
+- Independent verification under Node 22:
+  - 121 unit/contract tests passed; four opt-in tests skipped in the general
+    run, then the same four registry-drift tests passed live against
+    `../lekin-library`;
+  - library TypeScript checking, ESLint, fixture reproduction, and the
+    production vinext build passed;
+  - 9 implemented Chromium end-to-end flows passed, including all four real
+    lekinpy algorithms, cancellation, editor validation, custom-problem
+    execution, and stale-result reruns; four not-yet-built product flows were
+    explicitly skipped;
+  - visual QA at 1440×1000 confirmed the real Gantt renders eight operations
+    across four machine lanes with the expected metrics and machine sequence
+    table, without clipping or overlap.
+- Status: independently accepted; ready to commit, merge to `main`, push, and
+  publish.
