@@ -15,6 +15,7 @@ type Props = {
   onAlgorithmChange: (id: string) => void;
   onRun: () => void;
   onCancel: () => void;
+  onCollapse: () => void;
 };
 
 function matches(
@@ -82,12 +83,13 @@ export function ProblemSidebar({
   onAlgorithmChange,
   onRun,
   onCancel,
+  onCollapse,
 }: Props) {
   return (
     <aside className="sidebar" aria-label="Problem setup">
       <div className="side-heading">
         <span>Problem setup</span>
-        <button type="button" aria-label="Collapse problem setup panel">‹</button>
+        <button type="button" aria-label="Collapse problem setup panel" onClick={onCollapse}>‹</button>
       </div>
 
       <label className="field-label">
@@ -106,12 +108,11 @@ export function ProblemSidebar({
           {problem.jobs.map((job) => (
             <details key={job.jobId} className="entity-row">
               <summary>
-                <span>
+                <span className="job-summary-title">
                   <strong>{job.jobId}</strong>
-                  <small>
-                    {job.operations.length} op{job.operations.length === 1 ? "" : "s"} · Due {job.due} · Weight {job.weight}
-                  </small>
+                  <small>{job.operations.length} operation{job.operations.length === 1 ? "" : "s"}</small>
                 </span>
+                <span className="job-summary-meta"><small>Due {job.due}</small><small>Weight {job.weight}</small></span>
                 <IssueBadge issues={validationIssues} filter={{ jobId: job.jobId }} />
               </summary>
 
@@ -148,69 +149,73 @@ export function ProblemSidebar({
               <div className="operation-list">
                 {job.operations.map((operation, index) => (
                   <div className="operation-row" key={operation.operationId}>
-                    <span className="operation-index">O{operation.operationIndex}</span>
-                    <select
-                      value={operation.workcenterId}
-                      disabled={running}
-                      aria-label={`Workcenter for operation ${operation.operationIndex}`}
-                      onChange={(event) =>
-                        dispatch({
-                          type: "updateOperation",
-                          jobId: job.jobId,
-                          operationIndex: operation.operationIndex,
-                          patch: { workcenterId: event.target.value },
-                        })
-                      }
-                    >
-                      <option value="" disabled>
-                        Choose workcenter
-                      </option>
-                      {problem.workcenters.map((wc) => (
-                        <option key={wc.workcenterId} value={wc.workcenterId}>
-                          {wc.workcenterId}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="number"
-                      className="operation-duration"
-                      value={operation.processingTime}
-                      disabled={running}
-                      aria-label={`Processing time for operation ${operation.operationIndex}`}
-                      onChange={(event) =>
-                        dispatch({
-                          type: "updateOperation",
-                          jobId: job.jobId,
-                          operationIndex: operation.operationIndex,
-                          patch: { processingTime: Number(event.target.value) },
-                        })
-                      }
-                    />
-                    <div className="operation-actions">
-                      <button
-                        type="button"
-                        aria-label="Move operation earlier"
-                        disabled={running || index === 0}
-                        onClick={() => dispatch({ type: "moveOperation", jobId: job.jobId, fromIndex: index, toIndex: index - 1 })}
-                      >
-                        ↑
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="Move operation later"
-                        disabled={running || index === job.operations.length - 1}
-                        onClick={() => dispatch({ type: "moveOperation", jobId: job.jobId, fromIndex: index, toIndex: index + 1 })}
-                      >
-                        ↓
-                      </button>
-                      <button
-                        type="button"
-                        aria-label={`Remove ${job.jobId} operation ${operation.operationIndex}`}
-                        disabled={running}
-                        onClick={() => dispatch({ type: "removeOperation", jobId: job.jobId, operationIndex: operation.operationIndex })}
-                      >
-                        ✕
-                      </button>
+                    <div className="operation-heading">
+                      <strong>Operation {operation.operationIndex + 1}</strong>
+                      <div className="operation-actions">
+                        <button
+                          type="button"
+                          aria-label="Move operation earlier"
+                          disabled={running || index === 0}
+                          onClick={() => dispatch({ type: "moveOperation", jobId: job.jobId, fromIndex: index, toIndex: index - 1 })}
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Move operation later"
+                          disabled={running || index === job.operations.length - 1}
+                          onClick={() => dispatch({ type: "moveOperation", jobId: job.jobId, fromIndex: index, toIndex: index + 1 })}
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={`Remove ${job.jobId} operation ${operation.operationIndex}`}
+                          disabled={running}
+                          onClick={() => dispatch({ type: "removeOperation", jobId: job.jobId, operationIndex: operation.operationIndex })}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                    <div className="operation-fields">
+                      <label className="field-label">
+                        Workcenter
+                        <select
+                          value={operation.workcenterId}
+                          disabled={running}
+                          aria-label={`Workcenter for operation ${operation.operationIndex}`}
+                          onChange={(event) =>
+                            dispatch({
+                              type: "updateOperation",
+                              jobId: job.jobId,
+                              operationIndex: operation.operationIndex,
+                              patch: { workcenterId: event.target.value },
+                            })
+                          }
+                        >
+                          <option value="" disabled>Choose workcenter</option>
+                          {problem.workcenters.map((wc) => <option key={wc.workcenterId} value={wc.workcenterId}>{wc.workcenterId}</option>)}
+                        </select>
+                      </label>
+                      <label className="field-label operation-time-field">
+                        Duration
+                        <input
+                          type="number"
+                          className="operation-duration"
+                          value={operation.processingTime}
+                          disabled={running}
+                          aria-label={`Processing time for operation ${operation.operationIndex}`}
+                          onChange={(event) =>
+                            dispatch({
+                              type: "updateOperation",
+                              jobId: job.jobId,
+                              operationIndex: operation.operationIndex,
+                              patch: { processingTime: Number(event.target.value) },
+                            })
+                          }
+                        />
+                      </label>
                     </div>
                     <IssuesFor issues={validationIssues} filter={{ jobId: job.jobId, operationIndex: operation.operationIndex }} />
                   </div>
@@ -253,8 +258,11 @@ export function ProblemSidebar({
         <div className="job-list">
           {problem.workcenters.map((wc) => (
             <div className="entity-row entity-row-flat" key={wc.workcenterId}>
+              <div className="entity-card-heading">
+                <strong>{wc.workcenterId}</strong>
+                <button className="icon-delete" type="button" disabled={running} aria-label={`Delete workcenter ${wc.workcenterId}`} onClick={() => dispatch({ type: "removeWorkcenter", workcenterId: wc.workcenterId })}>✕</button>
+              </div>
               <div className="entity-fields workcenter-fields">
-                <span className="entity-id">{wc.workcenterId}</span>
                 <label className="field-label">
                   Release
                   <input
@@ -272,15 +280,6 @@ export function ProblemSidebar({
                     onChange={(event) => dispatch({ type: "updateWorkcenter", workcenterId: wc.workcenterId, patch: { status: event.target.value } })}
                   />
                 </label>
-                <button
-                  className="remove-button"
-                  type="button"
-                  disabled={running}
-                  aria-label={`Delete workcenter ${wc.workcenterId}`}
-                  onClick={() => dispatch({ type: "removeWorkcenter", workcenterId: wc.workcenterId })}
-                >
-                  ✕
-                </button>
               </div>
               <IssuesFor issues={validationIssues} filter={{ workcenterId: wc.workcenterId }} />
             </div>
@@ -301,20 +300,17 @@ export function ProblemSidebar({
         <div className="job-list">
           {problem.machines.map((machine) => (
             <div className="entity-row entity-row-flat" key={machine.machineId}>
+              <div className="entity-card-heading">
+                <strong>{machine.machineId}</strong>
+                <button className="icon-delete" type="button" disabled={running} aria-label={`Delete machine ${machine.machineId}`} onClick={() => dispatch({ type: "removeMachine", machineId: machine.machineId })}>✕</button>
+              </div>
               <div className="entity-fields machine-fields">
-                <span className="entity-id">{machine.machineId}</span>
-                <select
-                  value={machine.workcenterId}
-                  disabled={running}
-                  aria-label={`Workcenter for machine ${machine.machineId}`}
-                  onChange={(event) => dispatch({ type: "updateMachine", machineId: machine.machineId, patch: { workcenterId: event.target.value } })}
-                >
-                  {problem.workcenters.map((wc) => (
-                    <option key={wc.workcenterId} value={wc.workcenterId}>
-                      {wc.workcenterId}
-                    </option>
-                  ))}
-                </select>
+                <label className="field-label machine-workcenter-field">
+                  Workcenter
+                  <select value={machine.workcenterId} disabled={running} aria-label={`Workcenter for machine ${machine.machineId}`} onChange={(event) => dispatch({ type: "updateMachine", machineId: machine.machineId, patch: { workcenterId: event.target.value } })}>
+                    {problem.workcenters.map((wc) => <option key={wc.workcenterId} value={wc.workcenterId}>{wc.workcenterId}</option>)}
+                  </select>
+                </label>
                 <label className="field-label">
                   Release
                   <input
@@ -332,15 +328,6 @@ export function ProblemSidebar({
                     onChange={(event) => dispatch({ type: "updateMachine", machineId: machine.machineId, patch: { status: event.target.value } })}
                   />
                 </label>
-                <button
-                  className="remove-button"
-                  type="button"
-                  disabled={running}
-                  aria-label={`Delete machine ${machine.machineId}`}
-                  onClick={() => dispatch({ type: "removeMachine", machineId: machine.machineId })}
-                >
-                  ✕
-                </button>
               </div>
               <IssuesFor issues={validationIssues} filter={{ machineId: machine.machineId }} />
             </div>

@@ -18,6 +18,7 @@ describe("runtime schemas for shared result shapes", () => {
         scheduleId: "s1", algorithmId: "fcfs", scheduleType: "FCFS", time: 0, machines: [],
       },
       metrics: {
+        timeStart: 0,
         makespan: 0, maxTardiness: 0, tardyJobCount: 0,
         totalCompletionTime: 0, totalTardiness: 0,
         weightedCompletionTime: 0, weightedTardiness: 0,

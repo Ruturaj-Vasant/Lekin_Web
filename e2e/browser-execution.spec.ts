@@ -56,6 +56,16 @@ test.describe("real in-browser scheduling", () => {
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
 
+    const summary = page.locator(".schedule-summary");
+    const expectedSummary = new Map([
+      ["Time", "0"], ["C_max", "16"], ["T_max", "0"], ["ΣU_j", "0"],
+      ["ΣC_j", "40"], ["ΣT_j", "0"], ["ΣwC_j", "75"], ["ΣwT_j", "0"],
+    ]);
+    for (const [symbol, value] of expectedSummary) {
+      const item = summary.locator("article").filter({ hasText: symbol });
+      await expect(item.locator("strong")).toHaveText(value);
+    }
+
     const details = page.locator(".details-card");
     await expect(details.getByText("release 0 · 69% utilized")).toBeVisible();
     await expect(details.locator(".chip").first()).toContainText("J-103 · O2 · 2–7");

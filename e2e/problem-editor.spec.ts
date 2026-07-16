@@ -8,37 +8,53 @@ function entityDetails(page: import("@playwright/test").Page, id: string): Locat
 }
 
 test.describe("problem editor", () => {
-  test("keeps job, workcenter, and machine controls readable without sidebar overflow", async ({ page }) => {
+  test("renders structured editor cards and a working collapse rail", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await openExample(page);
 
     const sidebar = page.getByRole("complementary", { name: "Problem setup" });
     const sidebarBox = await sidebar.boundingBox();
-    expect(sidebarBox?.width).toBeGreaterThanOrEqual(300);
+    expect(sidebarBox?.width).toBeGreaterThanOrEqual(340);
 
     const firstJob = entityDetails(page, "J-101");
+    await expect(firstJob.locator("summary").getByText("J-101", { exact: true })).toBeVisible();
+    await expect(firstJob.locator("summary").getByText("3 operations", { exact: true })).toBeVisible();
+    await expect(firstJob.locator("summary").getByText("Due 30", { exact: true })).toBeVisible();
+    await expect(firstJob.locator("summary").getByText("Weight 2", { exact: true })).toBeVisible();
     await firstJob.locator("summary").click();
     for (const label of ["Release", "Due", "Weight"]) {
       const box = await firstJob.getByLabel(label).boundingBox();
       expect(box?.width, `${label} job control width`).toBeGreaterThanOrEqual(70);
     }
-    expect((await firstJob.getByLabel("Workcenter for operation 0").boundingBox())?.width).toBeGreaterThanOrEqual(112);
+    await expect(firstJob.getByText("Operation 1", { exact: true })).toBeVisible();
+    await expect(firstJob.locator(".operation-row")).toHaveCount(3);
+    expect((await firstJob.getByLabel("Workcenter for operation 0").boundingBox())?.width).toBeGreaterThanOrEqual(140);
+    const headingBox = await firstJob.locator(".operation-heading").first().boundingBox();
+    const actionBox = await firstJob.getByRole("button", { name: "Move operation earlier" }).first().boundingBox();
+    expect(Math.abs((headingBox?.y ?? 0) - (actionBox?.y ?? 0))).toBeLessThan(8);
 
     await page.getByText(/^Workcenters/).click();
     const firstWorkcenter = page.locator(".workcenter-fields").first();
     for (const input of await firstWorkcenter.locator("input").all()) {
-      expect((await input.boundingBox())?.width).toBeGreaterThanOrEqual(82);
+      expect((await input.boundingBox())?.width).toBeGreaterThanOrEqual(100);
     }
 
     await page.getByText(/^Machines/).click();
     const firstMachine = page.locator(".machine-fields").first();
-    expect((await firstMachine.locator("select").boundingBox())?.width).toBeGreaterThanOrEqual(112);
+    expect((await firstMachine.locator("select").boundingBox())?.width).toBeGreaterThanOrEqual(240);
     for (const input of await firstMachine.locator("input").all()) {
       expect((await input.boundingBox())?.width).toBeGreaterThanOrEqual(74);
     }
 
     const overflows = await sidebar.evaluate((element) => element.scrollWidth > element.clientWidth + 1);
     expect(overflows).toBe(false);
+
+    await page.getByRole("button", { name: "Collapse problem setup panel" }).click();
+    await expect(page.getByRole("complementary", { name: "Problem setup", exact: true })).not.toBeVisible();
+    const expand = page.getByRole("button", { name: "Expand problem setup panel" });
+    await expect(expand).toBeVisible();
+    await expand.click();
+    await expect(sidebar).toBeVisible();
   });
 
   test("creates, edits, reorders, validates, and schedules jobs and operations", async ({ page }) => {

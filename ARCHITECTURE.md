@@ -216,6 +216,8 @@ interface Metrics {
   // match what the library would have printed, byte for byte in value.
   // Recomputed by a pure function, client-side, after every execution AND
   // after every accepted manual edit (see §4).
+  timeStart: number;               // Time = min(startTime) across every known job's
+                                  // ScheduledOperations
   makespan: number;                // C_max = max(endTime) across every job's
                                   // ScheduledOperations
   maxTardiness: number;            // T_max = max(max(0, jobEnd - job.due))

@@ -21,6 +21,7 @@ export function computeMetrics(schedule: Schedule, problem: ProblemDefinition): 
   }
 
   const ends: number[] = [];
+  const starts: number[] = [];
   const tardinesses: number[] = [];
   const completions: number[] = [];
   const weightedCompletions: number[] = [];
@@ -32,9 +33,11 @@ export function computeMetrics(schedule: Schedule, problem: ProblemDefinition): 
     if (!ops || ops.length === 0) continue; // excluded, matching display_summary()
 
     const end = Math.max(...ops.map((o) => o.endTime));
+    const start = Math.min(...ops.map((o) => o.startTime));
     const tardiness = Math.max(0, end - job.due);
 
     ends.push(end);
+    starts.push(start);
     tardinesses.push(tardiness);
     completions.push(end);
     weightedCompletions.push(end * job.weight);
@@ -45,6 +48,7 @@ export function computeMetrics(schedule: Schedule, problem: ProblemDefinition): 
   const makespan = ends.length > 0 ? Math.max(...ends) : 0;
 
   const metrics: Metrics = {
+    timeStart: starts.length > 0 ? Math.min(...starts) : 0,
     makespan,
     maxTardiness: tardinesses.length > 0 ? Math.max(...tardinesses) : 0,
     tardyJobCount: tardyCount,

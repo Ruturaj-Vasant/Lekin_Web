@@ -6,7 +6,7 @@
     "wheelPath": "public/vendor/lekinpy-0.2.0-py3-none-any.whl",
     "wheelSha256": "e374e3d33049513947a943383838227ec383a6f2e2e1356b85c9e8234c1eacea",
     "pythonVersion": "3.12.6",
-    "generatedAt": "2026-07-16T02:31:27.062Z",
+    "generatedAt": "2026-07-16T03:59:27.124Z",
     "registrySnapshot": [
       {
         "id": "fcfs",
@@ -430,6 +430,7 @@
         ]
       },
       "metrics": {
+        "timeStart": 0,
         "makespan": 21,
         "maxTardiness": 6,
         "tardyJobCount": 2,
@@ -700,6 +701,7 @@
         ]
       },
       "metrics": {
+        "timeStart": 0,
         "makespan": 16,
         "maxTardiness": 0,
         "tardyJobCount": 0,
@@ -970,6 +972,7 @@
         ]
       },
       "metrics": {
+        "timeStart": 0,
         "makespan": 16,
         "maxTardiness": 0,
         "tardyJobCount": 0,
@@ -1240,6 +1243,7 @@
         ]
       },
       "metrics": {
+        "timeStart": 0,
         "makespan": 16,
         "maxTardiness": 0,
         "tardyJobCount": 0,

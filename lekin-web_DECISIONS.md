@@ -1088,3 +1088,43 @@ Each entry should follow this format:
 - Delivery: merged to `main` and pushed to `origin/main` with no co-author
   trailer; the private hosted build was refreshed from the same source.
 - Status: verified, merged, pushed, and published.
+
+## [2026-07-16] Screenshot-driven Problem Editor correction and complete schedule summary
+- Branch: `fix/editor-layout-summary`, created from clean current `main`.
+- Trigger: visual review of the expanded Job editor showed that the preceding
+  minimum-width adjustment did not solve the underlying composition problems.
+  Job metadata ran together, operation controls wrapped unpredictably, action
+  buttons detached from their operations, and the overall form appeared like
+  a collection of compressed inline controls rather than an intentional editor.
+- Problem Editor correction:
+  - changed job headings into distinct ID, operation-count, due, and weight
+    regions;
+  - changed every operation into a labeled card with a heading/action row and
+    a separate Workcenter/Duration field row;
+  - changed Workcenter and Machine entries into consistent cards with named
+    fields and fixed action targets;
+  - made operation numbering human-facing and one-based;
+  - replaced the decorative collapse affordance with working collapse and
+    expand behavior that leaves a narrow labeled rail.
+- Schedule Summary: added a separate section below the Gantt chart containing
+  every aggregate printed by `schedule.display_summary(system)`: `Time`,
+  `C_max`, `T_max`, `ΣU_j`, `ΣC_j`, `ΣT_j`, `ΣwC_j`, and `ΣwT_j`.
+- Data-contract correction: the existing web Metrics type covered seven of the
+  eight library summary values and omitted `Time`. Added `timeStart`, computed
+  as the minimum start time across scheduled operations for known jobs, with
+  zero for an empty schedule. Updated the architecture contract and regenerated
+  the committed real-execution fixture from pinned lekinpy v0.2.0.
+- Visual QA: inspected Chromium screenshots from the acceptance run at the real
+  1280x720 browser viewport. The summary renders as a separate two-row grid,
+  and the collapsed setup rail leaves the scheduling canvas usable. The editor
+  acceptance test additionally measures field widths, verifies action/header
+  alignment, asserts no horizontal overflow, and exercises collapse/expand.
+- Verification under Node 22.23.1:
+  - 126 unit and contract tests passed, with four opt-in tests skipped;
+  - library TypeScript checks, ESLint, and the production build passed;
+  - the committed execution fixture reproduced from pinned lekinpy v0.2.0;
+  - all four live algorithm registry-drift checks passed;
+  - the complete Chromium suite passed all 11 implemented user flows, with
+    four explicitly unbuilt product flows skipped;
+  - the repository-wide Unicode em dash scan and `git diff --check` passed.
+- Status: independently verified and ready to merge, push, and publish.
