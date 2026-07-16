@@ -375,7 +375,6 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
               {warning}
             </p>
           ))}
-          <MetricsRow metrics={result?.metrics ?? null} jobCount={problem.jobs.length} />
           <GanttChart
             schedule={result?.schedule ?? null}
             problem={problem}
@@ -384,7 +383,7 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             onCheckMove={checkManualMove}
             onMoveOperation={moveScheduledOperation}
           />
-          <ScheduleSummary metrics={result?.metrics ?? null} />
+          <MetricsRow metrics={result?.metrics ?? null} jobCount={problem.jobs.length} />
           <DetailTabs
             result={result}
             validationIssues={validationIssues}
@@ -392,6 +391,7 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             comparisonResults={comparisonResults}
             onSelectComparisonResult={selectComparisonResult}
           />
+          <ScheduleSummary metrics={result?.metrics ?? null} />
         </div>
       </div>
     </main>

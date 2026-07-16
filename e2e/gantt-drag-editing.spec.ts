@@ -6,6 +6,35 @@ async function dragToLane(source: Locator, lane: Locator, x: number) {
 }
 
 test.describe("manual Gantt editing", () => {
+  test("provides timeline zoom, utilization, idle, cursor, and operation inspection controls", async ({ page }) => {
+    test.setTimeout(150_000);
+    await openExample(page);
+    await page.getByRole("button", { name: "Run schedule" }).click();
+    await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+
+    await expect(page.getByLabel(/utilization/)).toHaveCount(4);
+    await expect(page.locator(".idle-segment")).not.toHaveCount(0);
+
+    const timeline = page.locator(".timeline");
+    const fittedWidth = (await timeline.boundingBox())!.width;
+    await page.getByRole("button", { name: "Zoom in timeline" }).click();
+    await expect.poll(async () => (await timeline.boundingBox())!.width).toBeGreaterThan(fittedWidth);
+    await page.getByRole("button", { name: "Fit" }).click();
+    await expect.poll(async () => Math.round((await timeline.boundingBox())!.width)).toBe(Math.round(fittedWidth));
+
+    const timelineBox = (await timeline.boundingBox())!;
+    await page.mouse.move(timelineBox.x + timelineBox.width / 2, timelineBox.y + 20);
+    await expect(page.locator(".cursor-time")).toBeVisible();
+
+    const operation = page.getByLabel("Drag J-103-O0");
+    await operation.hover();
+    await expect(operation.getByRole("tooltip")).toContainText("Start to end");
+    await expect(operation.getByRole("tooltip")).toContainText("Weight");
+
+    await page.getByRole("button", { name: "Idle time" }).click();
+    await expect(page.locator(".idle-segment")).toHaveCount(0);
+  });
+
   test("aligns a time-9 operation with the time-9 tick and grid line", async ({ page }) => {
     test.setTimeout(150_000);
     await openExample(page);

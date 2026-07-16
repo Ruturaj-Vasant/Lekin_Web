@@ -30,9 +30,15 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
   const [draggedOperationId, setDraggedOperationId] = useState<string | null>(null);
   const [candidate, setCandidate] = useState<DropCandidate | null>(null);
   const [edit, setEdit] = useState<EditState | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [cursorTime, setCursorTime] = useState<number | null>(null);
+  const [showIdle, setShowIdle] = useState(true);
   const machineSchedules = schedule?.machines ?? problem.machines.map((machine) => ({ machineId: machine.machineId, workcenterId: machine.workcenterId, operations: [] }));
   const makespan = Math.max(1, ...machineSchedules.flatMap((machine) => machine.operations.map((operation) => operation.endTime)));
-  const ticks = timelineTicks(makespan);
+  const ticks = timelineTicks(makespan, Math.max(7, Math.round(7 * zoom)));
+  const minorStep = Math.max(1, Math.ceil(makespan / 50));
+  const minorTicks = Array.from({ length: Math.floor(makespan / minorStep) + 1 }, (_, index) => index * minorStep)
+    .filter((time) => time <= makespan && !ticks.includes(time));
   const colors = new Map(problem.jobs.map((job) => [job.jobId, job.rgb ? `rgb(${job.rgb.join(",")})` : "#57068c"]));
   const draggedOperation = machineSchedules.flatMap((machine) => machine.operations).find(
     (operation) => operation.scheduledOperationId === draggedOperationId,
@@ -58,6 +64,26 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
         (operation) => operation.scheduledOperationId !== edit.operationId,
       ).length ?? 0)
     : 0;
+
+  function machineUtilization(machineId: string, operations: ScheduledOperation[]): number {
+    const release = problem.machines.find((machine) => machine.machineId === machineId)?.release ?? 0;
+    const available = makespan - release;
+    if (available <= 0) return 0;
+    return operations.reduce((total, operation) => total + operation.endTime - operation.startTime, 0) / available;
+  }
+
+  function idleIntervals(machineId: string, operations: ScheduledOperation[]) {
+    const release = problem.machines.find((machine) => machine.machineId === machineId)?.release ?? 0;
+    const sorted = [...operations].sort((left, right) => left.startTime - right.startTime);
+    const intervals: Array<{ start: number; end: number }> = [];
+    let cursor = release;
+    for (const operation of sorted) {
+      if (operation.startTime > cursor) intervals.push({ start: cursor, end: operation.startTime });
+      cursor = Math.max(cursor, operation.endTime);
+    }
+    if (cursor < makespan) intervals.push({ start: cursor, end: makespan });
+    return intervals;
+  }
 
   function openEditor(operation: ScheduledOperation) {
     setEdit({
@@ -137,13 +163,35 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
   }
   return (
     <section className={`gantt-card${draggedOperationId ? " drag-active" : ""}`} aria-labelledby="gantt-title">
-      <div className="card-head"><div><span className="section-kicker">Schedule</span><h2 id="gantt-title">Machine timeline</h2></div><span className="chart-status">{schedule ? `${schedule.time} time units · Grab an operation and place it on a machine lane` : "No schedule yet"}</span></div>
+      <div className="card-head gantt-head">
+        <div><span className="section-kicker">Schedule</span><h2 id="gantt-title">Machine timeline</h2><small>{schedule ? "Drag operations to reschedule" : "Run a schedule"}</small></div>
+        <div className="chart-toolbar" aria-label="Timeline controls">
+          <span className="time-scale">Time units</span>
+          <button type="button" aria-label="Zoom out timeline" disabled={zoom <= 1} onClick={() => setZoom((value) => Math.max(1, Number((value - 0.25).toFixed(2))))}>−</button>
+          <strong>{Math.round(zoom * 100)}%</strong>
+          <button type="button" aria-label="Zoom in timeline" disabled={zoom >= 3} onClick={() => setZoom((value) => Math.min(3, Number((value + 0.25).toFixed(2))))}>+</button>
+          <button type="button" onClick={() => setZoom(1)}>Fit</button>
+          <button type="button" aria-pressed={showIdle} onClick={() => setShowIdle((value) => !value)}>Idle time</button>
+        </div>
+      </div>
       <div className="legend">{problem.jobs.map((job) => <span key={job.jobId}><i style={{ background: colors.get(job.jobId) }} />{job.jobId}</span>)}<span className="legend-note">Time units</span></div>
       <div className="gantt" style={{ height: `${Math.max(190, 30 + machineSchedules.length * 72)}px` }}>
-        <div className="machine-labels">{machineSchedules.map((machine) => <span key={machine.machineId}>{machine.machineId}<small>{machine.workcenterId ?? "Unassigned"}</small></span>)}</div>
-        <div className="timeline">
+        <div className="machine-labels">{machineSchedules.map((machine) => {
+          const utilization = machineUtilization(machine.machineId, machine.operations);
+          return <span key={machine.machineId}><b>{machine.machineId}</b><small>{machine.workcenterId ?? "Unassigned"}</small><em>Util. {(utilization * 100).toFixed(0)}%</em><meter min="0" max="1" value={utilization} aria-label={`${machine.machineId} utilization`} /></span>;
+        })}</div>
+        <div
+          className="timeline"
+          style={{ minWidth: zoom === 1 ? "650px" : `${zoom * 100}%` }}
+          onMouseMove={(event) => {
+            const bounds = event.currentTarget.getBoundingClientRect();
+            setCursorTime(Math.max(0, Math.min(makespan, Math.round(((event.clientX - bounds.left) / bounds.width) * makespan))));
+          }}
+          onMouseLeave={() => setCursorTime(null)}
+        >
           <div className="ticks">{ticks.map((tick, index) => <span data-time={tick} className={index === 0 ? "tick-first" : index === ticks.length - 1 ? "tick-last" : undefined} style={{ left: `${(tick / makespan) * 100}%` }} key={tick}>{tick}</span>)}</div>
-          <div className="grid">{ticks.map((tick) => <i data-time={tick} className="grid-line" style={{ left: `${(tick / makespan) * 100}%` }} key={`line-${tick}`} />)}{machineSchedules.map((machine) => <div className="grid-row" key={machine.machineId} />)}</div>
+          <div className="grid">{minorTicks.map((tick) => <i className="grid-line grid-line-minor" style={{ left: `${(tick / makespan) * 100}%` }} key={`minor-${tick}`} />)}{ticks.map((tick) => <i data-time={tick} className="grid-line" style={{ left: `${(tick / makespan) * 100}%` }} key={`line-${tick}`} />)}{machineSchedules.map((machine) => <div className="grid-row" key={machine.machineId} />)}</div>
+          {showIdle && schedule && <div className="idle-layer" aria-hidden="true">{machineSchedules.flatMap((machine, machineIndex) => idleIntervals(machine.machineId, machine.operations).map((interval) => <i key={`${machine.machineId}-${interval.start}`} className="idle-segment" style={{ left: `${(interval.start / makespan) * 100}%`, width: `${((interval.end - interval.start) / makespan) * 100}%`, top: `${42 + machineIndex * 72}px` }}>{interval.end - interval.start >= Math.max(2, makespan * 0.06) ? `Idle ${interval.end - interval.start}u` : ""}</i>))}</div>}
           {schedule && <div className="drop-lanes">{machineSchedules.map((machine) => {
             const active = candidate?.machineId === machine.machineId;
             const compatible = !draggedDefinition || machine.workcenterId === draggedDefinition.workcenterId;
@@ -156,6 +204,7 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
             >{active && <span>Position {candidate.sequencePosition + 1}{candidate.rejection ? " · Not allowed" : ` · Start near ${candidate.requestedStartTime}`}</span>}</div>;
           })}</div>}
           {candidate && <div className={`time-preview${candidate.rejection ? " time-preview-invalid" : ""}`} style={{ left: `${(candidate.requestedStartTime / makespan) * 100}%` }}><span>{candidate.requestedStartTime}</span></div>}
+          {cursorTime !== null && !candidate && <div className="cursor-time" style={{ left: `${(cursorTime / makespan) * 100}%` }}><span>{cursorTime}</span></div>}
           {machineSchedules.flatMap((machine, machineIndex) => machine.operations.map((operation) => (
             <div
               key={operation.scheduledOperationId}
@@ -179,9 +228,19 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
             >
               <i className="drag-handle" aria-hidden="true">⋮⋮</i><span>{operation.jobId} · O{operation.operationIndex + 1}</span><small>{operation.startTime}–{operation.endTime} · {operation.endTime - operation.startTime}u</small>
               <button type="button" draggable={false} className="operation-edit-trigger" aria-label={`Edit ${operation.scheduledOperationId}`} onClick={(event) => { event.stopPropagation(); openEditor(operation); }}>Edit</button>
+              <div className="operation-hover-card" role="tooltip">
+                <strong>{operation.jobId} · Operation {operation.operationIndex + 1}</strong>
+                <span>{operation.machineId} · {machine.workcenterId}</span>
+                <dl>
+                  <div><dt>Start to end</dt><dd>{operation.startTime}–{operation.endTime}</dd></div>
+                  <div><dt>Duration</dt><dd>{operation.endTime - operation.startTime}u</dd></div>
+                  <div><dt>Due</dt><dd>{problem.jobs.find((job) => job.jobId === operation.jobId)?.due ?? "-"}</dd></div>
+                  <div><dt>Weight</dt><dd>{problem.jobs.find((job) => job.jobId === operation.jobId)?.weight ?? "-"}</dd></div>
+                </dl>
+              </div>
             </div>
           )))}
-          {!schedule && <p className="gantt-empty">Choose an algorithm and run the sample problem.</p>}
+          {!schedule && <p className="gantt-empty">No schedule yet</p>}
         </div>
       </div>
       {(candidate?.rejection?.message || dragMessage) && <p className={candidate?.rejection ? "drag-feedback drag-rejected" : "drag-feedback"} role={candidate?.rejection ? "alert" : "status"}>{candidate?.rejection?.message ?? dragMessage}</p>}

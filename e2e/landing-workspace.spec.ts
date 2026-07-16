@@ -74,7 +74,7 @@ test.describe("landing and workspace shell", () => {
     await expect(page.getByLabel("Problem name")).toHaveValue("Untitled problem");
     await expect(page.locator("details.entity-row")).toHaveCount(0);
     await expect(page.getByLabel("Dispatching rule")).toHaveValue("spt");
-    await expect(page.locator(".metrics article strong")).toHaveText(["-", "-", "-", "-"]);
+    await expect(page.locator(".metrics article strong")).toHaveText(["-", "-", "-", "-", "-", "-"]);
   });
 
   test("keeps editing and project actions available on a narrow screen", async ({ page }) => {
