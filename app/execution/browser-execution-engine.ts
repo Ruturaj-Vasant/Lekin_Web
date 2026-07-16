@@ -8,12 +8,21 @@ import { hasBlockingError, makeIssue } from "../../lib/schema/issue";
 import type { WorkerRequest, WorkerResponse, ExecutionProgress } from "../../worker/scheduling-protocol";
 
 export type ExecutionProgressListener = (stage: ExecutionProgress) => void;
+export type SchedulerPreparationState = "idle" | Exclude<ExecutionProgress, "running"> | "ready" | "error";
 
 type PendingExecution = {
   request: ExecutionRequest;
   resolve: (result: ExecutionResult) => void;
   timer: ReturnType<typeof setTimeout> | null;
   onProgress?: ExecutionProgressListener;
+};
+
+type PendingPreparation = {
+  executionId: string;
+  promise: Promise<void>;
+  resolve: () => void;
+  reject: (error: Error) => void;
+  listeners: Set<ExecutionProgressListener>;
 };
 
 function baseResult(request: ExecutionRequest): Omit<ExecutionResult, "status"> {
@@ -37,6 +46,34 @@ export class BrowserExecutionEngine {
   private worker: Worker | null = null;
   private pending = new Map<string, PendingExecution>();
   private startedAt = new Map<string, number>();
+  private preparation: PendingPreparation | null = null;
+  private prepared = false;
+
+  prepare(onProgress?: ExecutionProgressListener): Promise<void> {
+    if (this.prepared) return Promise.resolve();
+    if (this.preparation) {
+      if (onProgress) this.preparation.listeners.add(onProgress);
+      return this.preparation.promise;
+    }
+
+    this.ensureWorker();
+    const executionId = `prepare-${crypto.randomUUID()}`;
+    let resolve!: () => void;
+    let reject!: (error: Error) => void;
+    const promise = new Promise<void>((done, failed) => {
+      resolve = done;
+      reject = failed;
+    });
+    this.preparation = {
+      executionId,
+      promise,
+      resolve,
+      reject,
+      listeners: new Set(onProgress ? [onProgress] : []),
+    };
+    this.worker!.postMessage({ type: "prepare", executionId });
+    return promise;
+  }
 
   execute(request: ExecutionRequest, onProgress?: ExecutionProgressListener): Promise<ExecutionResult> {
     const algorithm = getAlgorithmDefinition(request.algorithmId);
@@ -62,7 +99,6 @@ export class BrowserExecutionEngine {
     return new Promise((resolve) => {
       this.ensureWorker();
       this.pending.set(request.executionId, { request, resolve, timer: null, onProgress });
-      this.startedAt.set(request.executionId, performance.now());
       const message: WorkerRequest = {
         type: "execute",
         executionId: request.executionId,
@@ -87,7 +123,7 @@ export class BrowserExecutionEngine {
   }
 
   dispose(): void {
-    this.resetWorker();
+    this.resetWorker(new Error("Execution engine was disposed."));
     for (const [executionId, pending] of this.pending) {
       pending.resolve({ ...baseResult(pending.request), status: "error", warnings: ["Execution engine was disposed."] });
       this.cleanup(executionId);
@@ -100,6 +136,7 @@ export class BrowserExecutionEngine {
     this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => this.handleMessage(event.data);
     this.worker.onerror = (event) => {
       const message = event.message || "The scheduling worker stopped unexpectedly.";
+      this.failPreparation(new Error(message));
       for (const [executionId, pending] of this.pending) {
         pending.resolve({ ...baseResult(pending.request), status: "error", runtimeMs: this.elapsed(executionId), warnings: [message] });
         this.cleanup(executionId);
@@ -109,12 +146,26 @@ export class BrowserExecutionEngine {
   }
 
   private handleMessage(message: WorkerResponse) {
+    if (this.preparation?.executionId === message.executionId) {
+      if (message.type === "progress") {
+        for (const listener of this.preparation.listeners) listener(message.stage);
+      } else if (message.type === "prepared") {
+        this.prepared = true;
+        this.preparation.resolve();
+        this.preparation = null;
+      } else if (message.type === "error") {
+        this.failPreparation(new Error(message.message));
+      }
+      return;
+    }
+    if (message.type === "prepared") return;
     const pending = this.pending.get(message.executionId);
     if (!pending) return;
 
     if (message.type === "progress") {
       pending.onProgress?.(message.stage);
       if (message.stage === "running" && pending.timer === null) {
+        this.startedAt.set(message.executionId, performance.now());
         pending.timer = setTimeout(() => this.timeout(message.executionId), DEFAULT_BROWSER_EXECUTION_POLICY.maxEstimatedRuntimeMs);
       }
       return;
@@ -175,8 +226,16 @@ export class BrowserExecutionEngine {
     this.startedAt.delete(executionId);
   }
 
-  private resetWorker() {
+  private failPreparation(error: Error) {
+    this.preparation?.reject(error);
+    this.preparation = null;
+    this.prepared = false;
+  }
+
+  private resetWorker(preparationError = new Error("Scheduler preparation was interrupted.")) {
     this.worker?.terminate();
     this.worker = null;
+    this.failPreparation(preparationError);
+    this.prepared = false;
   }
 }

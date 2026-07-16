@@ -86,6 +86,7 @@
 /* Local persistence */
 .save-feedback{font-size:10px;color:var(--success);white-space:nowrap;padding:0 4px}
 .landing-notice{max-width:640px;margin:0 auto 0;padding:11px 16px;border:1px solid #e2c9bd;background:#fdf6f2;color:#8f5a3f;font-size:12px;border-radius:7px;text-align:left}
+.scheduler-preparation{display:flex;align-items:center;gap:7px;margin:16px 0 0;color:var(--muted);font-size:11px}.scheduler-preparation span{width:7px;height:7px;border-radius:50%;background:#c5a36a;box-shadow:0 0 0 3px #f4ead8}.scheduler-ready{color:var(--success)}.scheduler-ready span{background:var(--success);box-shadow:0 0 0 3px #e2f1e9}.scheduler-error span{background:var(--warning);box-shadow:0 0 0 3px #fae8e2}.engine-state{font-size:9px!important}.engine-ready{background:#edf6f1!important;color:var(--success)!important}.engine-loading-runtime,.engine-verifying-wheel,.engine-installing-wheel,.engine-idle{background:#f8f1e5!important;color:#8a6530!important}.engine-error{background:#faece7!important;color:var(--warning)!important}
 .recent-projects{max-width:900px;margin:36px auto 0;padding:0 24px;text-align:left}
 .recent-projects h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:650;margin:0 0 12px}
 .recent-project-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}

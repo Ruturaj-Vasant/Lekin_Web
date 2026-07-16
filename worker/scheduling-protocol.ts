@@ -10,7 +10,12 @@ export type WorkerExecuteMessage = {
   system: LekinpySystemPayload;
 };
 
-export type WorkerRequest = WorkerExecuteMessage;
+export type WorkerPrepareMessage = {
+  type: "prepare";
+  executionId: string;
+};
+
+export type WorkerRequest = WorkerExecuteMessage | WorkerPrepareMessage;
 
 export type WorkerProgressMessage = {
   type: "progress";
@@ -24,6 +29,11 @@ export type WorkerCompletedMessage = {
   schedule: LekinpyScheduleDict;
   lekinpyVersion: string;
   algorithmVersion: string;
+};
+
+export type WorkerPreparedMessage = {
+  type: "prepared";
+  executionId: string;
 };
 
 export type WorkerValidationMessage = {
@@ -41,6 +51,7 @@ export type WorkerErrorMessage = {
 
 export type WorkerResponse =
   | WorkerProgressMessage
+  | WorkerPreparedMessage
   | WorkerCompletedMessage
   | WorkerValidationMessage
   | WorkerErrorMessage;

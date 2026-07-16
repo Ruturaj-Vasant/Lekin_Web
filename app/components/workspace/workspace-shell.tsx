@@ -12,7 +12,7 @@ import type { DragRejection } from "../../../lib/scheduling/recalculate";
 import { checkDropValidity, isNoOpEdit, recalculate } from "../../../lib/scheduling/recalculate";
 import type { ExecutionProgress } from "../../../worker/scheduling-protocol";
 import { saveProject, setLastActiveProjectId } from "../../../lib/persistence/local-project-store";
-import { BrowserExecutionEngine } from "../../execution/browser-execution-engine";
+import { BrowserExecutionEngine, type SchedulerPreparationState } from "../../execution/browser-execution-engine";
 import { createBlankProblem } from "../../execution/blank-problem";
 import { getBrowserLocalStorage } from "../../persistence/browser-storage";
 import { Brand } from "../brand";
@@ -23,8 +23,12 @@ import { ProblemSidebar } from "./problem-sidebar";
 import { ScheduleSummary } from "./schedule-summary";
 import { downloadProblemFile, readProblemFile } from "../../import-export/browser-problem-files";
 
-export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: ProblemDefinition; onClose: () => void }) {
-  const engine = useRef<BrowserExecutionEngine | null>(null);
+export function WorkspaceShell({ initialProblem, onClose, executionEngine, schedulerPreparation }: {
+  initialProblem: ProblemDefinition;
+  onClose: () => void;
+  executionEngine: BrowserExecutionEngine;
+  schedulerPreparation: SchedulerPreparationState;
+}) {
   const activeExecution = useRef<string | null>(null);
   const importInput = useRef<HTMLInputElement | null>(null);
   const [problem, dispatch] = useReducer(problemEditorReducer, initialProblem);
@@ -61,8 +65,6 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     setRedoStack([]);
     setDragMessage(null);
   }
-
-  useEffect(() => () => engine.current?.dispose(), []);
 
   // PRODUCT_SPEC.md §24: automatically save the active ProblemDefinition
   // after edits. Runs on mount too, so simply opening/creating a project
@@ -108,13 +110,12 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
 
   async function run() {
     if (!canRun) return;
-    engine.current ??= new BrowserExecutionEngine();
     const executionId = crypto.randomUUID();
     activeExecution.current = executionId;
     setRunning(true);
     setProgress("loading-runtime");
     setResult(null);
-    const next = await engine.current.execute({ executionId, problem, algorithmId }, setProgress);
+    const next = await executionEngine.execute({ executionId, problem, algorithmId }, setProgress);
     if (activeExecution.current !== executionId) return;
     setResult(next);
     setResultFor({ problem, algorithmId });
@@ -131,7 +132,7 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
   }
 
   function cancel() {
-    if (activeExecution.current) engine.current?.cancel(activeExecution.current);
+    if (activeExecution.current) executionEngine.cancel(activeExecution.current);
     activeExecution.current = null;
     setRunning(false);
     setProgress(null);
@@ -293,6 +294,13 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
           <small>Project</small>
           <strong>{problem.name}</strong>
           <span>Local</span>
+          <span className={`engine-state engine-${schedulerPreparation}`}>
+            {schedulerPreparation === "ready"
+              ? "Engine ready"
+              : schedulerPreparation === "error"
+                ? "Engine retrying"
+                : "Engine preparing"}
+          </span>
         </div>
         <div className="app-actions">
           <button type="button" onClick={createNewProblem}>＋ New</button>

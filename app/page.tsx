@@ -16,12 +16,33 @@ import { createBlankProblem } from "./execution/blank-problem";
 import { SAMPLE_PROBLEM } from "./execution/sample-problem";
 import { getBrowserLocalStorage } from "./persistence/browser-storage";
 import { readProblemFile } from "./import-export/browser-problem-files";
+import { BrowserExecutionEngine, type SchedulerPreparationState } from "./execution/browser-execution-engine";
 
 export default function Home() {
+  const [executionEngine] = useState(() => new BrowserExecutionEngine());
   const [initialProblem, setInitialProblem] = useState<ProblemDefinition | null>(null);
   const [checkingRestore, setCheckingRestore] = useState(true);
   const [recentProjects, setRecentProjects] = useState<ProjectSummary[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
+  const [schedulerPreparation, setSchedulerPreparation] = useState<SchedulerPreparationState>("idle");
+
+  useEffect(() => {
+    const engine = executionEngine;
+    const prepare = () => {
+      void engine.prepare((stage) => setSchedulerPreparation(stage)).then(
+        () => setSchedulerPreparation("ready"),
+        () => setSchedulerPreparation("error"),
+      );
+    };
+    const idleId = window.requestIdleCallback
+      ? window.requestIdleCallback(prepare)
+      : window.setTimeout(prepare, 1);
+    return () => {
+      if (window.cancelIdleCallback) window.cancelIdleCallback(idleId);
+      else window.clearTimeout(idleId);
+      engine.dispose();
+    };
+  }, [executionEngine]);
 
   // Runs once on mount: PRODUCT_SPEC.md §24 - restore the most recently
   // active project after a refresh, instead of always falling back to the
@@ -100,7 +121,12 @@ export default function Home() {
   if (checkingRestore) return null;
 
   return initialProblem ? (
-    <WorkspaceShell initialProblem={initialProblem} onClose={closeWorkspace} />
+    <WorkspaceShell
+      initialProblem={initialProblem}
+      onClose={closeWorkspace}
+      executionEngine={executionEngine}
+      schedulerPreparation={schedulerPreparation}
+    />
   ) : (
     <LandingScreen
       onCreateProblem={() => setInitialProblem(createBlankProblem())}
@@ -110,6 +136,7 @@ export default function Home() {
       onDeleteProject={deleteSavedProject}
       onImportFile={importFromLanding}
       notice={notice}
+      schedulerPreparation={schedulerPreparation}
     />
   );
 }
