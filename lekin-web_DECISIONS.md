@@ -968,7 +968,10 @@ Each entry should follow this format:
   opt-in skips; type checks, ESLint, and the production build passed; the full
   Chromium suite passed all 14 implemented flows with four explicitly unbuilt
   product flows skipped.
-- Status: verified on the feature branch and ready to merge and publish.
+- Delivery: merged to `main` as `72e7685`, pushed, and published privately
+  from that exact source. No co-author trailer was added. The clean redundant
+  parallel worktree that held `main` was removed after the merge.
+- Status: verified, merged, pushed, and published.
 
 ## [2026-07-16] Editable entity names and sidebar readability
 - Branch: `feat/editable-entity-names`, created from clean current `main`.
