@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { monitorBrowserErrors, openExample } from "./helpers";
+import { expectNoBrowserErrors, monitorBrowserErrors, openExample } from "./helpers";
 
 test.describe("real in-browser scheduling", () => {
   test("runs all algorithms through Pyodide and renders their real results", async ({ page }) => {
@@ -46,5 +46,27 @@ test.describe("real in-browser scheduling", () => {
     await cancel.click();
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");
     await expect(page.getByRole("button", { name: "Run schedule" })).toBeEnabled();
+  });
+
+  test("renders machine timing, per-job results, and weighted execution metrics", async ({ page }) => {
+    test.setTimeout(120_000);
+    const errors = monitorBrowserErrors(page);
+    await openExample(page);
+
+    await page.getByRole("button", { name: "Run schedule" }).click();
+    await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+
+    const details = page.locator(".details-card");
+    await expect(details.getByText("release 0 · 69% utilized")).toBeVisible();
+    await expect(details.locator(".chip").first()).toContainText("J-103 · O2 · 2–7");
+
+    await page.getByRole("tab", { name: "Job details" }).click();
+    await expect(details.getByText("release 0 · due 30 · weight 2 · completes 13 · on time")).toBeVisible();
+    await expect(details.getByText("O1 · M-01B · 3–7")).toBeVisible();
+    await expect(details.locator(".job-summary-row")).toHaveCount(3);
+
+    await page.getByRole("tab", { name: "Execution" }).click();
+    await expect(details.getByText(/weighted completion 75 · weighted tardiness 0/)).toBeVisible();
+    await expectNoBrowserErrors(errors);
   });
 });

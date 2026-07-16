@@ -1035,3 +1035,30 @@ Each entry should follow this format:
   drag-and-drop or manual-edit affordance (unchanged, later milestone).
 - Status: implemented on `feat/results-detail`, not merged, not pushed, not
   deleted.
+
+## [2026-07-16] Independent review of result detail views
+- Reviewed commit: `f25d9a9` from `feat/results-detail`, integrated on top of
+  current `main` so the em dash cleanup and result-detail work were tested as
+  one prospective release.
+- Review result: `buildJobSummaries()` derives completion and non-negative
+  tardiness correctly, preserves every problem job (including an explicit
+  not-scheduled state), and presents operations in job order even when the
+  schedule groups them by machine. Machine release/utilization and weighted
+  metrics are read from the existing typed problem/result data rather than
+  recomputed in the React component.
+- Review gap corrected: the feature had five pure helper tests but no browser
+  coverage for the new user-visible fields. Added a production-browser test
+  that runs the real SPT algorithm through Pyodide and checks exact known
+  values from the sample fixture: M-01 at 69% utilization, J-103 O2 at 2-7,
+  J-101 completion at 13, J-101 O1 on M-01B at 3-7, weighted completion 75,
+  and weighted tardiness 0.
+- Verification: 126 unit/contract tests passed with four opt-in skips; all
+  four live registry-drift checks passed; the real fixture reproduced; type
+  checks, ESLint, and the production build passed. The complete Chromium
+  acceptance suite passed with 10 implemented flows and four explicitly
+  unbuilt product flows skipped.
+- Remaining product scope: weighted metrics are now visible in Execution but
+  are not yet promoted into the always-visible top Metrics row. Algorithm
+  comparison, persistence/import-export, and Gantt drag editing remain later
+  milestones.
+- Status: independently accepted and ready to merge.
