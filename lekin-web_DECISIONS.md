@@ -349,8 +349,8 @@ Each entry should follow this format:
   `app/components/` gives the browser work a stable integration surface while
   preventing either branch from editing the other's files.
 - Tests added: none; this is behavior-preserving component decomposition.
-- Status: in progress — must not merge until the core branch interfaces are
-  reviewed and the two branches are integrated deliberately.
+- Status: integrated with the reviewed core branch, verified as a combined
+  build, and merged to `main` in merge commit `6f8eb4b`.
 
 ## [2026-07-15] lib/: schema, registry, recalculation engine, adapter core
 - Branch: `feat/scheduling-core-lib`
