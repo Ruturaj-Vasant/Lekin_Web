@@ -26,6 +26,7 @@ test.describe("manual Gantt editing", () => {
     expect(lineBox).not.toBeNull();
     expect(Math.abs(barBox!.x - (tickBox!.x + tickBox!.width / 2))).toBeLessThan(1.5);
     expect(Math.abs(barBox!.x - lineBox!.x)).toBeLessThan(1.5);
+    await expect(page.getByLabel("Drag J-102-O0").locator("small")).toHaveText("9–15 · 6u");
   });
 
   test("edits an exact start time by right-click and clears it with undo support", async ({ page }) => {

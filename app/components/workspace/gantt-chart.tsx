@@ -177,7 +177,7 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
               style={{ background: colors.get(operation.jobId), left: `${(operation.startTime / makespan) * 100}%`, width: `${Math.max(1, ((operation.endTime - operation.startTime) / makespan) * 100)}%`, top: `${42 + machineIndex * 72}px` }}
               title={`${operation.jobId} operation ${operation.operationIndex + 1}: ${operation.startTime}–${operation.endTime}`}
             >
-              <i className="drag-handle" aria-hidden="true">⋮⋮</i><span>{operation.jobId} · O{operation.operationIndex + 1}</span><small>{operation.endTime - operation.startTime}u</small>
+              <i className="drag-handle" aria-hidden="true">⋮⋮</i><span>{operation.jobId} · O{operation.operationIndex + 1}</span><small>{operation.startTime}–{operation.endTime} · {operation.endTime - operation.startTime}u</small>
               <button type="button" draggable={false} className="operation-edit-trigger" aria-label={`Edit ${operation.scheduledOperationId}`} onClick={(event) => { event.stopPropagation(); openEditor(operation); }}>Edit</button>
             </div>
           )))}
