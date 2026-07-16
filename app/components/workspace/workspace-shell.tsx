@@ -11,8 +11,10 @@ import type { ManualStartConstraints } from "../../../lib/schema/manual-edit";
 import type { DragRejection } from "../../../lib/scheduling/recalculate";
 import { checkDropValidity, isNoOpEdit, recalculate } from "../../../lib/scheduling/recalculate";
 import type { ExecutionProgress } from "../../../worker/scheduling-protocol";
+import { saveProject, setLastActiveProjectId } from "../../../lib/persistence/local-project-store";
 import { BrowserExecutionEngine } from "../../execution/browser-execution-engine";
 import { createBlankProblem } from "../../execution/blank-problem";
+import { getBrowserLocalStorage } from "../../persistence/browser-storage";
 import { Brand } from "../brand";
 import { DetailTabs } from "./detail-tabs";
 import { GanttChart } from "./gantt-chart";
@@ -43,6 +45,7 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
   const [redoStack, setRedoStack] = useState<Array<{ result: ExecutionResult; constraints: ManualStartConstraints }>>([]);
   const [dragMessage, setDragMessage] = useState<string | null>(null);
   const [manualProblem, setManualProblem] = useState(problem);
+  const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
 
   if (result !== null && isResultStale(resultFor, problem, algorithmId)) {
     setResult(null);
@@ -58,6 +61,37 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
   }
 
   useEffect(() => () => engine.current?.dispose(), []);
+
+  // PRODUCT_SPEC.md §24: automatically save the active ProblemDefinition
+  // after edits. Runs on mount too, so simply opening/creating a project
+  // (with no edits yet) already becomes the one restored after a refresh.
+  useEffect(() => {
+    const storage = getBrowserLocalStorage();
+    if (!storage) return;
+    saveProject(storage, problem);
+    setLastActiveProjectId(storage, problem.problemId);
+  }, [problem]);
+
+  useEffect(() => {
+    if (!saveFeedback) return;
+    const timer = setTimeout(() => setSaveFeedback(null), 2500);
+    return () => clearTimeout(timer);
+  }, [saveFeedback]);
+
+  function saveLocally() {
+    const storage = getBrowserLocalStorage();
+    if (!storage) {
+      setSaveFeedback("Local storage is unavailable in this browser.");
+      return;
+    }
+    const result = saveProject(storage, problem);
+    if (result.ok) {
+      setLastActiveProjectId(storage, problem.problemId);
+      setSaveFeedback("Saved locally.");
+    } else {
+      setSaveFeedback(`Could not save: ${result.error}`);
+    }
+  }
 
   const validationIssues = useMemo(
     () => validateExecutionRequest(problem, algorithmId),
@@ -236,6 +270,10 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
         <div className="app-actions">
           <button type="button" onClick={createNewProblem}>＋ New</button>
           <button type="button">⇧ Import</button>
+          <button type="button" onClick={saveLocally}>⤓ Save locally</button>
+          {saveFeedback && (
+            <span className="save-feedback" role="status">{saveFeedback}</span>
+          )}
           <button type="button">↓ Export</button>
           <button type="button" onClick={undoManualEdit} disabled={undoStack.length === 0}>↶ Undo</button>
           <button type="button" onClick={redoManualEdit} disabled={redoStack.length === 0}>↷ Redo</button>

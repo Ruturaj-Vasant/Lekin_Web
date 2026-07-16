@@ -1,11 +1,16 @@
 "use client";
 
 import { useRef } from "react";
+import type { ProjectSummary } from "../../lib/persistence/local-project-store";
 import { Brand } from "./brand";
 
 type LandingScreenProps = {
   onCreateProblem: () => void;
   onOpenExample: () => void;
+  recentProjects: ProjectSummary[];
+  onOpenProject: (problemId: string) => void;
+  onDeleteProject: (problemId: string) => void;
+  notice?: string | null;
 };
 
 const features = [
@@ -14,7 +19,19 @@ const features = [
   ["03", "Inspect every decision", "Read the Gantt chart, sequences, and metrics from one focused workspace."],
 ];
 
-export function LandingScreen({ onCreateProblem, onOpenExample }: LandingScreenProps) {
+function formatSavedAt(iso: string): string {
+  const parsed = new Date(iso);
+  return Number.isNaN(parsed.getTime()) ? "unknown time" : parsed.toLocaleString();
+}
+
+export function LandingScreen({
+  onCreateProblem,
+  onOpenExample,
+  recentProjects,
+  onOpenProject,
+  onDeleteProject,
+  notice,
+}: LandingScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null);
 
   return (
@@ -64,6 +81,45 @@ export function LandingScreen({ onCreateProblem, onOpenExample }: LandingScreenP
           onChange={onOpenExample}
         />
       </section>
+
+      {notice && (
+        <div className="landing-notice" role="status">
+          {notice}
+        </div>
+      )}
+
+      {recentProjects.length > 0 && (
+        <section className="recent-projects" aria-label="Recent projects">
+          <h2>Recent projects</h2>
+          <ul className="recent-project-list">
+            {recentProjects.map((project) => (
+              <li key={project.problemId}>
+                <button
+                  type="button"
+                  className="recent-project-open"
+                  aria-label={`Open ${project.name}`}
+                  onClick={() => onOpenProject(project.problemId)}
+                >
+                  <strong>{project.name}</strong>
+                  <small>Saved {formatSavedAt(project.savedAt)}</small>
+                </button>
+                <button
+                  type="button"
+                  className="recent-project-delete"
+                  aria-label={`Delete ${project.name}`}
+                  onClick={() => {
+                    if (window.confirm(`Delete "${project.name}"? This cannot be undone.`)) {
+                      onDeleteProject(project.problemId);
+                    }
+                  }}
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="feature-strip" id="about" aria-label="LEKIN Lab features">
         {features.map(([number, title, description]) => (
