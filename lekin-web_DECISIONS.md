@@ -211,3 +211,40 @@ Each entry should follow this format:
   entry above) because no `SchedulingAlgorithm` accepts a partially-fixed
   schedule as input. Noted as a `lekin-library` enhancement candidate, not
   actioned.
+
+## [2026-07-15] ARCHITECTURE.md v1.3: machine releases and persistent manual-start constraints
+- Branch: `docs/architecture-v1`
+- Phase: 1 (final architecture review before implementation)
+- What changed:
+  - Added `machine.release` to every scheduled operation's recalculation
+    lower bound, matching `lekinpy`'s real machine-availability behavior.
+  - Added `ManualStartConstraints`, owned by `ScheduleEditorState`, so an
+    intentional requested start time persists across later unrelated edits
+    and full graph recalculations.
+  - Changed `ManualScheduleEdit.from`/`to` to snapshot the old and new
+    requested-start constraint alongside machine and sequence position.
+  - Defined exact semantics: queue-only moves preserve a constraint, time
+    drags replace it, "start as early as possible" clears it, and undo/redo
+    restores the complete old/new placement intent.
+  - Updated the recalculation contract to accept and return the persistent
+    constraint map and the `ProblemDefinition` needed to read machine release
+    times.
+  - Expanded §4.7's required tests for machine release, persistence across
+    edits, undo/redo, clearing, hidden constraints, and same-slot no-ops.
+- Why:
+  - v1.2 could place an operation before its machine became available because
+    the graph formula omitted `Machine.release`.
+  - A requested start time existed only on the edit that introduced it; the
+    next full topological recalculation had no durable record of that intent
+    and could collapse the operation back to its earliest feasible time.
+- Alternatives considered / tradeoffs:
+  - Considered storing `requestedStartTime` directly on
+    `ScheduledOperation`. Rejected because it is manual editing intent, not
+    an observed scheduling result; a separate constraint map keeps that
+    distinction explicit and makes reset/undo behavior clearer.
+  - Chose explicit old/new constraint snapshots in every edit rather than
+    reconstructing them from rendered timestamps, which may be later than the
+    request because of precedence or machine constraints.
+- Tests added: none (architecture-only pass); the implementation acceptance
+  tests are specified in §4.7.
+- Status: in review — ready for final user approval before implementation.

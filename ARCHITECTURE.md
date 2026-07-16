@@ -1,4 +1,4 @@
-# LEKIN Lab — Web Architecture (v1.2)
+# LEKIN Lab — Web Architecture (v1.3)
 
 **Revision note (v1.1)**: v1's §4 claimed that any workcenter-eligible
 `(machine, position)` drop could always be resolved by pushing later
@@ -20,6 +20,15 @@ consistent shape regardless of which layer caught the problem. §1.4 and
 explicitly includes running Zod before Pyodide ever loads. Adopted from a
 concrete proposal reviewed during this session (credited inline where
 relevant).
+
+**Revision note (v1.3)**: v1.2's graph recalculation omitted the target
+machine's own release time, even though `lekinpy` initializes machine
+availability from `Machine.release`. It also stored a requested manual start
+time only on the edit that introduced it, so a later unrelated edit could
+recalculate the whole graph and accidentally erase intentional idle time.
+§1.7, §3, and §4 now define persistent manual-start constraints with exact
+undo/redo and clearing semantics, include machine release in every node's
+lower bound, and add regression requirements for both cases.
 
 Owner: Claude, per the division of responsibility in `MASTER_PROMPT_v2.md`.
 This is the schema, execution-adapter, component-boundary, and
@@ -507,21 +516,35 @@ interface ManualScheduleEdit {
   scheduleId: string;                // which Schedule this applies to
   scheduledOperationId: string;      // the operation that was moved
   timestamp: string;                  // ISO 8601
-  from: { machineId: string; sequencePosition: number };
-  to: { machineId: string; sequencePosition: number };
-  requestedStartTime?: number;       // OPTIONAL. See §4.1 — supports genuine
-                                  // "drag later, same slot" idle-time edits
-                                  // (PRODUCT_SPEC §12's "drag it earlier/later"),
-                                  // not just reordering. Recalculation (§4.5)
-                                  // treats this as an extra lower-bound
-                                  // constraint on this one operation's start
-                                  // time, alongside its graph-derived lower
-                                  // bound — never as a way to start earlier
-                                  // than what precedence actually allows.
+  from: {
+    machineId: string;
+    sequencePosition: number;
+    requestedStartTime: number | null; // Previous persisted lower bound.
+  };
+  to: {
+    machineId: string;
+    sequencePosition: number;
+    requestedStartTime: number | null; // New persisted lower bound. A number
+                                  // creates/updates intentional idle time;
+                                  // null explicitly clears the constraint.
+  };
   // endTime is NEVER part of the edit's input — it's always an OUTPUT of
   // recalculation (§4.5), derived from startTime + processingTime.
 }
+
+type ManualStartConstraints = Record<string, number>;
+// WEB-ONLY, owned by ScheduleEditorState. Keyed by scheduledOperationId.
+// Absence means "start as early as the graph permits." This is editing
+// intent, not an observed schedule result, so it is deliberately separate
+// from ScheduledOperation.startTime. See §4.1 and §4.5.
 ```
+
+Every accepted edit snapshots both the old and new constraint in `from` and
+`to`. A queue-only move preserves the operation's existing constraint by
+copying it to `to.requestedStartTime`; a time drag supplies a new number; an
+explicit "start as early as possible" action supplies `null`. Undo restores
+the `from` machine/position and constraint, redo restores `to`. This makes
+undo/redo deterministic without reconstructing intent from rendered times.
 
 ### Color assignment note (applies to Job.rgb / Workcenter.rgb, §1.1)
 
@@ -662,7 +685,7 @@ another module's state without owning it.
 |---|---|---|---|
 | **ProblemEditorState** | `ProblemDefinition` (jobs, operations, workcenters, machines — flat, normalized by id, see §3.1), unsaved-edit/dirty flag, import/export status | — | Nothing automatically. Editing the problem does **not** re-run execution — the user explicitly re-runs (PRODUCT_SPEC has no "live recompute on every keystroke" requirement). |
 | **ExecutionState** | Selected `algorithmId`, the current `ExecutionRequest`, the list of `ExecutionResult`s (one per run — this is what makes algorithm comparison, §19, possible without re-running), execution status (`idle`\|`running`\|`rejected`\|`invalid`\|`error`\|`completed`) | `ProblemEditorState.problem` (read-only, snapshotted into each `ExecutionRequest` at run time) | Calls `ExecutionEngine.execute()` |
-| **ScheduleEditorState** (Gantt canvas) | The *active* `Schedule` (one `ExecutionResult.schedule` plus every `ManualScheduleEdit` applied on top of it, §4), the undo/redo stack of `ManualScheduleEdit`s, current selection (selected `scheduledOperationId`), in-progress drag state (candidate machine/position, valid/invalid highlight set — transient, not persisted), viewport (zoom/pan — view-only) | `ExecutionState` (to pick which `ExecutionResult` is "active" when the user switches algorithms in the comparison tab) | Recalculation (§4) on every accepted drop |
+| **ScheduleEditorState** (Gantt canvas) | The *active* `Schedule` (one `ExecutionResult.schedule` plus every `ManualScheduleEdit` applied on top of it, §4), `manualStartConstraints: ManualStartConstraints` (persistent requested lower bounds, §1.7/§4.1), the undo/redo stack of `ManualScheduleEdit`s (each snapshots its old/new constraint), current selection (selected `scheduledOperationId`), in-progress drag state (candidate machine/position/time, valid/invalid highlight set — transient, not persisted), viewport (zoom/pan — view-only) | `ExecutionState` (to pick which `ExecutionResult` is "active" when the user switches algorithms in the comparison tab) | Recalculation (§4) on every accepted drop |
 | **MetricsPanel** | Nothing of its own | `ScheduleEditorState`'s active `Schedule` | Recomputes `Metrics` (pure function, §1.3) on every change to the active schedule — not separately stateful |
 | **ValidationState** | The current `ValidationIssue[]` — either the live `validateExecutionRequest()` result as the user edits (`source: "schema"`), or the last `ExecutionResult.validationIssues` (§1.4/§1.6, either `source`), whichever is most recent — plus any drag `DragRejection`s the user should still see (§4.6) | `ExecutionState`, `ScheduleEditorState`, `ProblemEditorState` | — |
 | **DetailTabs** | Only the "Algorithm Comparison" tab has its own state: which `ExecutionResult`s are selected for side-by-side comparison. Machine Sequence, Job Details, and Validation Messages tabs are pure read views over `ScheduleEditorState` / `ValidationState` — they own nothing. | `ScheduleEditorState`, `ValidationState`, `ExecutionState` | — |
@@ -699,7 +722,7 @@ operation in the editor, not just checked at execution time).
 
 The drop target is **`(targetMachineId, targetSequencePosition)`** — an
 insertion index into that machine's operation queue — plus an **optional**
-`requestedStartTime` (§1.7) for intentional idle-time placement. This
+persisted `to.requestedStartTime` (§1.7) for intentional idle-time placement. This
 matches PRODUCT_SPEC §12's action list ("reorder operations on the same
 machine, move it to another eligible machine") and §14's recalculation
 strategy ("treat the user's move as a new machine-sequence constraint").
@@ -710,6 +733,15 @@ of recalculation (§4.5), never a value the user sets directly, **except**
 where `requestedStartTime` explicitly asks for later-than-minimum
 placement (still validated, never used to start earlier than precedence
 allows).
+
+The requested time is a persistent lower-bound constraint, not a one-shot
+hint. `ScheduleEditorState.manualStartConstraints` carries it across every
+later recalculation. Queue-only moves preserve the existing value. A time
+drag replaces it. "Start as early as possible" clears it. Undo/redo restores
+the exact previous/next value recorded in the edit. A request earlier than
+the current graph-derived lower bound remains stored even though it has no
+visible effect yet; if a later edit removes that blocking dependency, the
+requested lower bound still applies.
 
 ### 4.2 The precedence graph
 
@@ -793,19 +825,23 @@ queuing, so **once a drop clears both hard-reject checks above,
 recalculation is guaranteed to succeed** — a topological order always
 exists for an acyclic graph, and walking it always produces a valid
 start/end time for every node. Defensive/no-op case: dropping onto the
-operation's own current `(machine, position)` with no `requestedStartTime`
-change is a silent no-op — no edit recorded, nothing recalculated.
+operation's own current `(machine, position)` with the same persisted
+requested-start constraint is a silent no-op — no edit recorded, nothing
+recalculated. A same-slot edit that changes or clears the requested-start
+constraint is a real edit and triggers recalculation.
 
 See §6.3 for how this revises PRODUCT_SPEC §13's eight-item list.
 
 ### 4.5 Recalculation algorithm (triggered on every accepted drop)
 
-Pure function: `recalculate(schedule: Schedule, edit: ManualScheduleEdit): { schedule: Schedule; metrics: Metrics }`.
+Pure function: `recalculate(schedule: Schedule, edit: ManualScheduleEdit, manualStartConstraints: ManualStartConstraints, problem: ProblemDefinition): { schedule: Schedule; metrics: Metrics; manualStartConstraints: ManualStartConstraints }`.
 
 1. Apply the edit to the graph: remove the moved operation's old machine
    edges, insert it into the target machine's queue at
    `to.sequencePosition`, add its new machine edges. Job-precedence edges
-   are untouched (they're fixed).
+   are untouched (they're fixed). Clone `manualStartConstraints` and either
+   set the moved operation's entry to `to.requestedStartTime` or delete the
+   entry when that value is `null`; never mutate the caller's map in place.
 2. Run cycle detection (§4.3) on the result. (In practice this was already
    done to accept the drop in the first place — recalculation reuses that
    same topological order rather than recomputing it, so this is one
@@ -820,12 +856,12 @@ Pure function: `recalculate(schedule: Schedule, edit: ManualScheduleEdit): { sch
      lowerBound = max(
        0,
        job.release        (only if n is its job's first operation),
+       machine.release    (for the machine n is assigned to),
        every incoming edge's source node's endTime,
-       n.requestedStartTime ?? 0   (only meaningful if it's >= the above —
-                                     a requestedStartTime earlier than the
-                                     true lower bound is simply ignored,
-                                     never used to start earlier than
-                                     precedence allows)
+       manualStartConstraints[n.scheduledOperationId] ?? 0
+                            (a requested time earlier than the other lower
+                             bounds has no current visible effect, but stays
+                             persisted for subsequent edits)
      )
      n.startTime = lowerBound
      n.endTime = n.startTime + n.processingTime
@@ -838,6 +874,11 @@ Pure function: `recalculate(schedule: Schedule, edit: ManualScheduleEdit): { sch
    schedule as input (they only ever compute from scratch via a
    job-selector function — see §6.2, a real library gap, not a web-side
    shortcut).
+   Applying `machine.release` to every assigned operation is intentional and
+   harmlessly redundant after the first queue operation: later operations
+   also inherit the preceding machine operation's end time through an
+   incoming edge, while the explicit bound guarantees correctness even for
+   an empty-prefix/newly moved first operation.
 4. Recompute `Metrics` (§1.3) from the fully updated `ScheduledOperation`
    set.
 5. Mark every `ScheduledOperation` whose `startTime`/`endTime`/`machineId`
@@ -905,9 +946,21 @@ concrete acceptance bar, not just prose:
 - A `requestedStartTime` later than the graph-derived lower bound produces
   genuine idle time before the operation starts, without affecting
   operations that don't depend on it.
-- Dropping onto an operation's own current `(machine, position)` with no
-  `requestedStartTime` change is a no-op: no `ManualScheduleEdit` recorded,
-  no recalculation triggered.
+- A machine released at time 10 never receives an operation starting before
+  time 10, even when that operation has no earlier job or machine predecessor.
+- A requested-start constraint survives an unrelated later edit and its full
+  graph recalculation.
+- Undo restores the prior requested-start constraint; redo restores the new
+  one, together with the corresponding machine and queue position.
+- A queue-only move preserves an existing requested-start constraint; an
+  explicit "start as early as possible" edit clears it.
+- A requested time currently hidden by a later predecessor bound remains
+  stored and becomes effective if a subsequent edit moves that predecessor
+  earlier.
+- Dropping onto an operation's own current `(machine, position)` with the
+  same persisted requested-start constraint is a no-op: no
+  `ManualScheduleEdit` recorded, no recalculation triggered. Changing or
+  clearing the constraint in the same slot is not a no-op.
 
 ---
 
@@ -982,7 +1035,7 @@ rather than leaving the tooling question open.
 ### 6.5 Metrics is web-side; multi-error validation is a unified web-side contract, not a lekinpy gap
 `Metrics` is computed client-side (§1.3), flagged as a `lekin-library`
 enhancement candidate rather than Phase 0 rework — unchanged from the
-earlier discussion. **Validation's final shape (v1.2)**: `ExecutionResult`
+earlier discussion. **Validation's final shape (v1.2, unchanged in v1.3)**: `ExecutionResult`
 carries `validationIssues: ValidationIssue[]` (§1.4/§1.6) — a single array
 regardless of which layer produced an entry (`source: "schema"` for the
 Zod problem-editor pass, which collects every violation in one pass with
