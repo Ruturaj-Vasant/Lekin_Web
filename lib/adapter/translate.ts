@@ -3,7 +3,7 @@ import type { Schedule } from "../schema/schedule";
 import { makeOperationId } from "../schema/schedule";
 
 /**
- * ARCHITECTURE.md §2.2 steps 4 and 7 / §5 — the ONLY place snake_case <->
+ * ARCHITECTURE.md §2.2 steps 4 and 7 / §5 - the ONLY place snake_case <->
  * camelCase and flat <-> nested translation happens. Pure functions only;
  * actually invoking Pyodide with these payloads is the Worker-side glue
  * (not this module's job).
@@ -105,7 +105,7 @@ export interface LekinpyScheduleDict {
 /**
  * lekinpy Schedule.to_dict() output -> web Schedule (ARCHITECTURE.md §1.2).
  * Adds the derived scheduledOperationId and tags every record
- * `source: "algorithm"`, `manuallyModified: false` — this is always a
+ * `source: "algorithm"`, `manuallyModified: false` - this is always a
  * fresh algorithm result; manual edits are layered on afterward by
  * recalculate() (lib/scheduling/recalculate.ts).
  */

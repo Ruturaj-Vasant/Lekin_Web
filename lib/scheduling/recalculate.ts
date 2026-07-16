@@ -13,7 +13,7 @@ import {
   type MachineQueues,
 } from "./graph";
 
-/** ARCHITECTURE.md §4.6 — Wording contract for rejection explanations. */
+/** ARCHITECTURE.md §4.6 - Wording contract for rejection explanations. */
 export interface DragRejection {
   operationId: string;
   targetMachineId: string;
@@ -51,7 +51,7 @@ function buildOperationLookup(problem: ProblemDefinition): Map<string, Operation
 }
 
 /**
- * ARCHITECTURE.md §4.4 — the two hard-reject cases, checked in order:
+ * ARCHITECTURE.md §4.4 - the two hard-reject cases, checked in order:
  *  1. Workcenter/eligibility mismatch (O(1), no graph needed).
  *  2. Cyclic precedence (§4.3's Kahn's-algorithm check on the *proposed*
  *     graph, i.e. the graph resulting from actually applying the move).
@@ -135,10 +135,10 @@ export function isNoOpEdit(
 }
 
 /**
- * ARCHITECTURE.md §4.5 — Recalculation algorithm.
+ * ARCHITECTURE.md §4.5 - Recalculation algorithm.
  *
  * Callers MUST call checkDropValidity() first and only invoke this for an
- * edit it accepted (`valid: true`) — this function assumes the resulting
+ * edit it accepted (`valid: true`) - this function assumes the resulting
  * graph is acyclic and throws if it isn't, rather than silently producing
  * a nonsensical schedule.
  */

@@ -3,7 +3,7 @@ import { ValidationIssueSchema } from "./issue";
 import { ProblemDefinitionSchema } from "./problem";
 import { ScheduleSchema, MetricsSchema } from "./schedule";
 
-/** ARCHITECTURE.md §1.5 — Algorithm registry. */
+/** ARCHITECTURE.md §1.5 - Algorithm registry. */
 
 export const AlgorithmParameterSchema = z.object({
   name: z.string(),
@@ -38,7 +38,7 @@ export const AlgorithmDefinitionSchema = z.object({
 });
 export type AlgorithmDefinition = z.infer<typeof AlgorithmDefinitionSchema>;
 
-/** ARCHITECTURE.md §1.6 — Execution. */
+/** ARCHITECTURE.md §1.6 - Execution. */
 
 export const ExecutionRequestSchema = z.object({
   executionId: z.string(),

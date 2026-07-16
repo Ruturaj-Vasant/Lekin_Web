@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** ARCHITECTURE.md §1.2 — Scheduled results. */
+/** ARCHITECTURE.md §1.2 - Scheduled results. */
 
 export const ScheduledOperationSchema = z.object({
   scheduledOperationId: z.string(),
@@ -36,7 +36,7 @@ export const ScheduleSchema = z.object({
 });
 export type Schedule = z.infer<typeof ScheduleSchema>;
 
-/** ARCHITECTURE.md §1.3 — Metrics. */
+/** ARCHITECTURE.md §1.3 - Metrics. */
 export const MetricsSchema = z.object({
   makespan: z.number(),
   maxTardiness: z.number(),
@@ -49,7 +49,7 @@ export const MetricsSchema = z.object({
 });
 export type Metrics = z.infer<typeof MetricsSchema>;
 
-/** Derives scheduledOperationId/operationId consistently — ARCHITECTURE.md §1.1/§1.2. */
+/** Derives scheduledOperationId/operationId consistently - ARCHITECTURE.md §1.1/§1.2. */
 export function makeOperationId(jobId: string, operationIndex: number): string {
   return `${jobId}-O${operationIndex}`;
 }

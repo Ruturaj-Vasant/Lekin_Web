@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { severityForCode, VALIDATION_ERROR_CODES } from "./codes";
 
-/** ARCHITECTURE.md §1.4 — ValidationIssue. */
+/** ARCHITECTURE.md §1.4 - ValidationIssue. */
 export const ValidationIssueSchema = z.object({
   code: z.enum(VALIDATION_ERROR_CODES),
   message: z.string(),

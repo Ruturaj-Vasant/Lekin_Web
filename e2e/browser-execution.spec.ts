@@ -19,7 +19,7 @@ test.describe("real in-browser scheduling", () => {
       await page.getByRole("button", { name: "Run schedule" }).click();
       await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
       await expect(page.locator(".bar")).toHaveCount(8);
-      await expect(page.locator(".metrics article").first().locator("strong")).not.toHaveText("—");
+      await expect(page.locator(".metrics article").first().locator("strong")).not.toHaveText("-");
       scheduleFingerprints.set(id, await page.locator(".bar").evaluateAll((bars) => bars.map((bar) => {
         const element = bar as HTMLElement;
         return `${element.innerText}|${element.style.left}|${element.style.top}`;

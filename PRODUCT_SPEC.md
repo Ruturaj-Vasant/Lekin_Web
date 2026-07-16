@@ -1,8 +1,8 @@
-# LEKIN Lab — Web Product & Design Specification
+# LEKIN Lab - Web Product & Design Specification
 
 This is the permanent source of truth for the **web application** (`lekin-web`)
 specifically. For cross-project overview, phase status, and working
-conventions shared with `lekin-library`, see `Lekin/MASTER_PROMPT.md` — read
+conventions shared with `lekin-library`, see `Lekin/MASTER_PROMPT.md` - read
 that first. This file assumes that context and does not repeat it.
 
 Repository this is built on: https://github.com/mpinedo170/Lekin_Python
@@ -10,7 +10,7 @@ Repository this is built on: https://github.com/mpinedo170/Lekin_Python
 Before making architectural or implementation decisions, inspect the current
 state of `lekin-library` directly and verify its actual capabilities, data
 models, algorithms, file formats, dependencies, and limitations. Do not
-assume documentation and implementation are perfectly aligned — verify.
+assume documentation and implementation are perfectly aligned - verify.
 
 ---
 
@@ -25,7 +25,7 @@ inspect the generated schedules, manually modify schedules through
 drag-and-drop, and immediately observe how schedule-performance metrics
 change.
 
-It should feel like **Figma for scheduling and operations research** — a
+It should feel like **Figma for scheduling and operations research** - a
 professional engineering application running in the browser, not a
 university website, admin dashboard, or generic AI-styled SaaS interface.
 
@@ -107,14 +107,14 @@ Avoid modal windows for every small change.
 ## 6. Algorithm execution and compatibility
 
 Initial platform exposes: FCFS, SPT, EDD, WSPT. The application must verify
-— against the actual current library, not assumed capability — whether each
+- against the actual current library, not assumed capability - whether each
 algorithm supports: single-operation jobs, multi-operation jobs, parallel
 machines, multiple workcenters, release times, due dates, weights.
 
 **The UI must never imply support the underlying implementation doesn't
 provide.** If an algorithm only supports single-operation jobs, show a clear
 compatibility label before execution, e.g.: *"SPT currently supports
-single-operation jobs only."* This is not a cosmetic detail — it directly
+single-operation jobs only."* This is not a cosmetic detail - it directly
 follows from the real bugs found in the library (§16 below) and must reflect
 whatever state Phase 0 of the library refactor actually leaves things in,
 not the aspirational end state.
@@ -150,10 +150,10 @@ execution is required.
 
 Adding an approved algorithm later should require minimal or no changes to
 the main workspace UI. Possible mechanisms: JSON manifest, Python registry,
-decorators, abstract base classes, Python entry points — use the simplest
+decorators, abstract base classes, Python entry points - use the simplest
 reliable option for the current architecture while preserving future
 extensibility. (This is the same plugin contract referenced in
-`MASTER_PROMPT.md` Phase 0 item 5 on the library side — the two must stay
+`MASTER_PROMPT.md` Phase 0 item 5 on the library side - the two must stay
 compatible.)
 
 ## 8. Browser-first execution model
@@ -162,7 +162,7 @@ Run small computations locally in the browser whenever technically
 practical: Pyodide, WebAssembly, PyScript, or a browser-compatible JS/TS
 execution layer are the candidate technologies.
 
-Do not assume Streamlit is a static browser application — it normally
+Do not assume Streamlit is a static browser application - it normally
 requires a running Python server. Pydantic may be used for schemas and
 validation but is not a browser execution engine.
 
@@ -192,7 +192,7 @@ operations, number of machines, number of workcenters, selected algorithm,
 estimated algorithmic complexity, estimated memory usage, expected execution
 time, imported file size.
 
-Example execution-policy configuration (values are illustrative, not final —
+Example execution-policy configuration (values are illustrative, not final -
 freeze real numbers only after benchmarking on representative browsers):
 
 ```json
@@ -268,7 +268,7 @@ Future server execution may support: hundreds/thousands of jobs,
 long-running optimization algorithms, solver-based algorithms, batch
 comparisons, queued execution, downloadable results, saved execution
 history. Do not implement this backend in the initial release unless
-explicitly requested — prepare interfaces and schemas for it now.
+explicitly requested - prepare interfaces and schemas for it now.
 
 ## 12. Interactive Gantt chart
 
@@ -284,7 +284,7 @@ algorithm-generated schedule.
 
 ## 13. Drag-and-drop validation
 
-A drag must not simply alter the visual chart — every movement is validated
+A drag must not simply alter the visual chart - every movement is validated
 against scheduling constraints, at minimum: job release time, operation
 precedence, machine availability, workcenter eligibility, eligible machine
 assignment, processing duration, machine capacity, operation overlap,
@@ -372,7 +372,7 @@ The schedule itself:
 ```
 
 The Gantt chart, metrics, export functions, and drag-and-drop logic must all
-use this authoritative data — never reconstruct operation timing from job
+use this authoritative data - never reconstruct operation timing from job
 IDs alone when accurate timestamps already exist.
 
 ## 16. Known library limitations to account for
@@ -387,7 +387,7 @@ may be incomplete; empty machine candidate lists may cause generic runtime
 errors; duplicate IDs may not be prevented; invalid processing times may not
 be rejected.
 
-Do not hide these limitations in the website — surface real compatibility
+Do not hide these limitations in the website - surface real compatibility
 status (§6) instead. Before implementing advanced interactive editing,
 confirm the necessary library refactoring (Phase 0) is actually complete.
 
@@ -414,7 +414,7 @@ First version priority: (1) JSON import/export, (2) current LEKIN-supported
 formats already handled reliably by the library, (3) schedule export.
 
 Imported files must be validated before use, with clear file-specific
-errors (row, field, or line information where possible) — not a generic
+errors (row, field, or line information where possible) - not a generic
 failure message.
 
 ## 19. Algorithm comparison
@@ -427,7 +427,7 @@ one selected schedule unless the user explicitly chooses otherwise.
 
 ## 20. Design direction
 
-70% Figma, 20% Linear, 10% Apple Instruments — a professional engineering
+70% Figma, 20% Linear, 10% Apple Instruments - a professional engineering
 workbench. Avoid: gradients, glassmorphism, neon colors, excessive shadows,
 oversized rounded cards, decorative dashboards, heavy dark themes, generic
 purple-blue AI styling, unnecessary illustrations.
@@ -441,7 +441,7 @@ borders `#E6E6EA`, primary text `#1A1A1A`, secondary text `#6B6B72`.
 Warning/manual-change emphasis `#C45C3B`.
 
 NYU Violet is used for: primary actions, selected tabs, active states,
-focus indicators, links, selected-operation outlines — nothing else. The
+focus indicators, links, selected-operation outlines - nothing else. The
 interface remains approximately 95% neutral; do not let the overall
 application read as purple.
 
@@ -455,7 +455,7 @@ identification.
 
 Interface fonts (preferred): IBM Plex Sans, Geist, Source Sans 3.
 Monospace (for machine IDs, durations, metrics): IBM Plex Mono, Geist Mono.
-Compact, readable, professional — not decorative.
+Compact, readable, professional - not decorative.
 
 ## 23. Interaction principles
 
@@ -473,7 +473,7 @@ Support both mouse and keyboard use where practical.
 No login in the first version, so support local project persistence:
 browser local storage for small project metadata, IndexedDB for larger
 structured project data, downloadable JSON files. Do not promise permanent
-cloud storage initially — clearly communicate that locally saved work stays
+cloud storage initially - clearly communicate that locally saved work stays
 tied to the current browser unless exported.
 
 ## 25. Performance and safety
@@ -504,34 +504,34 @@ algorithms, (2) trusted installed plugins, (3) untrusted uploaded
 algorithms. Untrusted algorithms will eventually require: isolated
 containers, CPU limits, memory limits, execution timeouts, disabled network
 access, temporary filesystems, dependency restrictions, job queues, audit
-logs. This is a future phase — do not implement it casually in the initial
+logs. This is a future phase - do not implement it casually in the initial
 version.
 
 ## 28. Recommended implementation phases (web-specific detail)
 
-**Phase 1 — Browser-based MVP**: minimal landing screen, single-page
+**Phase 1 - Browser-based MVP**: minimal landing screen, single-page
 workspace, problem editor, example problems, JSON import/export, algorithm
 selection, browser-side execution for supported small problems,
 configurable execution limits, informative limit errors, static Gantt
 chart, core metrics, local persistence, compatibility warnings.
 
-**Phase 2 — Interactive scheduling**: operation-level schedule model,
+**Phase 2 - Interactive scheduling**: operation-level schedule model,
 drag-and-drop Gantt editing, feasibility validation, automatic
 recalculation, undo/redo, reset to algorithm schedule, improved
 machine-sequence editor, algorithm comparison.
 
-**Phase 3 — Backend computation**: execution API, background workers, job
+**Phase 3 - Backend computation**: execution API, background workers, job
 queue, large-problem routing, execution status, downloadable results,
 server-side time/memory limits. Browser and backend execution must return
 the same schema.
 
-**Phase 4 — Extensible algorithm ecosystem**: formal plugin interface,
+**Phase 4 - Extensible algorithm ecosystem**: formal plugin interface,
 additional approved algorithms, algorithm parameter forms generated from
 metadata, backend-only solvers, trusted plugin distribution, isolated
 execution for untrusted custom algorithms.
 
-**Phase 5 — Optional accounts and collaboration**: only if the product
-actually requires it — authentication, cloud-saved projects, classroom
+**Phase 5 - Optional accounts and collaboration**: only if the product
+actually requires it - authentication, cloud-saved projects, classroom
 assignments, shared experiments, collaboration, execution history. Do not
 add login merely because most web applications have it.
 
@@ -608,7 +608,7 @@ Unless explicitly revised, preserve:
 - Prefer a smaller correct system over a large unreliable system.
 - Keep the UI streamlined and scheduling-focused.
 - Update this specification when a product decision is intentionally
-  changed — and log the change in `DECISIONS.md` when you do.
+  changed - and log the change in `DECISIONS.md` when you do.
 - **Design implementation defers to `ARCHITECTURE.md`.** If a visual
   requirement here can't be met without changing the shared schema or
   component boundaries defined there, flag it back rather than quietly

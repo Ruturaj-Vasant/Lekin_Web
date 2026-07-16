@@ -1,8 +1,8 @@
-# Decisions Log — lekin-web
+# Decisions Log - lekin-web
 
 Append-only log of changes made to `lekin-web`, in order, with reasoning.
 Read this whole file at the start of every new session before doing any work.
-Never delete or rewrite past entries — if a decision is later reversed, add a
+Never delete or rewrite past entries - if a decision is later reversed, add a
 new entry saying so and why, rather than editing the old one.
 
 Each entry should follow this format:
@@ -24,7 +24,7 @@ Each entry should follow this format:
 - Branch: n/a
 - Phase: n/a
 - What changed: Created empty `lekin-web` repo as a placeholder. No
-  implementation started — waiting on `lekin-library` Phase 0 to complete
+  implementation started - waiting on `lekin-library` Phase 0 to complete
   first, since the web app is built against its finished interface.
 - Why: Keep the two repos separate from day one so `lekin-library` stays a
   clean, standalone package and `lekin-web` only ever depends on a pinned
@@ -55,21 +55,21 @@ Each entry should follow this format:
     `ManualScheduleEdit`), the browser execution adapter's internal step
     order (policy check before Pyodide loads, validate-first, translation
     boundary), component state-ownership boundaries, and the
-    drag-and-drop validation/recalculation contract — no UI/component
+    drag-and-drop validation/recalculation contract - no UI/component
     code.
 - Why: `MASTER_PROMPT_v2.md`'s division of responsibility puts schema and
   structure under Claude, visual/component implementation under Codex,
   with Codex building against this document plus `PRODUCT_SPEC.md`.
 - Alternatives considered / tradeoffs:
   - Found the real `lekinpy` shape differs from `PRODUCT_SPEC.md` §15/17's
-    placeholder JSON in several real ways — no `Metrics` are ever returned
+    placeholder JSON in several real ways - no `Metrics` are ever returned
     as data (only printed by `display_summary()`), `System.validate()`
     raises one error at a time rather than collecting a list, `Operation`
     has no id field or eligible-machine restriction, `Machine` has no
     parent-workcenter field. Chose to treat metrics computation and
     single-error validation as web-side responsibilities for v1 rather
     than reopening `lekin-library` scope (Phase 0 was scoped to exactly 7
-    items and is closed) — flagged both as library-enhancement candidates
+    items and is closed) - flagged both as library-enhancement candidates
     in `ARCHITECTURE.md` §6 instead.
   - Found that `PRODUCT_SPEC.md` §13's eight-item drag validation list
     collapses, given lekinpy's actual constraint model (no hard deadlines,
@@ -81,26 +81,26 @@ Each entry should follow this format:
   - Picked Zod as the schema-validation tool (§17's open question) over
     Pydantic-generated/JSON-Schema-generated options, specifically to
     avoid introducing Pydantic into `lekin-library` merely to enable
-    codegen — `MASTER_PROMPT_v2.md` is explicit the library should have no
+    codegen - `MASTER_PROMPT_v2.md` is explicit the library should have no
     knowledge a website exists.
   - Left the question of where the pinned `.whl` file is actually hosted
-    for Pyodide to fetch unresolved — flagged in `ARCHITECTURE.md` §2.3 as
+    for Pyodide to fetch unresolved - flagged in `ARCHITECTURE.md` §2.3 as
     a concrete Phase 1 blocker rather than assumed away.
 - Tests added: none (architecture document only, no code).
-- Status: in review — awaiting user review before Codex starts building
+- Status: in review - awaiting user review before Codex starts building
   against it.
 
 ## [2026-07-15] ARCHITECTURE.md v1.1: fix a real infeasibility gap in the drag-and-drop model
 - Branch: `docs/architecture-v1`
 - Phase: 1 (still pre-implementation)
 - What changed: user review of v1 rejected it as-is and found a genuine
-  correctness bug, not a style nit — revised §4 (drag-and-drop) and made
+  correctness bug, not a style nit - revised §4 (drag-and-drop) and made
   four smaller corrections (§1.3, §1.7, §2.3, §3.1) in response. See
   `ARCHITECTURE.md`'s own revision note at the top for the full technical
   detail; summarized here:
   - **The critical fix**: v1 claimed any workcenter-eligible
     `(machine, position)` drop could always be resolved by pushing later
-    operations forward. False — the user gave a concrete counterexample
+    operations forward. False - the user gave a concrete counterexample
     (two jobs, two machines, manual machine orders combined with job
     precedence forming `J1-O0 → J1-O1 → J2-O0 → J2-O1 → J1-O0`, a genuine
     cycle). This is the classic job-shop disjunctive-graph problem (fixed
@@ -120,14 +120,14 @@ Each entry should follow this format:
     silently only supporting one of the two.
   - Corrected the multi-error-validation framing from the prior session
     discussion: Zod already collects every problem-editor violation in one
-    pass with zero `lekin-library` changes needed — the earlier answer
+    pass with zero `lekin-library` changes needed - the earlier answer
     conflated that with `system.validate()`'s single-error execution-time
     check, which is a separate, narrower thing that's correctly singular.
   - Resolved the wheel-hosting open question (§2.3) rather than leaving it
     open: a version-stamped same-origin static asset
     (`public/vendor/lekinpy-0.2.0-py3-none-any.whl`) with a checksum and a
     documented replace process, per the user's specific recommendation.
-  - Fixed an inaccurate O(1)-lookup claim (§3.1) — arrays alone don't
+  - Fixed an inaccurate O(1)-lookup claim (§3.1) - arrays alone don't
     provide O(1) access; `ProblemEditorState` needs derived id-indexed
     `Map`s alongside the arrays.
   - Specified `machineUtilization`'s denominator precisely
@@ -135,24 +135,24 @@ Each entry should follow this format:
     exact behavior for empty schedules and jobs missing from a given
     schedule (§1.3).
 - Why: the cycle case is a real, not hypothetical, failure mode the moment
-  drag-and-drop ships — any user reordering two machines whose jobs also
+  drag-and-drop ships - any user reordering two machines whose jobs also
   share cross-machine precedence could hit it. Catching this before Codex
   builds anything against the recalculation contract avoids a rebuild
   after the fact.
-- Alternatives considered / tradeoffs: none recorded here — this entry
+- Alternatives considered / tradeoffs: none recorded here - this entry
   documents an external review's findings and this session's response to
   them, not a original design choice with rejected alternatives.
 - Tests added: none (still architecture-only); §4.7 was added specifying
   the required test coverage once this is implemented, including the
   exact cycle counterexample as a named regression case.
-- Status: in review — awaiting user re-review and approval before Codex
+- Status: in review - awaiting user re-review and approval before Codex
   starts building against it.
 
 ## [2026-07-15] ARCHITECTURE.md v1.2: unify validation into validationIssues: ValidationIssue[]
 - Branch: `docs/architecture-v1`
 - Phase: 1 (still pre-implementation)
 - What changed: adopted a concrete proposal (Codex, reviewed mid-session)
-  closing a gap the v1.1 revision left open — §1.4's "two validation
+  closing a gap the v1.1 revision left open - §1.4's "two validation
   layers" note was correct in prose, but `ExecutionResult` still carried a
   singular `validationError`, so the frontend had no single consistent
   shape to read regardless of which layer (Zod vs. `system.validate()`)
@@ -179,7 +179,7 @@ Each entry should follow this format:
     browser limit.
   - §2.2's adapter step order now explicitly runs the Zod check
     (`validateExecutionRequest`) before Pyodide loads at all, not just
-    before running the algorithm — avoids paying for a Pyodide spin-up on
+    before running the algorithm - avoids paying for a Pyodide spin-up on
     input already known to be invalid.
 - Why: a unified issue shape is simpler for the Validation Messages tab to
   render (one list, filter by `severity`) and gives every issue enough
@@ -188,21 +188,21 @@ Each entry should follow this format:
   reliably provide for editor-level (non-library) issues.
 - Alternatives considered / tradeoffs: considered separate
   `validationErrors`/`validationWarnings` arrays instead of one array with
-  `severity` — went with the single array (matching the proposal's stated
+  `severity` - went with the single array (matching the proposal's stated
   preference) since it avoids the risk of an issue being miscategorized
   into the wrong array and keeps "is execution blocked" a single
   `.some(i => i.severity === "error")` check.
 - Tests added: none (still architecture-only).
-- Status: in review — awaiting user re-review and approval before Codex
+- Status: in review - awaiting user re-review and approval before Codex
   starts building against it.
 
 ## Observed, not yet actioned
 <!-- Anything noticed while working that's out of scope for the current
-     item — note it here instead of fixing it inline, so it isn't lost. -->
+     item - note it here instead of fixing it inline, so it isn't lost. -->
 - `ARCHITECTURE.md` §2.3: no decision yet on where the built `lekinpy`
   wheel is hosted/fetched from for Pyodide's `micropip.install()`. Needs
   resolving before the execution adapter can actually be implemented.
-  **RESOLVED 2026-07-15** — see the v1.1 entry above; versioned same-origin
+  **RESOLVED 2026-07-15** - see the v1.1 entry above; versioned same-origin
   static asset under `public/vendor/`, with checksum + documented replace
   process.
 - `ARCHITECTURE.md` §6.2: manual-edit recalculation currently reimplements
@@ -255,7 +255,7 @@ Each entry should follow this format:
 - What changed:
   - Executed §2.3's already-decided (v1.1) wheel-hosting process for the
     first time: checked out `lekin-library`'s `v0.2.0` tag in detached
-    HEAD (resolves to commit `a3fee48` — the annotated tag object's own
+    HEAD (resolves to commit `a3fee48` - the annotated tag object's own
     SHA is `34c9cad`, distinct from the commit it points to; noted here
     since it's easy to confuse the two), ran a clean `python -m build
     --wheel`, verified the resulting wheel's contents (only `lekinpy/`
@@ -267,7 +267,7 @@ Each entry should follow this format:
     (`e374e3d33049513947a943383838227ec383a6f2e2e1356b85c9e8234c1eacea`)
     to this repo.
   - Fixed a stale commit hash in `ARCHITECTURE.md`'s "Pinned dependency"
-    line (`adf6e07` → `a3fee48`) — the original hash I recorded no longer
+    line (`adf6e07` → `a3fee48`) - the original hash I recorded no longer
     resolves in `lekin-library` (likely rewritten by history changes on
     that repo, e.g. matplotlib becoming a core dependency and other
     commits landing after the fact); the tag itself still points at the
@@ -275,10 +275,10 @@ Each entry should follow this format:
     hash. Updated §2.3 from "Decision" to "Done" now that the asset
     actually exists.
 - Why: this was the last fully-specified, non-UI, cross-repo prerequisite
-  blocking the execution adapter (§2). No decision left to make here —
+  blocking the execution adapter (§2). No decision left to make here -
   §2.3 (v1.1) already fixed the path convention, checksum requirement, and
   replace process; this entry just executes it.
-- Alternatives considered / tradeoffs: none — implementation of an already
+- Alternatives considered / tradeoffs: none - implementation of an already
   approved decision, not a new design choice. Built from `lekin-library`'s
   tagged commit in detached HEAD specifically (rather than whatever
   `master` happened to be at) so the wheel's provenance is unambiguous and
@@ -365,7 +365,7 @@ Each entry should follow this format:
     intended composition (adapter step order, drag-and-drop call sequence).
   - `lib/schema/`: Zod schemas + TS types for every ARCHITECTURE.md §1
     shape. `validateProblemDefinition()` implements the multi-error,
-    client-side validation layer (§1.4) — structural type-shape check via
+    client-side validation layer (§1.4) - structural type-shape check via
     Zod, then plain-function business-rule checks (duplicates,
     cross-references, positivity, `Machine.workcenterId`/
     `Workcenter.machineIds` consistency, `operationIndex` correctness,
@@ -376,13 +376,13 @@ Each entry should follow this format:
     `AlgorithmDefinition`s. `libraryMetadata` for each was verified
     directly against `lekin-library`'s `lekinpy/algorithms/*.py` at commit
     `a3fee48` (tag `v0.2.0`), not assumed. `verify.test.ts` is the
-    registry-drift guard from §1.5 — opt-in (needs a local Python +
+    registry-drift guard from §1.5 - opt-in (needs a local Python +
     `lekin-library` checkout via `LEKINPY_SOURCE`), and I ran it for real
     against the actual pinned library (all 4 passed), then deliberately
     broke one entry to confirm the guard actually catches drift before
     restoring it.
-  - `lib/scheduling/`: `graph.ts` (the precedence graph — job edges fixed
-    from `ProblemDefinition`, machine edges from the current queue order —
+  - `lib/scheduling/`: `graph.ts` (the precedence graph - job edges fixed
+    from `ProblemDefinition`, machine edges from the current queue order -
     and Kahn's-algorithm cycle detection/topological sort in one pass,
     §4.2/§4.3), `recalculate.ts` (`checkDropValidity()` for the two
     hard-reject cases and `recalculate()` for the topological placement
@@ -397,13 +397,13 @@ Each entry should follow this format:
     `UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION` check, which needs both
     the problem and the selected algorithm id together), `translate.ts`
     (the snake_case/flat <-> camelCase/nested translation boundary,
-    §2.2/§5 — `toLekinpySystemPayload`/`fromLekinpyScheduleDict`).
+    §2.2/§5 - `toLekinpySystemPayload`/`fromLekinpyScheduleDict`).
   - Added `zod` and `vitest` as dependencies; a `vitest.config.ts` scoped
     to `lib/**/*.test.ts`; a new `test:unit` script (left the existing
     `test` script, which runs lint+build, untouched so this doesn't change
     Codex's existing tooling assumptions).
 - Why: this is the pure-logic layer the React/adapter-glue work depends on
-  — in particular the recalculation engine, which went through two rounds
+  - in particular the recalculation engine, which went through two rounds
   of real correctness corrections during architecture review (the
   workcenter-eligibility-only claim, then the missing machine-release-time
   and non-persistent-constraint gaps) and was judged worth implementing
@@ -429,10 +429,10 @@ Each entry should follow this format:
     edit that wasn't actually accepted first.
   - The registry-drift guard shells out to a real `python3` process rather
     than trying to run lekinpy's logic in-browser/in-Pyodide for the
-    check — simpler, and this test only needs to run at dev-time/CI, never
+    check - simpler, and this test only needs to run at dev-time/CI, never
     in the shipped app.
 - Tests added: 50 passing (`npm run test:unit`), plus 4 opt-in
-  (`lib/registry/verify.test.ts`, requires `LEKINPY_SOURCE`) — covering
+  (`lib/registry/verify.test.ts`, requires `LEKINPY_SOURCE`) - covering
   every case in §4.7's required list including the exact two-job/
   two-machine cycle counterexample from the architecture review, the
   dual-incoming-edge max() regression case, machine-release-time,
@@ -450,12 +450,12 @@ Each entry should follow this format:
 
 ## [2026-07-16] Real-execution fixture and contract tests (framework-independent)
 - Branch: `test/real-execution-fixture`
-- Phase: 1, verification milestone — coordinates with Codex's separate
+- Phase: 1, verification milestone - coordinates with Codex's separate
   browser/Pyodide/Web Worker integration work but does not implement or
   edit it (`app/`, `app/components/`, `worker/`, React state, browser APIs,
   drag-and-drop UI untouched; `main` untouched).
 - Pre-work verification (per this task's explicit instructions): read
-  `MASTER_PROMPT_v2.md`, `PRODUCT_SPEC.md`, `ARCHITECTURE.md` (full, v1.3 —
+  `MASTER_PROMPT_v2.md`, `PRODUCT_SPEC.md`, `ARCHITECTURE.md` (full, v1.3 -
   unchanged since the last review except one clarifying sentence on the
   `.sha256` file's raw-digest format in §2.3), and this file, in full, then
   confirmed directly rather than assumed: `main` was at `d2c1266` (exactly
@@ -468,11 +468,11 @@ Each entry should follow this format:
   still reference presentation-only `demo-data`; `lekin-library` still
   pinned at tag `v0.2.0` / commit `a3fee48` with no uncommitted source
   changes (only the pre-existing stale tracked `__pycache__` noise). No
-  inconsistency found — proceeded.
+  inconsistency found - proceeded.
 - What changed:
   - `test/fixtures/real-execution/problem.ts`: one authored
     `ProblemDefinition` (the INPUT, never a handwritten expected
-    schedule) — 3 jobs (2-3 operations each), 3 workcenters, 4 machines
+    schedule) - 3 jobs (2-3 operations each), 3 workcenters, 4 machines
     including two eligible machines at WC1 (`M1`, `M1b`), differing job
     releases/due dates/weights, and two nonzero machine release times
     (`M1b`=3, `M3`=1), specifically shaped so FCFS/SPT/EDD/WSPT pick
@@ -481,7 +481,7 @@ Each entry should follow this format:
   - `scripts/fixtures/run_lekinpy_fixture.py`: verifies the pinned wheel's
     SHA-256 against the committed `.sha256` before doing anything else;
     extracts the wheel into a fresh temp directory and imports `lekinpy`
-    only from there (never a global/ambient install — this is the exact
+    only from there (never a global/ambient install - this is the exact
     failure mode `lekin-library_DECISIONS.md` already documents once, a
     stale global install silently shadowing local source); after import,
     verifies both `lekinpy.__version__` AND that the resolved module's
@@ -491,7 +491,7 @@ Each entry should follow this format:
     algorithm (mutation from one algorithm run would otherwise corrupt the
     next); runs FCFS/SPT/EDD/WSPT; dumps raw `Schedule.to_dict()` +
     `metadata` per algorithm plus `lekinpy.__version__` as JSON to stdout.
-  - `scripts/fixtures/generate-real-execution-fixture.ts`: orchestrates —
+  - `scripts/fixtures/generate-real-execution-fixture.ts`: orchestrates -
     validates the sample problem with `lib/schema` (must be zero-error),
     translates it with the real `toLekinpySystemPayload()`, shells out to
     the Python script above, translates each raw result back with the
@@ -504,7 +504,7 @@ Each entry should follow this format:
     difference) for reproducibility verification without mutating the
     repo.
   - `lib/fixtures/real-execution.contract.test.ts`: 43 tests reading the
-    committed fixture — translation-shape checks (payload field names
+    committed fixture - translation-shape checks (payload field names
     exactly match `lekinpy`'s real constructor parameters), per-algorithm
     invariants (every operation scheduled exactly once, job precedence,
     no machine overlap, machine/job release times respected, duration ==
@@ -521,7 +521,7 @@ Each entry should follow this format:
     `--check` for the latter); left `test`/`test:unit`/`test:types`
     untouched.
 - Why: Codex's browser/Pyodide integration needs a stable, authoritative
-  ground truth to build and debug against — real `lekinpy` output, not
+  ground truth to build and debug against - real `lekinpy` output, not
   hand-written fixtures that could silently encode the same misconceptions
   the architecture review already twice caught in the recalculation logic.
   Generating the fixture from the actual pinned wheel (with checksum/
@@ -531,7 +531,7 @@ Each entry should follow this format:
   - Considered running the Python step against whatever `lekinpy` a
     developer's environment happens to have installed. Rejected per the
     task's explicit instruction and the project's own prior incident
-    (`lekin-library_DECISIONS.md`'s stale-global-install entry) — the
+    (`lekin-library_DECISIONS.md`'s stale-global-install entry) - the
     wheel-extraction-plus-`__file__`-check approach is the only one that
     actually guarantees the fixture reflects the pinned wheel and not
     ambient state.
@@ -560,7 +560,7 @@ Each entry should follow this format:
   - Live registry-drift guard (`LEKINPY_SOURCE=../lekin-library npx vitest
     run lib/registry/verify.test.ts`): 4/4 passed against the real pinned
     library.
-  - `npm run fixture:check`: passed — the committed fixture is exactly
+  - `npm run fixture:check`: passed - the committed fixture is exactly
     what a fresh run against the pinned wheel produces right now.
   - Manually verified both required failure modes fail clearly and exit
     non-zero: corrupted the committed `.sha256` (checksum-mismatch path)
@@ -574,7 +574,7 @@ Each entry should follow this format:
   nesting), the four algorithms' `libraryMetadata`, and every recalculation
   invariant `ARCHITECTURE.md` documents (precedence, no-overlap, machine/
   job release floors, duration == processingTime) all matched the real
-  pinned library's actual behavior exactly on this run — no architecture
+  pinned library's actual behavior exactly on this run - no architecture
   update needed.
 - Status: merged to `main` as part of the combined Phase 1 integration.
 
@@ -643,7 +643,7 @@ Each entry should follow this format:
   - Added fast tests for landing content, sample-workspace navigation,
     algorithm registry options, empty-result states, detail tabs, return
     navigation, and keyboard activation.
-  - Added a real—not mocked—browser execution test. It cold-loads Pyodide in
+  - Added a real-not mocked-browser execution test. It cold-loads Pyodide in
     the Web Worker, observes the pinned wheel and checksum requests, executes
     SPT, FCFS, EDD, and WSPT, and checks the rendered eight operations,
     non-empty metrics, validation state, and execution details after every
@@ -718,7 +718,7 @@ Each entry should follow this format:
 - Ownership note: this branch touches `app/components/workspace/*.tsx` and
   `app/globals.css`, not just `lib/`. That crosses the Claude-owns-`lib/`/
   Codex-owns-`app/` split used since `feat/scheduling-core-lib` (see that
-  entry and `lib/README.md`) — flagging explicitly since it's a deliberate
+  entry and `lib/README.md`) - flagging explicitly since it's a deliberate
   deviation for this task, not an oversight. Checked first: no other
   worktree was active and `main` had not moved since the last session, so
   there was no live collision risk. All actual state-transition logic
@@ -731,28 +731,28 @@ Each entry should follow this format:
   `origin/main`; no other worktrees active; `app/execution/sample-problem.ts`
   held the only `ProblemDefinition`, imported as a fixed constant into
   `WorkspaceShell`; `ProblemSidebar` was 100% read-only/decorative for
-  jobs/operations/workcenters/machines — no forms, no dispatch, "＋ Add job"
-  had no handler. No inconsistency found — proceeded.
+  jobs/operations/workcenters/machines - no forms, no dispatch, "＋ Add job"
+  had no handler. No inconsistency found - proceeded.
 - What changed:
   - `lib/editor/problem-editor.ts`: pure `ProblemDefinition` state
-    transitions — `addJob`/`updateJob`/`removeJob`,
+    transitions - `addJob`/`updateJob`/`removeJob`,
     `addOperation`/`updateOperation`/`removeOperation`/`moveOperation`,
     `addWorkcenter`/`updateWorkcenter`/`removeWorkcenter`,
     `addMachine`/`updateMachine`/`removeMachine`, plus
     `problemEditorReducer` (a thin action-dispatch layer over all of the
     above, so `app/` only needs `useReducer(problemEditorReducer, ...)` and
-    JSX — no state-transition logic lives in a component).
+    JSX - no state-transition logic lives in a component).
     `operationIndex`/`operationId` are recomputed from array position on
     every add/remove/move (`reindexOperations`), per ARCHITECTURE.md §1.1.
   - Scope decision: **entity ids (`jobId`/`workcenterId`/`machineId`) are
-    set at creation time and not editable afterward** — only settable via
+    set at creation time and not editable afterward** - only settable via
     the `add*` functions. This removes the entire cascade-rename question
     (what happens to every reference when an id changes) without reducing
     what's actually configurable: every non-identity field, and *which*
     workcenter/machine something is assigned to, remains freely editable.
   - ARCHITECTURE.md §3.1 explicitly requires the editor to keep
     `Machine.workcenterId`/`Workcenter.machineIds` consistent "on every
-    add/edit/delete/move-machine-between-workcenters operation" — actively
+    add/edit/delete/move-machine-between-workcenters operation" - actively
     maintained here, not left for validation: `addMachine` appends to both
     sides; `removeMachine` cleans the machine out of its workcenter's
     `machineIds`; `updateMachine` changing `workcenterId` relocates the
@@ -761,14 +761,14 @@ Each entry should follow this format:
     `removeWorkcenter` cascade-removes its member machines (no sensible
     default reassignment exists, and leaving them dangling would violate
     the same invariant). By contrast, `Operation.workcenterId` references
-    are deliberately **not** cascaded on workcenter deletion — §3.1 never
-    asks for that — so deleting a workcenter still referenced by an
+    are deliberately **not** cascaded on workcenter deletion - §3.1 never
+    asks for that - so deleting a workcenter still referenced by an
     operation is exactly the "deleting referenced entities" scenario live
     `MISSING_WORKCENTER_REFERENCE` validation is meant to catch and surface,
     not silently repair.
   - `lib/editor/result-staleness.ts`: `isResultStale()`, a pure predicate
     comparing what `(problem, algorithmId)` a stored `ExecutionResult` was
-    actually computed for against the live values (reference inequality —
+    actually computed for against the live values (reference inequality -
     every editor mutation returns a new `ProblemDefinition` object, so this
     needs no deep-equality or hashing).
   - `app/components/workspace/workspace-shell.tsx`: replaced the fixed
@@ -778,13 +778,13 @@ Each entry should follow this format:
     algorithmId), [problem, algorithmId])`; `run()` now passes the live
     `problem`, not the constant; stale-result clearing is adjusted
     *during render* (`if (isResultStale(...)) { setResult(null); ... }`)
-    rather than in a `useEffect` — ESLint's `react-hooks/set-state-in-effect`
+    rather than in a `useEffect` - ESLint's `react-hooks/set-state-in-effect`
     rule caught the effect-based version (calling `setState` synchronously
     in an effect causes an extra cascading render); switched to React's own
     documented "adjusting state when a dependency changes" pattern instead,
     which is also what makes `isResultStale` a plain, DOM-free unit-testable
     function rather than logic buried in an effect body.
-  - `app/components/workspace/problem-sidebar.tsx`: real forms — Jobs
+  - `app/components/workspace/problem-sidebar.tsx`: real forms - Jobs
     section with nested Operations (workcenter select, processing-time
     input, reorder ↑/↓, delete, per-operation and per-job inline issue
     lists via `IssuesFor`/`JobLevelIssues`, both matching on the
@@ -799,7 +799,7 @@ Each entry should follow this format:
   - `app/components/workspace/detail-tabs.tsx`: now takes a
     `validationIssues: ValidationIssue[]` prop (the live ones) instead of
     reading `result?.validationIssues` for the Validation tab and its badge
-    count — "live" per the task, always present (not just after a run
+    count - "live" per the task, always present (not just after a run
     attempt), and each row now labels itself Error/Warning.
   - `app/globals.css`: additive rules only (`.entity-row`,
     `.entity-fields`, `.operation-row`, `.field-issues`, `.issue-badge`,
@@ -809,7 +809,7 @@ Each entry should follow this format:
 - Why: this is the smallest slice that turns "run a fixed sample problem"
   into "define and run your own problem," while keeping every actual
   state-transition rule in `lib/`, pure and tested, so the form components
-  stay thin JSX wiring — consistent with how the execution adapter and
+  stay thin JSX wiring - consistent with how the execution adapter and
   recalculation engine were built.
 - Alternatives considered / tradeoffs:
   - Considered allowing entity-id rename with cascading reference updates.
@@ -821,19 +821,19 @@ Each entry should follow this format:
   - Considered leaving `removeWorkcenter` non-cascading (matching
     `removeMachine`'s "let validation catch it" philosophy) for
     consistency. Rejected because ARCHITECTURE.md §3.1's invariant is
-    explicit and unconditional for Machine/Workcenter specifically — cascade
+    explicit and unconditional for Machine/Workcenter specifically - cascade
     is what "kept consistent on every ... delete ... operation" requires
     here, even though the *symmetric-looking* Operation/Workcenter case
     correctly stays non-cascading (§3.1 doesn't cover it).
   - Considered testing `isResultStale`'s usage inside `WorkspaceShell`
     directly with a React component-testing setup. No `@testing-library/*`
     or `jsdom`/`happy-dom` is installed (checked `package.json`/
-    `package-lock.json` first — only present as vitest's own optional peer
+    `package-lock.json` first - only present as vitest's own optional peer
     deps, not actually installed); adding a full component-testing stack
     for one behavior was judged out of proportion to this task. Extracted
     the decision into a plain, thoroughly unit-tested pure function instead
     and left the one-line render-time call as thin, obviously-correct
-    wiring — same tradeoff already made for the rest of this branch's state
+    wiring - same tradeoff already made for the rest of this branch's state
     logic.
 - Tests added: 23 new (`lib/editor/problem-editor.test.ts`,
   `lib/editor/result-staleness.test.ts`) covering every required critical
@@ -849,13 +849,13 @@ Each entry should follow this format:
   algorithm-only-change, all via `isResultStale`).
 - Verification, run under Node `v22.23.1` (the required `>=22.13.0`; the
   default Node in this environment, `v20.17.0`, cannot build the vinext
-  toolchain per the existing documented limitation above — used
+  toolchain per the existing documented limitation above - used
   `/opt/homebrew/Cellar/node@22/22.23.1/bin` directly, since the `node@22`
   Homebrew `opt` symlink was pointing at the wrong Cellar path):
   - `npm run test:unit`: 121 passed, 4 opt-in skipped (up from 98 before
     this branch).
   - `npm run test:types`: clean.
-  - `npm run fixture:check`: passed — unaffected by this branch, reverified
+  - `npm run fixture:check`: passed - unaffected by this branch, reverified
     anyway since it shares the `lib/schema`/`lib/adapter` modules this
     branch's forms now write through.
   - Live registry-drift guard (`LEKINPY_SOURCE=../lekin-library`): 4/4
@@ -866,7 +866,7 @@ Each entry should follow this format:
     branch).
   - `npx tsc --noEmit -p tsconfig.json` (full project, not just `lib/`):
     only the pre-existing, already-documented `worker/index.ts` Cloudflare
-    ambient-type errors — no new errors from anything on this branch.
+    ambient-type errors - no new errors from anything on this branch.
   - `eslint` across every changed area (`lib/editor`, all four touched
     `app/components/workspace/*.tsx`): clean. Caught one real issue along
     the way (`react-hooks/set-state-in-effect` on the first version of the
@@ -874,8 +874,8 @@ Each entry should follow this format:
     pattern rather than suppressed.
 - Known limitations (not implemented, matching the task's explicit
   exclusions plus what fell out of the scope decisions above):
-  - No id rename/cascade-rename — delete and recreate instead.
-  - No persistence, import/export, comparison history, or drag-and-drop —
+  - No id rename/cascade-rename - delete and recreate instead.
+  - No persistence, import/export, comparison history, or drag-and-drop -
     unchanged from before this branch; the app-bar's Import/Export/New
     buttons remain inert, as they already were.
   - No React-component-level test for `WorkspaceShell`'s render-time
@@ -883,7 +883,7 @@ Each entry should follow this format:
     fully tested; the one-line call site is not, per the tradeoff above).
   - `lekin-library` untouched, as required.
 - Status: implemented on `feat/problem-editor`, not merged, not pushed, not
-  deleted — ready for independent Codex review.
+  deleted - ready for independent Codex review.
 
 ## [2026-07-16] Independent Problem Editor review and browser acceptance
 - Branch: `feat/problem-editor`
@@ -933,3 +933,18 @@ Each entry should follow this format:
   published privately at `https://lekin-lab-workbench.rvt2018.chatgpt.site`.
   The merge commit contains no co-author trailer.
 - Status: independently accepted, merged, pushed, and published.
+
+## [2026-07-16] Remove em dashes from authored project text
+- Scope: all authored LEKIN web source, tests, architecture/product
+  documentation, and this persistent log. Dependencies, generated builds,
+  test artifacts, Git metadata, and binary files remain untouched.
+- Decision: use the regular hyphen character in place of em dashes across the
+  project, including visible UI copy and empty metric placeholders.
+- Verification plan: scan the authored workspace for the Unicode em dash,
+  then run unit tests, type checks, lint, the production build, and browser
+  acceptance tests before delivery.
+- Verification: authored-source scan returned zero em dash characters; 121
+  unit tests passed with four opt-in skips; TypeScript, ESLint, production
+  build, and all 9 implemented Chromium acceptance flows passed (four
+  not-yet-built product flows remain explicitly skipped).
+- Status: verified and ready to merge.

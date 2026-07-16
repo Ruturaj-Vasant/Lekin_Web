@@ -1,4 +1,4 @@
-# `lib/` — pure logic layer
+# `lib/` - pure logic layer
 
 Everything under `lib/` is framework-agnostic TypeScript: no React, no DOM,
 no Pyodide/Worker I/O. It's unit-tested in isolation (`npm run test:unit`,
@@ -7,24 +7,24 @@ by the React/Worker code in `app/`, `components/`, and `worker/`.
 
 This split (Claude owns `lib/`, Codex owns everything that touches the DOM,
 React, or browser APIs) is a working-division decision, not an
-`ARCHITECTURE.md` requirement — see `lekin-web_DECISIONS.md` for the
+`ARCHITECTURE.md` requirement - see `lekin-web_DECISIONS.md` for the
 reasoning. `ARCHITECTURE.md` itself remains the authoritative contract for
 every shape and behavior below; this file is just an index of where each
 piece of that contract actually lives in code.
 
 ## Layout
 
-- **`lib/schema/`** — ARCHITECTURE.md §1. Zod schemas + TS types for every
+- **`lib/schema/`** - ARCHITECTURE.md §1. Zod schemas + TS types for every
   shared shape (`ProblemDefinition`, `Schedule`, `Metrics`,
   `ValidationIssue`, `AlgorithmDefinition`, `ExecutionRequest`/`Result`,
   `ManualScheduleEdit`, `ManualStartConstraints`). `validateProblemDefinition()`
-  is the multi-error, client-side validation layer (§1.4) — collects every
+  is the multi-error, client-side validation layer (§1.4) - collects every
   problem in one pass, no `lekin-library` involvement.
-- **`lib/registry/`** — §1.5. `ALGORITHM_REGISTRY`, the web-owned superset
+- **`lib/registry/`** - §1.5. `ALGORITHM_REGISTRY`, the web-owned superset
   over lekinpy's four built-in algorithms. `verify.test.ts` is the
-  registry-drift guard (opt-in — see its header comment for how to run it
+  registry-drift guard (opt-in - see its header comment for how to run it
   against a real `lekin-library` checkout).
-- **`lib/scheduling/`** — §4.2–§4.5 and §1.3. `graph.ts` builds the
+- **`lib/scheduling/`** - §4.2–§4.5 and §1.3. `graph.ts` builds the
   precedence graph and runs Kahn's-algorithm cycle detection;
   `recalculate.ts` is `checkDropValidity()` (§4.4, the two hard-reject
   checks) and `recalculate()` (§4.5, the topological placement pass,
@@ -32,13 +32,13 @@ piece of that contract actually lives in code.
   `computeMetrics()` (§1.3, mirroring `lekinpy`'s `display_summary()`).
   `recalculate.test.ts` covers every case in §4.7's required test list,
   including the exact two-job/two-machine cycle counterexample.
-- **`lib/adapter/`** — §2.2's pure logic: `policy.ts` (`checkExecutionPolicy`,
+- **`lib/adapter/`** - §2.2's pure logic: `policy.ts` (`checkExecutionPolicy`,
   step 1), `validate-request.ts` (`validateExecutionRequest`, step 2),
   `translate.ts` (`toLekinpySystemPayload`/`fromLekinpyScheduleDict`, the
   snake_case↔camelCase / flat↔nested translation boundary, steps 4 and 7).
   **What's deliberately NOT here**: actually loading Pyodide, calling
   `micropip.install()` on the pinned wheel (`public/vendor/`), spinning up
-  the Web Worker, or invoking the translated payloads against real Python —
+  the Web Worker, or invoking the translated payloads against real Python -
   that I/O/environment glue is Worker-side code, consuming these pure
   functions rather than reimplementing their logic.
 

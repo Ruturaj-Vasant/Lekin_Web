@@ -5,7 +5,7 @@ import { makeIssue } from "../schema/issue";
 import { getAlgorithmDefinition } from "../registry/algorithms";
 
 /**
- * ARCHITECTURE.md §1.4/§2.2 step 2 — layer 1 of validation: Zod problem
+ * ARCHITECTURE.md §1.4/§2.2 step 2 - layer 1 of validation: Zod problem
  * structure/business rules + algorithm-compatibility, collected together,
  * before Pyodide ever loads. UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION is
  * checked separately from ProblemDefinitionSchema itself because it depends

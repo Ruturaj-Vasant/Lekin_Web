@@ -48,7 +48,7 @@ function IssuesFor({
   );
 }
 
-/** Job-level-only issues (e.g. EMPTY_OPERATIONS, DUPLICATE_JOB_ID) — deliberately
+/** Job-level-only issues (e.g. EMPTY_OPERATIONS, DUPLICATE_JOB_ID) - deliberately
  * excludes anything that already has its own operationIndex, which renders
  * under that specific operation row instead (see IssuesFor above). */
 function JobLevelIssues({ issues, jobId }: { issues: ValidationIssue[]; jobId: string }) {
@@ -365,10 +365,10 @@ export function ProblemSidebar({
         <label className="field-label">
           Dispatching rule
           <select value={algorithmId} onChange={(event) => onAlgorithmChange(event.target.value)} disabled={running}>
-            <option value="spt">SPT — Shortest processing time</option>
-            <option value="fcfs">FCFS — First come, first served</option>
-            <option value="edd">EDD — Earliest due date</option>
-            <option value="wspt">WSPT — Weighted SPT</option>
+            <option value="spt">SPT - Shortest processing time</option>
+            <option value="fcfs">FCFS - First come, first served</option>
+            <option value="edd">EDD - Earliest due date</option>
+            <option value="wspt">WSPT - Weighted SPT</option>
           </select>
         </label>
       </details>
