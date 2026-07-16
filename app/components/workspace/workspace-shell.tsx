@@ -6,6 +6,7 @@ import { hasBlockingError } from "../../../lib/schema/issue";
 import { validateExecutionRequest } from "../../../lib/adapter/validate-request";
 import { problemEditorReducer } from "../../../lib/editor/problem-editor";
 import { isResultStale, type ResultContext } from "../../../lib/editor/result-staleness";
+import { recordComparisonResult, comparisonResultsFor, type ComparisonHistory } from "../../../lib/editor/comparison-history";
 import type { ExecutionProgress } from "../../../worker/scheduling-protocol";
 import { BrowserExecutionEngine } from "../../execution/browser-execution-engine";
 import { createBlankProblem } from "../../execution/blank-problem";
@@ -29,6 +30,7 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
   // rather than in a useEffect, which would cause an extra cascading render
   // and trips the react-hooks/set-state-in-effect lint rule.
   const [resultFor, setResultFor] = useState<ResultContext | null>(null);
+  const [comparisonHistory, setComparisonHistory] = useState<ComparisonHistory | null>(null);
   const [progress, setProgress] = useState<ExecutionProgress | null>(null);
   const [running, setRunning] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -45,6 +47,7 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     [problem, algorithmId],
   );
   const canRun = !hasBlockingError(validationIssues);
+  const comparisonResults = comparisonResultsFor(comparisonHistory, problem);
 
   async function run() {
     if (!canRun) return;
@@ -58,6 +61,7 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     if (activeExecution.current !== executionId) return;
     setResult(next);
     setResultFor({ problem, algorithmId });
+    setComparisonHistory((prev) => recordComparisonResult(prev, problem, next));
     setRunning(false);
     setProgress(null);
     activeExecution.current = null;
@@ -76,7 +80,14 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     setAlgorithmId("spt");
     setResult(null);
     setResultFor(null);
+    setComparisonHistory(null);
     setSidebarCollapsed(false);
+  }
+
+  function selectComparisonResult(selected: ExecutionResult) {
+    setAlgorithmId(selected.algorithmId);
+    setResult(selected);
+    setResultFor({ problem, algorithmId: selected.algorithmId });
   }
 
   const stateLabel = running
@@ -153,7 +164,13 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
           <MetricsRow metrics={result?.metrics ?? null} jobCount={problem.jobs.length} />
           <GanttChart schedule={result?.schedule ?? null} problem={problem} />
           <ScheduleSummary metrics={result?.metrics ?? null} />
-          <DetailTabs result={result} validationIssues={validationIssues} problem={problem} />
+          <DetailTabs
+            result={result}
+            validationIssues={validationIssues}
+            problem={problem}
+            comparisonResults={comparisonResults}
+            onSelectComparisonResult={selectComparisonResult}
+          />
         </div>
       </div>
     </main>

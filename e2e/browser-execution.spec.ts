@@ -79,4 +79,50 @@ test.describe("real in-browser scheduling", () => {
     await expect(details.getByText(/weighted completion 75 · weighted tardiness 0/)).toBeVisible();
     await expectNoBrowserErrors(errors);
   });
+
+  test("accumulates a real algorithm comparison table across reruns on the same problem", async ({ page }) => {
+    test.setTimeout(120_000);
+    const errors = monitorBrowserErrors(page);
+    await openExample(page);
+
+    const algorithm = page.getByLabel("Dispatching rule");
+    const details = page.locator(".details-card");
+
+    await algorithm.selectOption("spt");
+    await page.getByRole("button", { name: "Run schedule" }).click();
+    await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+
+    await page.getByRole("tab", { name: "Algorithm comparison" }).click();
+    await expect(details.getByText("Run at least one algorithm to compare results here.")).toHaveCount(0);
+    await expect(details.locator(".comparison-table tbody tr")).toHaveCount(1);
+
+    await algorithm.selectOption("fcfs");
+    await page.getByRole("button", { name: "Run schedule" }).click();
+    await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+
+    await page.getByRole("tab", { name: "Algorithm comparison" }).click();
+    const rows = details.locator(".comparison-table tbody tr");
+    await expect(rows).toHaveCount(2);
+
+    const sptRow = rows.filter({ hasText: "SPT" });
+    const fcfsRow = rows.filter({ hasText: "FCFS" });
+    await expect(sptRow.getByText("16 (best)")).toBeVisible();
+    await expect(fcfsRow.getByText("Ignores job weights")).toBeVisible();
+    await expect(fcfsRow.locator("td").nth(4)).toHaveText("21");
+
+    // Selecting an earlier comparison restores its complete visible result.
+    await sptRow.getByRole("button", { name: "SPT" }).click();
+    await expect(algorithm).toHaveValue("spt");
+    await expect(page.locator(".metrics article").first().locator("strong")).toContainText("16");
+    await page.getByRole("tab", { name: "Execution" }).click();
+    await expect(details.getByText(/^SPT completed locally/)).toBeVisible();
+
+    // rerunning SPT on the same problem replaces its row rather than duplicating it
+    await page.getByRole("button", { name: "Run schedule" }).click();
+    await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+    await page.getByRole("tab", { name: "Algorithm comparison" }).click();
+    await expect(rows).toHaveCount(2);
+
+    await expectNoBrowserErrors(errors);
+  });
 });

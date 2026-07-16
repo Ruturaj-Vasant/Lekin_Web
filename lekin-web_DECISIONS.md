@@ -1199,3 +1199,111 @@ Each entry should follow this format:
 - Delivery: merged to `main` as `8283759`, pushed, and published privately
   from that exact source. No co-author trailer was added.
 - Status: verified, merged, pushed, and published.
+
+## [2026-07-16] Algorithm comparison table
+- Branch: `feat/algorithm-comparison`, created from clean current `main`
+  (`72e7685`, after the blank-problem-workflow merge) in a separate git
+  worktree (`../lekin-web-claude-parallel`), specifically to avoid sharing
+  live working-tree state with whatever the primary checkout is mid-editing.
+- Trigger: this closes one of the four `test.fixme` placeholders in
+  `e2e/pending-product-flows.spec.ts` ("compares algorithm runs") and
+  PRODUCT_SPEC.md section 19: "Users select multiple compatible algorithms
+  and compare: makespan, tardiness, weighted tardiness, completion time,
+  runtime, feasibility, algorithm limitations."
+- Scope taken: a real comparison table across every algorithm run so far
+  against the *current* problem, with the lowest feasible value per metric
+  marked "(best)". Reached by running the existing single-algorithm
+  dropdown + Run flow repeatedly (no new multi-select UI), which keeps this
+  slice small and avoids duplicating the existing algorithm picker.
+- Scope explicitly deferred (not implemented): "switch the Gantt chart
+  between results" and "algorithm limitations" as a compared column (the
+  registry's `supportsWeights`/`problemTypes`/etc. are static per-algorithm
+  metadata already visible in the sidebar, not a per-run result). The Gantt
+  chart and top Metrics row still only ever reflect the most recently
+  completed run. Both are natural follow-ups once there's a chosen UI for
+  switching the "active" result.
+- What changed:
+  - `lib/editor/comparison-history.ts` (new): `ComparisonHistory` holds a
+    `Record<algorithmId, ExecutionResult>` for one specific problem
+    (compared by reference, mirroring `result-staleness.ts`'s
+    `ResultContext` pattern -- since every problem-editor mutation returns a
+    new object, reference inequality is exactly "the problem changed").
+    `recordComparisonResult` adds/replaces one algorithm's result, starting
+    a fresh set if the problem reference differs from what the history was
+    built against. `comparisonResultsFor` reads back the array for the
+    current problem, returning `[]` once the problem has moved on. 5 tests.
+  - `lib/results/algorithm-comparison.ts` (new): `buildAlgorithmComparison`
+    is a pure function, `ExecutionResult[] -> { rows, bestByMetric }`. A row
+    is `feasible: status === "completed"`; `bestByMetric` picks the lowest
+    value per metric among feasible rows only, so a numerically small value
+    on a rejected/invalid/errored run is never reported as a winner; ties
+    keep the first-seen algorithm. 6 tests.
+  - `app/components/workspace/workspace-shell.tsx`: added
+    `comparisonHistory` state, recorded on every completed `run()` (any
+    status, not just `"completed"`, so a rejected or errored algorithm still
+    shows up in the table rather than silently disappearing), reset in
+    `createNewProblem()`, and derives `comparisonResults` for the current
+    problem to pass down.
+  - `app/components/workspace/detail-tabs.tsx`: the "Algorithm comparison"
+    tab now renders a real `<table>` (Algorithm, Status, Runtime, Makespan,
+    Total tardiness, Weighted tardiness, Total completion), highlighting
+    each metric's best cell, instead of the placeholder sentence.
+  - `app/globals.css` (additive only): `.comparison-wrap` (horizontal
+    scroll, since `.details-card` clips overflow and a 7-column table can
+    exceed the canvas width) and `.comparison-table` styled to the existing
+    scale (9-11px, `var(--line)`/`var(--muted)` borders and header text).
+  - `e2e/browser-execution.spec.ts`: added a Chromium test that runs SPT
+    then FCFS against the real sample problem, asserts a 2-row table with
+    SPT's known makespan (16) marked best and FCFS's (21) shown plainly,
+    then reruns SPT and asserts the row count stays at 2 (replace, not
+    duplicate).
+  - `e2e/pending-product-flows.spec.ts`: removed the now-implemented
+    "compares algorithm runs" `fixme` placeholder.
+- Verification, under Node 22.23.1 (`>=22.13.0` required; system default is
+  v20.17.0), from the isolated worktree with `node_modules` symlinked from
+  the primary checkout (worktrees don't share untracked files):
+  - `npm run test:unit`: 142 passed, 4 opt-in skipped (up from 126; the new
+    11 comparison tests, after adding the `timeStart` metrics field the
+    prior "editor layout and schedule summary" milestone had introduced,
+    which this branch's tests didn't originally know about);
+  - `npm run test:types`: clean;
+  - full-project `tsc --noEmit`: only the pre-existing, unrelated
+    `worker/index.ts` Cloudflare ambient-type errors, untouched;
+  - `npm test` (ESLint + production `vinext build`): passed;
+  - `npx playwright test`: 15 passed, 3 skipped (the remaining unimplemented
+    fixmes), including the new comparison-table test, against the real
+    Pyodide/Chromium execution path;
+  - scanned all new/changed files for the Unicode em dash: none found.
+- Known limitations: no way yet to view a non-latest result's Gantt chart or
+  top metrics; "algorithm limitations" is not a compared column; comparison
+  state is in-memory only and lost on reload (same as every other result,
+  pending the separate persistence milestone).
+- Status: implemented on `feat/algorithm-comparison`, not merged, not
+  pushed, not deleted.
+
+## [2026-07-16] Codex review completion for algorithm comparison
+- Reviewed `3c24559` independently after merging current `main` into the
+  isolated feature worktree. The history replacement, same-problem scoping,
+  feasible-only best-value selection, and real Pyodide comparison results were
+  correct.
+- Blocking gap found: the handoff explicitly left comparison rows read-only,
+  despite the accepted task requiring users to select an earlier run and show
+  its Gantt chart and details. Added selectable algorithm buttons, active-row
+  highlighting, and full restoration of the selected run's algorithm picker,
+  Gantt, top metrics, schedule summary, machine/job details, and execution tab.
+- Second acceptance gap closed: PRODUCT_SPEC section 19 requires algorithm
+  limitations. Added a registry-derived Limitations column. The current
+  FCFS/SPT/EDD definitions state that they ignore job weights; WSPT reports no
+  limitation. The values come from the versioned registry rather than duplicated
+  UI constants.
+- Extended real-browser coverage to select the earlier SPT result after FCFS,
+  verify the picker and makespan restore to SPT, verify SPT execution details,
+  and confirm rerunning still replaces rather than duplicates its row. Added a
+  unit test for registry-derived limitations.
+- Verification under Node 22.23.1: 143 unit and contract tests passed with four
+  opt-in skips; type checks, ESLint, and the production build passed; the full
+  Chromium suite passed all 15 implemented flows with three explicitly unbuilt
+  product flows skipped. The rendered comparison table was inspected from the
+  Chromium run and the selected SPT row, restored metrics, and limitations were
+  visually coherent.
+- Status: independently accepted and ready to merge and publish.

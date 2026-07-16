@@ -4,15 +4,30 @@ import type { ProblemDefinition } from "../../../lib/schema/problem";
 import type { ExecutionResult } from "../../../lib/schema/algorithm";
 import type { ValidationIssue } from "../../../lib/schema/issue";
 import { buildJobSummaries } from "../../../lib/results/job-summary";
+import { buildAlgorithmComparison, COMPARISON_METRICS, type ComparisonMetric } from "../../../lib/results/algorithm-comparison";
 
-type Props = { result: ExecutionResult | null; validationIssues: ValidationIssue[]; problem: ProblemDefinition };
+type Props = {
+  result: ExecutionResult | null;
+  validationIssues: ValidationIssue[];
+  problem: ProblemDefinition;
+  comparisonResults: ExecutionResult[];
+  onSelectComparisonResult: (result: ExecutionResult) => void;
+};
 
-export function DetailTabs({ result, validationIssues, problem }: Props) {
+const METRIC_LABELS: Record<ComparisonMetric, string> = {
+  makespan: "Makespan",
+  totalTardiness: "Total tardiness",
+  weightedTardiness: "Weighted tardiness",
+  totalCompletionTime: "Total completion",
+};
+
+export function DetailTabs({ result, validationIssues, problem, comparisonResults, onSelectComparisonResult }: Props) {
   const [activeTab, setActiveTab] = useState("Machine sequence");
   const schedule = result?.schedule ?? null;
   const errorCount = validationIssues.filter((issue) => issue.severity === "error").length;
   const releaseByMachine = new Map(problem.machines.map((machine) => [machine.machineId, machine.release]));
   const utilization = result?.metrics?.machineUtilization ?? {};
+  const { rows: comparisonRows, bestByMetric } = buildAlgorithmComparison(comparisonResults);
   const content: Record<string, ReactNode> = {
     "Machine sequence": schedule ? (
       <div className="sequence-table">
@@ -59,7 +74,53 @@ export function DetailTabs({ result, validationIssues, problem }: Props) {
     ) : (
       <p className="tab-empty">No scheduled jobs yet.</p>
     ),
-    "Algorithm comparison": <p className="tab-empty">Run another algorithm to compare results in a later milestone.</p>,
+    "Algorithm comparison": comparisonResults.length ? (
+      <div className="comparison-wrap">
+        <table className="comparison-table">
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Status</th>
+              <th>Runtime</th>
+              <th>Limitations</th>
+              {COMPARISON_METRICS.map((metric) => (
+                <th key={metric}>{METRIC_LABELS[metric]}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {comparisonRows.map((row) => (
+              <tr key={row.algorithmId} className={result?.algorithmId === row.algorithmId ? "comparison-active" : undefined}>
+                <td>
+                  <button
+                    type="button"
+                    className="comparison-select"
+                    aria-pressed={result?.algorithmId === row.algorithmId}
+                    onClick={() => {
+                      const selected = comparisonResults.find((candidate) => candidate.algorithmId === row.algorithmId);
+                      if (selected) onSelectComparisonResult(selected);
+                    }}
+                  >
+                    {row.algorithmId.toUpperCase()}
+                  </button>
+                </td>
+                <td className={row.feasible ? "success-text" : "issue-warning"}>{row.status}</td>
+                <td>{row.runtimeMs} ms</td>
+                <td>{row.limitations.length ? row.limitations.join(", ") : "None"}</td>
+                {COMPARISON_METRICS.map((metric) => (
+                  <td key={metric} className={bestByMetric[metric] === row.algorithmId ? "success-text" : undefined}>
+                    {row[metric] === null ? "n/a" : row[metric]}
+                    {bestByMetric[metric] === row.algorithmId ? " (best)" : ""}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <p className="tab-empty">Run at least one algorithm to compare results here.</p>
+    ),
     Validation: validationIssues.length ? (
       <ul className="issue-list">
         {validationIssues.map((issue, index) => (
