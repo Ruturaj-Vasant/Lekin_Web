@@ -8,6 +8,9 @@ import {
   moveOperation,
   nextAvailableId,
   problemEditorReducer,
+  renameJob,
+  renameMachine,
+  renameWorkcenter,
   removeJob,
   removeMachine,
   removeOperation,
@@ -78,6 +81,18 @@ describe("addJob / createDefaultJob", () => {
 });
 
 describe("updateJob / removeJob", () => {
+  it("renames a job and regenerates all of its derived operation ids", () => {
+    let problem = problemWithOneWorkcenterAndMachine();
+    problem = addJob(problem, createDefaultJob(problem));
+    problem = addOperation(problem, problem.jobs[0]!.jobId, "WC1");
+    const renamed = renameJob(problem, 0, "Priority order");
+    expect(renamed.jobs[0]!.jobId).toBe("Priority order");
+    expect(renamed.jobs[0]!.operations.map((operation) => operation.operationId)).toEqual([
+      "Priority order-O0",
+      "Priority order-O1",
+    ]);
+  });
+
   it("updateJob patches only the targeted job's editable fields", () => {
     let problem = problemWithOneWorkcenterAndMachine();
     problem = addJob(problem, createDefaultJob(problem));
@@ -157,6 +172,23 @@ describe("operation reindexing (operationIndex/operationId consistency)", () => 
 });
 
 describe("workcenter/machine consistency (ARCHITECTURE.md §3.1)", () => {
+  it("renames a workcenter across machines and every operation reference", () => {
+    let problem = problemWithOneWorkcenterAndMachine();
+    problem = addJob(problem, createDefaultJob(problem));
+    const renamed = renameWorkcenter(problem, 0, "Cutting department");
+    expect(renamed.workcenters[0]!.workcenterId).toBe("Cutting department");
+    expect(renamed.machines[0]!.workcenterId).toBe("Cutting department");
+    expect(renamed.jobs[0]!.operations[0]!.workcenterId).toBe("Cutting department");
+    expect(validateProblemDefinition(renamed)).toEqual([]);
+  });
+
+  it("renames a machine in both the machine collection and its workcenter", () => {
+    const renamed = renameMachine(problemWithOneWorkcenterAndMachine(), 0, "Laser cutter");
+    expect(renamed.machines[0]!.machineId).toBe("Laser cutter");
+    expect(renamed.workcenters[0]!.machineIds).toEqual(["Laser cutter"]);
+    expect(validateProblemDefinition(renamed)).toEqual([]);
+  });
+
   it("addMachine keeps Machine.workcenterId and Workcenter.machineIds in sync", () => {
     let problem = emptyProblem();
     problem = addWorkcenter(problem, { workcenterId: "WC1", release: 0, status: "active", machineIds: [] });

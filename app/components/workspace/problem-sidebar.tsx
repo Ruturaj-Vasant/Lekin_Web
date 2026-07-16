@@ -109,11 +109,18 @@ export function ProblemSidebar({
           <b aria-hidden="true">⌄</b>
         </summary>
         <div className="job-list">
-          {problem.jobs.map((job) => (
-            <details key={job.jobId} className="entity-row">
+          {problem.jobs.map((job, jobIndex) => (
+            <details key={jobIndex} className="entity-row">
               <summary>
                 <span className="job-summary-title">
-                  <strong>{job.jobId}</strong>
+                  <input
+                    className="entity-name-input"
+                    aria-label={`Job name ${job.jobId}`}
+                    value={job.jobId}
+                    disabled={running}
+                    onClick={(event) => event.stopPropagation()}
+                    onChange={(event) => dispatch({ type: "renameJob", jobIndex, jobId: event.target.value })}
+                  />
                   <small>{job.operations.length} operation{job.operations.length === 1 ? "" : "s"}</small>
                 </span>
                 <span className="job-summary-meta"><small>Due {job.due}</small><small>Weight {job.weight}</small></span>
@@ -260,10 +267,19 @@ export function ProblemSidebar({
           <b aria-hidden="true">⌄</b>
         </summary>
         <div className="job-list">
-          {problem.workcenters.map((wc) => (
-            <div className="entity-row entity-row-flat" key={wc.workcenterId}>
+          {problem.workcenters.map((wc, workcenterIndex) => (
+            <div className="entity-row entity-row-flat" key={workcenterIndex}>
               <div className="entity-card-heading">
-                <strong>{wc.workcenterId}</strong>
+                <label className="entity-name-label">
+                  Workcenter name
+                  <input
+                    className="entity-name-input"
+                    aria-label={`Workcenter name ${wc.workcenterId}`}
+                    value={wc.workcenterId}
+                    disabled={running}
+                    onChange={(event) => dispatch({ type: "renameWorkcenter", workcenterIndex, workcenterId: event.target.value })}
+                  />
+                </label>
                 <button className="icon-delete" type="button" disabled={running} aria-label={`Delete workcenter ${wc.workcenterId}`} onClick={() => dispatch({ type: "removeWorkcenter", workcenterId: wc.workcenterId })}>✕</button>
               </div>
               <div className="entity-fields workcenter-fields">
@@ -302,10 +318,19 @@ export function ProblemSidebar({
           <b aria-hidden="true">⌄</b>
         </summary>
         <div className="job-list">
-          {problem.machines.map((machine) => (
-            <div className="entity-row entity-row-flat" key={machine.machineId}>
+          {problem.machines.map((machine, machineIndex) => (
+            <div className="entity-row entity-row-flat" key={machineIndex}>
               <div className="entity-card-heading">
-                <strong>{machine.machineId}</strong>
+                <label className="entity-name-label">
+                  Machine name
+                  <input
+                    className="entity-name-input"
+                    aria-label={`Machine name ${machine.machineId}`}
+                    value={machine.machineId}
+                    disabled={running}
+                    onChange={(event) => dispatch({ type: "renameMachine", machineIndex, machineId: event.target.value })}
+                  />
+                </label>
                 <button className="icon-delete" type="button" disabled={running} aria-label={`Delete machine ${machine.machineId}`} onClick={() => dispatch({ type: "removeMachine", machineId: machine.machineId })}>✕</button>
               </div>
               <div className="entity-fields machine-fields">

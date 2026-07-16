@@ -3,11 +3,31 @@ import { expectNoBrowserErrors, monitorBrowserErrors, openExample } from "./help
 
 function entityDetails(page: import("@playwright/test").Page, id: string): Locator {
   return page.locator("details.entity-row").filter({
-    has: page.locator("summary strong", { hasText: new RegExp(`^${id}$`) }),
+    has: page.locator(`summary input[value="${id}"]`),
   });
 }
 
 test.describe("problem editor", () => {
+  test("renames jobs, workcenters, and machines while preserving references", async ({ page }) => {
+    await openExample(page);
+
+    let job = entityDetails(page, "J-101");
+    await job.getByLabel("Job name J-101").fill("Rush order");
+    job = entityDetails(page, "Rush order");
+    await expect(job.getByLabel("Job name Rush order")).toHaveValue("Rush order");
+    await job.locator(".job-summary-meta").click();
+
+    await page.getByText(/^Workcenters/).click();
+    await page.getByLabel("Workcenter name WC-CUT").fill("Cutting");
+    await expect(job.getByLabel("Workcenter for operation 0")).toHaveValue("Cutting");
+    await expect(page.getByLabel("Workcenter for machine M-01", { exact: true })).toHaveValue("Cutting");
+
+    await page.getByText(/^Machines/).click();
+    await page.getByLabel("Machine name M-01", { exact: true }).fill("Primary cutter");
+    await expect(page.getByLabel("Machine name Primary cutter")).toHaveValue("Primary cutter");
+    await expect(page.getByRole("button", { name: "Run schedule" })).toBeEnabled();
+  });
+
   test("renders structured editor cards and a working collapse rail", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await openExample(page);
@@ -17,11 +37,11 @@ test.describe("problem editor", () => {
     expect(sidebarBox?.width).toBeGreaterThanOrEqual(340);
 
     const firstJob = entityDetails(page, "J-101");
-    await expect(firstJob.locator("summary").getByText("J-101", { exact: true })).toBeVisible();
+    await expect(firstJob.getByLabel("Job name J-101")).toHaveValue("J-101");
     await expect(firstJob.locator("summary").getByText("3 operations", { exact: true })).toBeVisible();
     await expect(firstJob.locator("summary").getByText("Due 30", { exact: true })).toBeVisible();
     await expect(firstJob.locator("summary").getByText("Weight 2", { exact: true })).toBeVisible();
-    await firstJob.locator("summary").click();
+    await firstJob.locator(".job-summary-meta").click();
     for (const label of ["Release", "Due", "Weight"]) {
       const box = await firstJob.getByLabel(label).boundingBox();
       expect(box?.width, `${label} job control width`).toBeGreaterThanOrEqual(70);
@@ -65,7 +85,7 @@ test.describe("problem editor", () => {
     await page.getByRole("button", { name: "Add job" }).click();
     const job = entityDetails(page, "J-1");
     await expect(job).toBeVisible();
-    await job.locator("summary").click();
+    await job.locator(".job-summary-meta").click();
     await job.getByLabel("Release").fill("3");
     await job.getByLabel("Due").fill("25");
     await job.getByLabel("Weight").fill("4");
@@ -139,7 +159,7 @@ test.describe("problem editor", () => {
     const originalMakespan = await page.locator(".metrics article").first().locator("strong").innerText();
 
     const firstJob = entityDetails(page, "J-101");
-    await firstJob.locator("summary").click();
+    await firstJob.locator(".job-summary-meta").click();
     await firstJob.getByLabel("Processing time for operation 0").fill("9");
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");
     await expect(page.locator(".bar")).toHaveCount(0);

@@ -18,9 +18,13 @@
 .entity-row>summary{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;padding:12px;align-items:center}
 .entity-row[open]>summary{border-bottom:1px solid #eeeeF1;background:#fbfafc}
 .job-summary-title{display:flex;min-width:0;flex-direction:column;gap:3px}
-.job-summary-title strong{font-size:12px}
-.job-summary-title small,.job-summary-meta small{font-size:9px;color:var(--muted);font-weight:500}
+.job-summary-title small{font-size:12px;color:#3f3f46;font-weight:650}
+.job-summary-meta small{font-size:12px;color:#3f3f46;font-weight:650}
 .job-summary-meta{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.entity-name-input{width:100%;min-width:0;padding:6px 8px;border:1px solid var(--line);border-radius:5px;background:white;color:var(--ink);font-size:12px;font-weight:650;outline:none}
+.entity-name-input:focus{border-color:var(--violet);box-shadow:0 0 0 2px var(--violet-soft)}
+.entity-name-label{display:flex;min-width:0;flex:1;flex-direction:column;gap:5px;color:var(--muted);font-size:9px;font-weight:650;letter-spacing:.06em;text-transform:uppercase}
+.entity-name-label .entity-name-input{text-transform:none;letter-spacing:0}
 .entity-row>.entity-fields,.entity-row>.operation-list,.entity-row>.field-issues,.entity-row>.remove-button{margin-left:12px;margin-right:12px}
 .entity-fields{margin-top:0;gap:10px}
 .job-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding-top:12px;align-items:end}

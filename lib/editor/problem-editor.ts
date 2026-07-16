@@ -7,15 +7,10 @@ import { makeOperationId } from "../schema/schedule";
  * unit-testable in isolation, matching the project's established pattern
  * (lib/scheduling/recalculate.ts) of keeping state logic out of components.
  *
- * Scope decision (documented in lekin-web_DECISIONS.md): identity fields
- * (Job.jobId, Workcenter.workcenterId, Machine.machineId) are set at
- * creation time and are NOT editable afterward - only settable via the
- * "add" functions below. This removes an entire class of cascade-rename
- * ambiguity (what happens to every Operation.workcenterId /
- * Machine.workcenterId reference when an id is renamed) without reducing
- * what a user can actually configure: every non-identity field (release,
- * due, weight, status, rgb, processingTime, and *which* workcenter/machine
- * something is assigned to) remains freely editable.
+ * Entity identity fields are editable through the cascade-safe rename
+ * functions below. Each rename updates every derived ID and cross-reference
+ * in one immutable transition so the problem never temporarily contains stale
+ * references during normal editing.
  *
  * ARCHITECTURE.md §3.1 explicitly requires the editor to keep
  * `Machine.workcenterId` and `Workcenter.machineIds` consistent "on every
@@ -112,6 +107,15 @@ export function updateJob(
   };
 }
 
+export function renameJob(problem: ProblemDefinition, jobIndex: number, jobId: string): ProblemDefinition {
+  return {
+    ...problem,
+    jobs: problem.jobs.map((job, index) =>
+      index === jobIndex ? { ...job, jobId, operations: reindexOperations(jobId, job.operations) } : job,
+    ),
+  };
+}
+
 export function removeJob(problem: ProblemDefinition, jobId: string): ProblemDefinition {
   return { ...problem, jobs: problem.jobs.filter((job) => job.jobId !== jobId) };
 }
@@ -198,6 +202,24 @@ export function updateWorkcenter(
   };
 }
 
+export function renameWorkcenter(problem: ProblemDefinition, workcenterIndex: number, workcenterId: string): ProblemDefinition {
+  const previousId = problem.workcenters[workcenterIndex]?.workcenterId;
+  if (previousId === undefined) return problem;
+  return {
+    ...problem,
+    workcenters: problem.workcenters.map((wc, index) => (index === workcenterIndex ? { ...wc, workcenterId } : wc)),
+    machines: problem.machines.map((machine) =>
+      machine.workcenterId === previousId ? { ...machine, workcenterId } : machine,
+    ),
+    jobs: problem.jobs.map((job) => ({
+      ...job,
+      operations: job.operations.map((operation) =>
+        operation.workcenterId === previousId ? { ...operation, workcenterId } : operation,
+      ),
+    })),
+  };
+}
+
 /**
  * Removes the workcenter AND cascade-removes its member machines (a machine
  * cannot exist without a valid workcenter per §3.1's invariant, and there is
@@ -253,6 +275,19 @@ export function updateMachine(
   };
 }
 
+export function renameMachine(problem: ProblemDefinition, machineIndex: number, machineId: string): ProblemDefinition {
+  const previousId = problem.machines[machineIndex]?.machineId;
+  if (previousId === undefined) return problem;
+  return {
+    ...problem,
+    machines: problem.machines.map((machine, index) => (index === machineIndex ? { ...machine, machineId } : machine)),
+    workcenters: problem.workcenters.map((wc) => ({
+      ...wc,
+      machineIds: wc.machineIds.map((id) => (id === previousId ? machineId : id)),
+    })),
+  };
+}
+
 export function removeMachine(problem: ProblemDefinition, machineId: string): ProblemDefinition {
   return {
     ...problem,
@@ -272,6 +307,9 @@ export function removeMachine(problem: ProblemDefinition, machineId: string): Pr
 
 export type ProblemEditorAction =
   | { type: "updateProblemName"; name: string }
+  | { type: "renameJob"; jobIndex: number; jobId: string }
+  | { type: "renameWorkcenter"; workcenterIndex: number; workcenterId: string }
+  | { type: "renameMachine"; machineIndex: number; machineId: string }
   | { type: "addJob" }
   | { type: "updateJob"; jobId: string; patch: Partial<Pick<Job, "release" | "due" | "weight" | "rgb">> }
   | { type: "removeJob"; jobId: string }
@@ -295,6 +333,12 @@ export function problemEditorReducer(problem: ProblemDefinition, action: Problem
   switch (action.type) {
     case "updateProblemName":
       return { ...problem, name: action.name };
+    case "renameJob":
+      return renameJob(problem, action.jobIndex, action.jobId);
+    case "renameWorkcenter":
+      return renameWorkcenter(problem, action.workcenterIndex, action.workcenterId);
+    case "renameMachine":
+      return renameMachine(problem, action.machineIndex, action.machineId);
     case "addJob":
       return addJob(problem, createDefaultJob(problem));
     case "updateJob":
