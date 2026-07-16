@@ -426,4 +426,5 @@ Each entry should follow this format:
   framework-independent layer. Full-project `tsc --noEmit` currently reports
   pre-existing missing Cloudflare Worker ambient types, so the earlier claim
   that it was globally clean was corrected rather than repeated.
-- Status: independently reviewed, corrected, and approved for merge.
+- Status: independently reviewed, corrected, and merged to `main` in
+  merge commit `a41c3ac`.
