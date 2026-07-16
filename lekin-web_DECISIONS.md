@@ -1306,6 +1306,6 @@ Each entry should follow this format:
   product flows skipped. The rendered comparison table was inspected from the
   Chromium run and the selected SPT row, restored metrics, and limitations were
   visually coherent.
-- Delivery: merged to `main` as `e82dbd8` and pushed. No co-author trailer was
-  added. Private publication is in progress from the verified merged build.
-- Status: independently accepted, merged, and awaiting publication completion.
+- Delivery: merged to `main` as `e82dbd8`, pushed, and published privately
+  from the verified merged build. No co-author trailer was added.
+- Status: independently accepted, merged, pushed, and published.
