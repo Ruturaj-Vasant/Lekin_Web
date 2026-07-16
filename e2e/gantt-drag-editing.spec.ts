@@ -14,6 +14,10 @@ test.describe("manual Gantt editing", () => {
 
     await expect(page.getByLabel(/utilization/)).toHaveCount(4);
     await expect(page.locator(".idle-segment")).not.toHaveCount(0);
+    await expect(page.locator(".gantt-card .chart-toolbar").getByRole("button", { name: /Undo/ })).toBeVisible();
+    await expect(page.locator(".gantt-card .chart-toolbar").getByRole("button", { name: /Redo/ })).toBeVisible();
+    await expect(page.locator(".gantt-card .chart-toolbar").getByRole("button", { name: "Reset schedule" })).toBeVisible();
+    await expect(page.locator(".appbar").getByRole("button", { name: /Undo/ })).toHaveCount(0);
 
     const timeline = page.locator(".timeline");
     const fittedWidth = (await timeline.boundingBox())!.width;
@@ -21,15 +25,30 @@ test.describe("manual Gantt editing", () => {
     await expect.poll(async () => (await timeline.boundingBox())!.width).toBeGreaterThan(fittedWidth);
     await page.getByRole("button", { name: "Fit" }).click();
     await expect.poll(async () => Math.round((await timeline.boundingBox())!.width)).toBe(Math.round(fittedWidth));
+    for (let index = 0; index < 9; index += 1) {
+      await page.getByRole("button", { name: "Zoom in timeline" }).click();
+    }
+    await expect(page.locator(".chart-toolbar strong")).toHaveText("325%");
+    await page.getByRole("button", { name: "Fit" }).click();
 
     const timelineBox = (await timeline.boundingBox())!;
     await page.mouse.move(timelineBox.x + timelineBox.width / 2, timelineBox.y + 20);
     await expect(page.locator(".cursor-time")).toBeVisible();
 
     const operation = page.getByLabel("Drag J-103-O0");
+    await expect(operation).not.toHaveAttribute("title");
     await operation.hover();
     await expect(operation.getByRole("tooltip")).toContainText("Start to end");
     await expect(operation.getByRole("tooltip")).toContainText("Weight");
+
+    const bottomOperation = page.getByLabel("Drag J-102-O1");
+    await bottomOperation.hover();
+    const bottomCardBox = await bottomOperation.getByRole("tooltip").boundingBox();
+    const ganttBox = await page.locator(".gantt").boundingBox();
+    expect(bottomCardBox).not.toBeNull();
+    expect(ganttBox).not.toBeNull();
+    expect(bottomCardBox!.y).toBeGreaterThanOrEqual(ganttBox!.y);
+    expect(bottomCardBox!.y + bottomCardBox!.height).toBeLessThanOrEqual(ganttBox!.y + ganttBox!.height);
 
     await page.getByRole("button", { name: "Idle time" }).click();
     await expect(page.locator(".idle-segment")).toHaveCount(0);
@@ -50,9 +69,15 @@ test.describe("manual Gantt editing", () => {
     const barBox = await page.getByLabel("Drag J-102-O0").boundingBox();
     const tickBox = await page.locator('.ticks [data-time="9"]').boundingBox();
     const lineBox = await page.locator('.grid-line[data-time="9"]').boundingBox();
+    const machineLabelsBox = await page.locator(".machine-labels").boundingBox();
+    const zeroLineBox = await page.locator('.grid-line[data-time="0"]').boundingBox();
     expect(barBox).not.toBeNull();
     expect(tickBox).not.toBeNull();
     expect(lineBox).not.toBeNull();
+    expect(machineLabelsBox).not.toBeNull();
+    expect(zeroLineBox).not.toBeNull();
+    expect(Math.abs(zeroLineBox!.x - (machineLabelsBox!.x + machineLabelsBox!.width))).toBeLessThan(1.5);
+    await expect(page.locator(".machine-labels")).toHaveCSS("border-right-width", "0px");
     expect(Math.abs(barBox!.x - (tickBox!.x + tickBox!.width / 2))).toBeLessThan(1.5);
     expect(Math.abs(barBox!.x - lineBox!.x)).toBeLessThan(1.5);
     await expect(page.getByLabel("Drag J-102-O0").locator("small")).toHaveText("9–15 · 6u");
@@ -74,17 +99,17 @@ test.describe("manual Gantt editing", () => {
     await dialog.getByLabel("Requested start time").fill("1");
     await dialog.getByRole("button", { name: "Apply change" }).click();
     await expect(page.getByRole("status")).toContainText("Moved J-103-O0 from time 0 to 1");
-    await expect(operation).toHaveAttribute("title", /1–3/);
+    await expect(operation.locator("small").first()).toContainText("1–3");
     await expect(page.getByRole("button", { name: /Undo/ })).toBeEnabled();
 
     await operation.press("Enter");
     await expect(dialog).toBeVisible();
     await dialog.getByRole("button", { name: "Clear manual time" }).click();
     await expect(dialog).not.toBeVisible();
-    await expect(operation).toHaveAttribute("title", /0–2/);
+    await expect(operation.locator("small").first()).toContainText("0–2");
 
     await page.getByRole("button", { name: /Undo/ }).click();
-    await expect(operation).toHaveAttribute("title", /1–3/);
+    await expect(operation.locator("small").first()).toContainText("1–3");
 
     await page.setViewportSize({ width: 390, height: 844 });
     await operation.press("Enter");

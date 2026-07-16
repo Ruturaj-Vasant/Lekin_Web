@@ -171,7 +171,7 @@
 .time-preview-invalid span{background:var(--warning)}
 .operation-edit-trigger{position:absolute;right:3px;top:3px;z-index:2;border:0;border-radius:3px;padding:2px 4px;background:#ffffffed;color:#3f3f46;font-size:7px;font-weight:700;opacity:0;transition:opacity .12s ease}
 .bar:hover .operation-edit-trigger,.bar:focus .operation-edit-trigger,.bar:focus-within .operation-edit-trigger{opacity:1}
-.operation-editor-backdrop{position:fixed;z-index:40;inset:0;display:grid;place-items:center;padding:18px;background:#19151d66;backdrop-filter:blur(2px)}
+.operation-editor-backdrop{position:fixed;z-index:1000;inset:0;display:grid;place-items:center;padding:18px;background:#19151d66;backdrop-filter:blur(2px)}
 .operation-editor{width:min(520px,100%);overflow:hidden;border:1px solid #d8cbe0;border-radius:10px;background:white;box-shadow:0 24px 70px #23152d40}
 .operation-editor>header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:18px 20px 15px;border-bottom:1px solid var(--line)}
 .operation-editor h3{margin:5px 0 0;font-size:18px}
@@ -219,10 +219,13 @@
 .chart-toolbar button[aria-pressed=true]{border-color:#c9aede;background:var(--violet-soft);color:var(--violet)}
 .chart-toolbar button:disabled{opacity:.35;cursor:default}
 .chart-toolbar strong{min-width:36px;text-align:center;color:var(--muted);font:600 9px var(--font-geist-mono)}
+.toolbar-separator{width:1px;height:22px;margin:0 4px;background:var(--line)}
 .time-scale{margin-right:5px;padding:5px 8px;border-radius:5px;background:#f5f3f7;color:var(--muted);font-size:9px;font-weight:650;text-transform:uppercase;letter-spacing:.05em}
 .legend{min-height:42px;align-items:center;padding:0 18px;overflow-x:auto}
 .legend span{white-space:nowrap}
-.gantt{grid-template-columns:145px minmax(650px,1fr)}
+.gantt{grid-template-columns:132px minmax(650px,1fr)}
+.gantt .timeline{width:100%;margin-left:0}
+.gantt .machine-labels{border-right:0}
 .machine-labels>span{height:72px;padding:9px 14px 8px 18px;justify-content:center}
 .machine-labels>span>b{font-size:11px}
 .machine-labels>span>small{font-size:8px}
@@ -240,6 +243,7 @@
 .operation-hover-card{position:absolute;display:none;z-index:20;left:50%;top:46px;width:210px;padding:12px;transform:translateX(-50%);border:1px solid #ddd8e2;border-radius:7px;background:white;color:var(--ink);box-shadow:0 12px 28px #20152c2e;pointer-events:none}
 .bar:hover .operation-hover-card,.bar:focus .operation-hover-card,.bar:focus-within .operation-hover-card{display:block}
 .operation-hover-card>strong{display:block;font-size:11px}
+.operation-hover-card-above{top:auto;bottom:46px}
 .operation-hover-card>span{display:block;margin-top:3px;color:var(--muted);font-size:9px;font-weight:400}
 .operation-hover-card dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0}
 .operation-hover-card dl div{display:block}
@@ -250,7 +254,7 @@
 .metrics strong{font-size:19px;margin:4px 0 0}
 .details-card{border-radius:9px}
 @media(max-width:1200px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.metrics article:nth-child(3){border-right:0}.metrics article:nth-child(-n+3){border-bottom:1px solid var(--line)}}
-@media(max-width:760px){.gantt-head{align-items:flex-start;flex-direction:column}.chart-toolbar{width:100%}.gantt{grid-template-columns:112px minmax(650px,1fr)}.machine-labels>span{padding-left:12px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics article:nth-child(odd){border-right:1px solid var(--line)}.metrics article:nth-child(even){border-right:0}.metrics article:nth-child(-n+4){border-bottom:1px solid var(--line)}}
+@media(max-width:760px){.gantt-head{align-items:flex-start;flex-direction:column}.chart-toolbar{width:100%}.gantt{grid-template-columns:108px minmax(650px,1fr)}.machine-labels>span{padding-left:12px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics article:nth-child(odd){border-right:1px solid var(--line)}.metrics article:nth-child(even){border-right:0}.metrics article:nth-child(-n+4){border-bottom:1px solid var(--line)}}
 
 /* One shared numeric scale for ticks, grid lines, bars, and drag previews. */
 .timeline .ticks{position:relative;display:block;padding:0}
@@ -259,6 +263,8 @@
 .timeline .ticks .tick-last{transform:translate(-100%,-50%)}
 .timeline .grid{background:none}
 .grid-line{position:absolute;top:0;bottom:0;width:1px;background:#eee;pointer-events:none}
-.timeline .grid{z-index:3;pointer-events:none}
+.timeline .grid{z-index:0;pointer-events:none}
 .timeline .grid-line{background:#dedee4}
-.timeline .bar{z-index:2}
+.timeline .bar{z-index:4}
+.timeline .bar:hover,.timeline .bar:focus,.timeline .bar:focus-within{z-index:100}
+.timeline .operation-hover-card{z-index:101}
