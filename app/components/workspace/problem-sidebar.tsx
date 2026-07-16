@@ -94,7 +94,11 @@ export function ProblemSidebar({
 
       <label className="field-label">
         Problem name
-        <input value={problem.name} readOnly />
+        <input
+          value={problem.name}
+          disabled={running}
+          onChange={(event) => dispatch({ type: "updateProblemName", name: event.target.value })}
+        />
       </label>
 
       <details open>

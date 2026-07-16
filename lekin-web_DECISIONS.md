@@ -1130,3 +1130,19 @@ Each entry should follow this format:
 - Delivery: merged to `main` as `95fa3b7`, pushed to `origin/main`, and
   published privately from that exact source. No co-author trailer was added.
 - Status: independently verified, merged, pushed, and published.
+
+## [2026-07-16] Make the problem name editable
+- Branch: `feat/editable-problem-name`, created from clean current `main`.
+- Changed the Problem name field from read-only to an editor-controlled input.
+  Name changes use the framework-independent problem reducer, update the app
+  header and workspace breadcrumb immediately, and invalidate any result tied
+  to the previous problem state through the existing stale-result guard.
+- The field is disabled while execution is active, matching all other editable
+  problem inputs and preventing the request from changing mid-run.
+- Added a reducer unit test and browser coverage that edits the sample name and
+  verifies both visible locations update.
+- Verification: 127 unit and contract tests passed with four opt-in skips;
+  library type checks, ESLint, and the production build passed. The complete
+  Chromium suite passed all 11 implemented flows with four explicitly unbuilt
+  product flows skipped.
+- Status: verified on the feature branch and ready to merge and publish.

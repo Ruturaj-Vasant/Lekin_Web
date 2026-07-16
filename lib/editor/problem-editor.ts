@@ -271,6 +271,7 @@ export function removeMachine(problem: ProblemDefinition, machineId: string): Pr
 // ---------------------------------------------------------------------------
 
 export type ProblemEditorAction =
+  | { type: "updateProblemName"; name: string }
   | { type: "addJob" }
   | { type: "updateJob"; jobId: string; patch: Partial<Pick<Job, "release" | "due" | "weight" | "rgb">> }
   | { type: "removeJob"; jobId: string }
@@ -292,6 +293,8 @@ export type ProblemEditorAction =
 
 export function problemEditorReducer(problem: ProblemDefinition, action: ProblemEditorAction): ProblemDefinition {
   switch (action.type) {
+    case "updateProblemName":
+      return { ...problem, name: action.name };
     case "addJob":
       return addJob(problem, createDefaultJob(problem));
     case "updateJob":
