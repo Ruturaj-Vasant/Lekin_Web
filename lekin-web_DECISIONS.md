@@ -578,6 +578,36 @@ Each entry should follow this format:
   update needed.
 - Status: merged to `main` as part of the combined Phase 1 integration.
 
+## [2026-07-15] Combined Phase 1 integration audit
+- Branch: `main`
+- Merged: `test/real-execution-fixture` (`ea2a481`) and
+  `feat/browser-execution-adapter` (`6c33946`). The only merge conflict was
+  this persistent log; both source entries were preserved. Application code,
+  fixture tooling, package scripts, and dependencies combined without a
+  source conflict.
+- Combined verification, run after both merges:
+  - clean dependency installation under Node `22.23.1`;
+  - 98 unit/contract tests passed, with four intentionally opt-in registry
+    tests skipped by the general run;
+  - all four registry-drift tests then passed live against
+    `../lekin-library`;
+  - the committed real-execution fixture exactly matched a fresh execution
+    against the pinned lekinpy wheel;
+  - library-layer TypeScript checking, ESLint, and the production vinext
+    build all passed;
+  - the production server returned the application, pinned wheel, and raw
+    checksum successfully over localhost.
+- Remaining verification limitation: no controllable browser was available
+  in this session, so clicking Run and observing the Pyodide Worker result
+  still needs one manual browser smoke test. This is the only uncompleted
+  integration check; it is not represented as passing.
+- Dependency audit note: `npm ci` currently reports 13 transitive findings
+  (2 low, 5 moderate, 6 high). No automatic `npm audit fix` was applied
+  because forced dependency upgrades could change the vinext/Pyodide stack;
+  triage should be a separate reviewed maintenance item.
+- Status: both completed feature branches are merged locally to `main` and
+  the combined non-browser verification is complete.
+
 ## [2026-07-15] Browser execution adapter and first real schedule rendering
 - Branch: `feat/browser-execution-adapter`
 - Phase: 1, browser execution integration (not merged)
