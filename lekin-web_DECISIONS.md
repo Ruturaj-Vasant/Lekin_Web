@@ -610,6 +610,26 @@ Each entry should follow this format:
 - Status: both completed feature branches are merged to `main`; combined
   non-browser verification and private publication are complete.
 
+## [2026-07-15] Make algorithm changes visible in the built-in sample
+- Branch: `fix/distinct-algorithm-sample`
+- Finding: rerunning with another algorithm was not stuck. Independent
+  execution showed FCFS, SPT, EDD, and WSPT all produced the exact same
+  29-unit schedule for the original sample because its release ordering and
+  dispatch priorities never created a meaningful choice.
+- Change: reshaped the same three-job/eight-operation sample using the proven
+  real-execution fixture pattern: disagreeing release times, due dates,
+  weights, and first-operation durations; parallel WC-CUT machines; and a
+  nonzero finishing-machine release. Identifiers and UI colors remain stable.
+- Why: the default sample is a teaching and verification surface. Selecting a
+  different algorithm must produce a visibly different sequence when the
+  algorithms genuinely make different decisions, or a correct rerun looks
+  like broken state management.
+- Verification: all 98 unit/contract tests, type checks, fixture reproduction,
+  lint, and production build passed. The real Playwright rerun executed all
+  four algorithms on port 3000 and proved the FCFS and EDD rendered schedules
+  differ from SPT while cancellation still works.
+- Status: verified and merged to `main`.
+
 ## [2026-07-15] Browser execution adapter and first real schedule rendering
 - Branch: `feat/browser-execution-adapter`
 - Phase: 1, browser execution integration (not merged)
