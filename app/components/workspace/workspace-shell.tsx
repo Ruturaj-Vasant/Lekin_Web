@@ -7,6 +7,9 @@ import { validateExecutionRequest } from "../../../lib/adapter/validate-request"
 import { problemEditorReducer } from "../../../lib/editor/problem-editor";
 import { isResultStale, type ResultContext } from "../../../lib/editor/result-staleness";
 import { recordComparisonResult, comparisonResultsFor, type ComparisonHistory } from "../../../lib/editor/comparison-history";
+import type { ManualStartConstraints } from "../../../lib/schema/manual-edit";
+import type { DragRejection } from "../../../lib/scheduling/recalculate";
+import { checkDropValidity, isNoOpEdit, recalculate } from "../../../lib/scheduling/recalculate";
 import type { ExecutionProgress } from "../../../worker/scheduling-protocol";
 import { BrowserExecutionEngine } from "../../execution/browser-execution-engine";
 import { createBlankProblem } from "../../execution/blank-problem";
@@ -34,10 +37,24 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
   const [progress, setProgress] = useState<ExecutionProgress | null>(null);
   const [running, setRunning] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [manualBaseResult, setManualBaseResult] = useState<ExecutionResult | null>(null);
+  const [manualStartConstraints, setManualStartConstraints] = useState<ManualStartConstraints>({});
+  const [undoStack, setUndoStack] = useState<Array<{ result: ExecutionResult; constraints: ManualStartConstraints }>>([]);
+  const [redoStack, setRedoStack] = useState<Array<{ result: ExecutionResult; constraints: ManualStartConstraints }>>([]);
+  const [dragMessage, setDragMessage] = useState<string | null>(null);
+  const [manualProblem, setManualProblem] = useState(problem);
 
   if (result !== null && isResultStale(resultFor, problem, algorithmId)) {
     setResult(null);
     setResultFor(null);
+  }
+  if (manualProblem !== problem) {
+    setManualProblem(problem);
+    setManualBaseResult(null);
+    setManualStartConstraints({});
+    setUndoStack([]);
+    setRedoStack([]);
+    setDragMessage(null);
   }
 
   useEffect(() => () => engine.current?.dispose(), []);
@@ -62,6 +79,12 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     setResult(next);
     setResultFor({ problem, algorithmId });
     setComparisonHistory((prev) => recordComparisonResult(prev, problem, next));
+    setManualBaseResult(next.status === "completed" ? next : null);
+    setManualProblem(problem);
+    setManualStartConstraints({});
+    setUndoStack([]);
+    setRedoStack([]);
+    setDragMessage(null);
     setRunning(false);
     setProgress(null);
     activeExecution.current = null;
@@ -81,6 +104,11 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     setResult(null);
     setResultFor(null);
     setComparisonHistory(null);
+    setManualBaseResult(null);
+    setManualStartConstraints({});
+    setUndoStack([]);
+    setRedoStack([]);
+    setDragMessage(null);
     setSidebarCollapsed(false);
   }
 
@@ -88,6 +116,101 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
     setAlgorithmId(selected.algorithmId);
     setResult(selected);
     setResultFor({ problem, algorithmId: selected.algorithmId });
+    setManualBaseResult(selected.status === "completed" ? selected : null);
+    setManualProblem(problem);
+    setManualStartConstraints({});
+    setUndoStack([]);
+    setRedoStack([]);
+    setDragMessage(null);
+  }
+
+  function changeAlgorithm(id: string) {
+    setAlgorithmId(id);
+    setManualBaseResult(null);
+    setManualStartConstraints({});
+    setUndoStack([]);
+    setRedoStack([]);
+    setDragMessage(null);
+  }
+
+  function findScheduledOperation(scheduledOperationId: string) {
+    return result?.schedule?.machines.flatMap((machine) => machine.operations).find(
+      (operation) => operation.scheduledOperationId === scheduledOperationId,
+    );
+  }
+
+  function checkManualMove(scheduledOperationId: string, machineId: string, sequencePosition: number): DragRejection | null {
+    if (!result?.schedule) return null;
+    const checked = checkDropValidity(result.schedule, problem, scheduledOperationId, machineId, sequencePosition);
+    return checked.valid ? null : checked.rejection;
+  }
+
+  function moveScheduledOperation(
+    scheduledOperationId: string,
+    machineId: string,
+    sequencePosition: number,
+    requestedStartTime: number | null,
+  ): { accepted: boolean; message: string } {
+    if (!result?.schedule || !result.metrics) return { accepted: false, message: "Run an algorithm before editing the schedule." };
+    const operation = findScheduledOperation(scheduledOperationId);
+    if (!operation) return { accepted: false, message: `Operation ${scheduledOperationId} is not in the active schedule.` };
+    const edit = {
+      editId: crypto.randomUUID(),
+      scheduleId: result.schedule.scheduleId,
+      scheduledOperationId,
+      timestamp: new Date().toISOString(),
+      from: { machineId: operation.machineId, sequencePosition: operation.sequencePosition, requestedStartTime: manualStartConstraints[scheduledOperationId] ?? null },
+      to: { machineId, sequencePosition, requestedStartTime },
+    };
+    if (isNoOpEdit(edit, manualStartConstraints)) return { accepted: false, message: "The operation is already in that position." };
+    const checked = checkDropValidity(result.schedule, problem, scheduledOperationId, machineId, sequencePosition);
+    if (!checked.valid) {
+      setDragMessage(checked.rejection.message);
+      return { accepted: false, message: checked.rejection.message };
+    }
+    const recalculated = recalculate(result.schedule, edit, manualStartConstraints, problem);
+    const nextResult: ExecutionResult = {
+      ...result,
+      schedule: { ...recalculated.schedule, time: recalculated.metrics.makespan },
+      metrics: recalculated.metrics,
+    };
+    setUndoStack((past) => [...past, { result, constraints: manualStartConstraints }]);
+    setRedoStack([]);
+    setManualStartConstraints(recalculated.manualStartConstraints);
+    setResult(nextResult);
+    setResultFor({ problem, algorithmId: nextResult.algorithmId });
+    const message = `Moved ${scheduledOperationId} to ${machineId}, position ${sequencePosition + 1}.`;
+    setDragMessage(message);
+    return { accepted: true, message };
+  }
+
+  function undoManualEdit() {
+    const previous = undoStack.at(-1);
+    if (!previous || !result) return;
+    setRedoStack((future) => [...future, { result, constraints: manualStartConstraints }]);
+    setUndoStack((past) => past.slice(0, -1));
+    setResult(previous.result);
+    setManualStartConstraints(previous.constraints);
+    setDragMessage("Undid the last manual schedule edit.");
+  }
+
+  function redoManualEdit() {
+    const next = redoStack.at(-1);
+    if (!next || !result) return;
+    setUndoStack((past) => [...past, { result, constraints: manualStartConstraints }]);
+    setRedoStack((future) => future.slice(0, -1));
+    setResult(next.result);
+    setManualStartConstraints(next.constraints);
+    setDragMessage("Redid the manual schedule edit.");
+  }
+
+  function resetManualEdits() {
+    if (!manualBaseResult || !result) return;
+    setUndoStack((past) => [...past, { result, constraints: manualStartConstraints }]);
+    setRedoStack([]);
+    setResult(manualBaseResult);
+    setManualStartConstraints({});
+    setDragMessage("Restored the original algorithm schedule.");
   }
 
   const stateLabel = running
@@ -114,6 +237,9 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
           <button type="button" onClick={createNewProblem}>＋ New</button>
           <button type="button">⇧ Import</button>
           <button type="button">↓ Export</button>
+          <button type="button" onClick={undoManualEdit} disabled={undoStack.length === 0}>↶ Undo</button>
+          <button type="button" onClick={redoManualEdit} disabled={redoStack.length === 0}>↷ Redo</button>
+          <button type="button" onClick={resetManualEdits} disabled={!manualBaseResult || undoStack.length === 0}>Reset schedule</button>
           <span className="divider" />
           <button type="button">Help</button>
         </div>
@@ -133,7 +259,7 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
             canRun={canRun}
             progress={progress}
             validationIssues={validationIssues}
-            onAlgorithmChange={setAlgorithmId}
+            onAlgorithmChange={changeAlgorithm}
             onRun={run}
             onCancel={cancel}
             onCollapse={() => setSidebarCollapsed(true)}
@@ -162,7 +288,13 @@ export function WorkspaceShell({ initialProblem, onClose }: { initialProblem: Pr
             </p>
           ))}
           <MetricsRow metrics={result?.metrics ?? null} jobCount={problem.jobs.length} />
-          <GanttChart schedule={result?.schedule ?? null} problem={problem} />
+          <GanttChart
+            schedule={result?.schedule ?? null}
+            problem={problem}
+            dragMessage={dragMessage}
+            onCheckMove={checkManualMove}
+            onMoveOperation={moveScheduledOperation}
+          />
           <ScheduleSummary metrics={result?.metrics ?? null} />
           <DetailTabs
             result={result}

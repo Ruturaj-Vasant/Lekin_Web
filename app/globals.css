@@ -69,3 +69,16 @@
 .comparison-select{border:0;background:transparent;padding:3px 6px;border-radius:4px;color:var(--violet);font-weight:700}
 .comparison-select:hover{background:#e9dcef}
 .comparison-select[aria-pressed="true"]{box-shadow:inset 0 0 0 1px #d1b8df}
+
+/* Manual Gantt editing */
+.timeline .grid{z-index:0}
+.drop-lanes{position:absolute;inset:30px 0 0;z-index:1}
+.drop-lane{height:72px;border-bottom:1px solid transparent;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;transition:background .12s ease,border-color .12s ease}
+.drop-lane span{padding:3px 7px;border-radius:10px;background:white;border:1px solid currentColor;font-size:8px;font-weight:650;box-shadow:0 1px 4px #00000012}
+.drop-lane.drop-valid{background:#eaf4ef99;border-color:#9cc8b4;color:var(--success)}
+.drop-lane.drop-invalid{background:#fbeeeaaa;border-color:#e2aa98;color:var(--warning)}
+.bar{z-index:2;cursor:grab}
+.bar:active{cursor:grabbing}
+.bar.bar-manual{box-shadow:inset 0 0 0 2px #fff,0 0 0 2px var(--violet)}
+.drag-feedback{margin:0;padding:10px 18px;border-top:1px solid #cce2d6;background:#f2f8f5;color:var(--success);font-size:10px;line-height:1.5}
+.drag-feedback.drag-rejected{border-color:#edc9bd;background:#fbeeea;color:#8f3f27}
