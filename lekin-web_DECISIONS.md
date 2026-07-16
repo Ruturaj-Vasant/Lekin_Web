@@ -951,6 +951,25 @@ Each entry should follow this format:
   refreshed from the same verified source.
 - Status: verified, merged, pushed, and published.
 
+## [2026-07-16] Functional New Problem flow
+- Branch: `feat/new-blank-problem`, created from clean current `main`.
+- Replaced the inert top-bar New button with a complete workspace reset. It
+  creates a new unique `problemId`, uses the name `Untitled problem`, clears
+  Jobs, Workcenters, Machines, results, execution progress, and stale-result
+  context, restores SPT, and expands the setup panel.
+- Corrected the landing-page split: Create new problem now opens the same blank
+  model, while Open example continues to load `SAMPLE_PROBLEM`. Previously both
+  buttons opened the sample.
+- Added a typed `replaceProblem` reducer transition and a reusable blank-problem
+  factory rather than reconstructing partial state inside the React component.
+- Added unit coverage for full replacement and browser flows for both landing
+  creation and top-bar reset.
+- Verification under Node 22.23.1: 131 unit and contract tests passed with four
+  opt-in skips; type checks, ESLint, and the production build passed; the full
+  Chromium suite passed all 14 implemented flows with four explicitly unbuilt
+  product flows skipped.
+- Status: verified on the feature branch and ready to merge and publish.
+
 ## [2026-07-16] Editable entity names and sidebar readability
 - Branch: `feat/editable-entity-names`, created from clean current `main`.
 - Reversed the earlier Problem Editor decision that kept Job, Workcenter, and

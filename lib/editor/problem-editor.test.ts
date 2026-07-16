@@ -243,6 +243,12 @@ describe("deleting referenced entities surfaces live validation, rather than sil
 });
 
 describe("problemEditorReducer", () => {
+  it("replaces the complete problem for a fresh workspace", () => {
+    const current = problemWithOneWorkcenterAndMachine();
+    const blank = emptyProblem();
+    expect(problemEditorReducer(current, { type: "replaceProblem", problem: blank })).toBe(blank);
+  });
+
   it("updates the problem name without changing its identity or contents", () => {
     const problem = problemWithOneWorkcenterAndMachine();
     const next = problemEditorReducer(problem, { type: "updateProblemName", name: "Revised experiment" });
