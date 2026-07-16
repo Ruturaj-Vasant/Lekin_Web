@@ -20,6 +20,9 @@ test.describe("manual Gantt editing", () => {
     await expect(page.locator(".appbar").getByRole("button", { name: /Undo/ })).toHaveCount(0);
 
     const timeline = page.locator(".timeline");
+    const ganttBounds = (await page.locator(".gantt").boundingBox())!;
+    const initialTimelineBounds = (await timeline.boundingBox())!;
+    expect(ganttBounds.x + ganttBounds.width - (initialTimelineBounds.x + initialTimelineBounds.width)).toBeGreaterThanOrEqual(14);
     const fittedWidth = (await timeline.boundingBox())!.width;
     await page.getByRole("button", { name: "Zoom in timeline" }).click();
     await expect.poll(async () => (await timeline.boundingBox())!.width).toBeGreaterThan(fittedWidth);
@@ -157,24 +160,24 @@ test.describe("manual Gantt editing", () => {
     await dragToLane(operation, target, 8);
 
     await expect(page.getByRole("status")).toContainText("Moved J-101-O0 from time 3 to 0");
-    await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).toContainText("18");
+    await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).toContainText("18");
     await expect(operation).toHaveClass(/bar-manual/);
     await expect(page.getByRole("button", { name: /Undo/ })).toBeEnabled();
 
     await page.getByRole("button", { name: /Undo/ }).click();
     await expect(page.getByRole("status")).toContainText("Undid");
-    await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).toContainText("16");
+    await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).toContainText("16");
     await expect(operation).not.toHaveClass(/bar-manual/);
     await expect(page.getByRole("button", { name: /Redo/ })).toBeEnabled();
 
     await page.getByRole("button", { name: /Redo/ }).click();
     await expect(page.getByRole("status")).toContainText("Redid");
-    await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).toContainText("18");
+    await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).toContainText("18");
     await expect(operation).toHaveClass(/bar-manual/);
 
     await page.getByRole("button", { name: "Reset schedule" }).click();
     await expect(page.getByRole("status")).toContainText("Restored the original algorithm schedule");
-    await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).toContainText("16");
+    await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).toContainText("16");
     await expect(operation).not.toHaveClass(/bar-manual/);
 
     await page.getByLabel("Problem name").fill("Changed problem");

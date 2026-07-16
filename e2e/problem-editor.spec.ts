@@ -161,19 +161,19 @@ test.describe("problem editor", () => {
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
     await expect(page.locator(".bar")).toHaveCount(8);
-    const originalMakespan = await page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong").innerText();
+    const originalMakespan = await page.locator('.schedule-summary article[data-metric="makespan"] strong').innerText();
 
     const firstJob = entityDetails(page, "J-101");
     await firstJob.locator(".job-summary-meta").click();
     await firstJob.getByLabel("Processing time for operation 0").fill("9");
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");
     await expect(page.locator(".bar")).toHaveCount(0);
-    await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).toHaveText("-");
+    await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).toHaveText("-");
 
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
     await expect(page.locator(".bar")).toHaveCount(8);
-    await expect(page.locator(".schedule-summary article").filter({ hasText: "C_max" }).locator("strong")).not.toHaveText(originalMakespan);
+    await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).not.toHaveText(originalMakespan);
 
     await page.getByLabel("Dispatching rule").selectOption("fcfs");
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");

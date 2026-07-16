@@ -58,7 +58,7 @@ export function LandingScreen({
           <span>production schedules.</span>
         </h1>
         <p>
-          LEKIN Lab is an open scheduling workbench for defining job-shop
+          LEKIN is an open scheduling workbench for defining job-shop
           problems, comparing algorithms, and exploring the schedule that
           results.
         </p>
@@ -75,14 +75,14 @@ export function LandingScreen({
           type="button"
           onClick={() => fileInput.current?.click()}
         >
-          ↑ Import a LEKIN Lab JSON file
+          ↑ Import a LEKIN JSON file
         </button>
         <input
           ref={fileInput}
           type="file"
           accept=".json,.lekin.json,application/json"
           hidden
-          aria-label="Import a LEKIN Lab JSON file"
+          aria-label="Import a LEKIN JSON file"
           onChange={(event) => {
             const file = event.currentTarget.files?.[0];
             if (file) onImportFile(file);
@@ -138,7 +138,7 @@ export function LandingScreen({
         </section>
       )}
 
-      <section className="feature-strip" id="about" aria-label="LEKIN Lab features">
+      <section className="feature-strip" id="about" aria-label="LEKIN features">
         {features.map(([number, title, description]) => (
           <article key={number}>
             <span className="icon" aria-hidden="true">{number}</span>
@@ -149,7 +149,7 @@ export function LandingScreen({
       </section>
 
       <footer id="help">
-        <span>LEKIN Lab</span>
+        <span>LEKIN</span>
         <span>Built for scheduling research and education.</span>
       </footer>
     </main>

@@ -16,8 +16,8 @@ test.describe("problem import and export", () => {
     const exportedPath = await download.path();
     expect(exportedPath).not.toBeNull();
 
-    await page.getByRole("button", { name: /LEKIN Lab/ }).click();
-    await page.getByLabel("Import a LEKIN Lab JSON file").setInputFiles(exportedPath!);
+    await page.getByRole("button", { name: /LEKIN/ }).click();
+    await page.getByLabel("Import a LEKIN JSON file").setInputFiles(exportedPath!);
     await page.getByText(/^Jobs/).click();
     await expect(page.getByLabel("Problem name")).toHaveValue("Round trip study");
     await expect(page.getByText("J-101", { exact: true })).toBeVisible();
@@ -49,7 +49,7 @@ test.describe("problem import and export", () => {
     await page.goto("/");
     await page.getByRole("button", { name: "Open example" }).click();
     await page.getByLabel("Problem name").fill("Keep this problem");
-    await page.getByLabel("Import a LEKIN Lab JSON file").setInputFiles(invalidPath);
+    await page.getByLabel("Import a LEKIN JSON file").setInputFiles(invalidPath);
 
     await expect(page.locator(".save-feedback")).toContainText("supports version 1");
     await expect(page.getByLabel("Problem name")).toHaveValue("Keep this problem");
@@ -62,7 +62,7 @@ test.describe("problem import and export", () => {
     await writeFile(malformedPath, "{not valid JSON");
 
     await page.goto("/");
-    await page.getByLabel("Import a LEKIN Lab JSON file").setInputFiles(malformedPath);
+    await page.getByLabel("Import a LEKIN JSON file").setInputFiles(malformedPath);
 
     await expect(page.getByRole("status")).toContainText("not valid JSON");
     await expect(page.getByRole("button", { name: "Open example" })).toBeVisible();
@@ -74,7 +74,7 @@ test.describe("problem import and export", () => {
     await writeFile(oversizedPath, " ".repeat(5 * 1024 * 1024 + 1));
 
     await page.goto("/");
-    await page.getByLabel("Import a LEKIN Lab JSON file").setInputFiles(oversizedPath);
+    await page.getByLabel("Import a LEKIN JSON file").setInputFiles(oversizedPath);
 
     await expect(page.getByRole("status")).toContainText("larger than the 5 MB import limit");
     await expect(page.getByRole("button", { name: "Open example" })).toBeVisible();

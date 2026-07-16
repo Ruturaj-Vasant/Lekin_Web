@@ -15,7 +15,7 @@ test.describe("local persistence", () => {
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
     await expect(page.getByLabel("Problem name")).toHaveValue("Persisted experiment");
 
-    await page.getByRole("button", { name: /LEKIN Lab/ }).click();
+    await page.getByRole("button", { name: /LEKIN/ }).click();
     const recent = page.getByRole("region", { name: "Recent projects" });
     await expect(recent.getByLabel("Open Persisted experiment")).toBeVisible();
 
@@ -33,7 +33,7 @@ test.describe("local persistence", () => {
     await page.getByRole("button", { name: /Save locally/ }).click();
     await expect(page.locator(".save-feedback")).toContainText("Saved locally.");
 
-    await page.getByRole("button", { name: /LEKIN Lab/ }).click();
+    await page.getByRole("button", { name: /LEKIN/ }).click();
     const recent = page.getByRole("region", { name: "Recent projects" });
     await expect(recent.getByLabel("Open Disposable experiment")).toBeVisible();
 
@@ -46,7 +46,7 @@ test.describe("local persistence", () => {
     await page.goto("/");
     await page.getByRole("button", { name: /Create new problem/ }).click();
     await page.getByLabel("Problem name").fill("Return to landing");
-    await page.getByRole("button", { name: /LEKIN Lab/ }).click();
+    await page.getByRole("button", { name: /LEKIN/ }).click();
 
     await page.reload();
 
@@ -67,7 +67,7 @@ test.describe("local persistence", () => {
     await page.getByRole("button", { name: /Save locally/ }).click();
     await expect(page.locator(".save-feedback")).toContainText("Saved locally.");
 
-    await page.getByRole("button", { name: /LEKIN Lab/ }).click();
+    await page.getByRole("button", { name: /LEKIN/ }).click();
     const recent = page.getByRole("region", { name: "Recent projects" });
     await expect(recent.getByLabel("Open Original project")).toBeVisible();
     await expect(recent.getByLabel("Open Second project")).toBeVisible();

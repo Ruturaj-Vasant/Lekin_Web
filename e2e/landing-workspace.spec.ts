@@ -15,9 +15,9 @@ test.describe("landing and workspace shell", () => {
     const errors = monitorBrowserErrors(page);
     await page.goto("/");
 
-    await expect(page).toHaveTitle("LEKIN Lab - Scheduling Research Workbench");
+    await expect(page).toHaveTitle("LEKIN - Scheduling Research Workbench");
     await expect(page.getByRole("heading", { name: /Build, run, and understand/ })).toBeVisible();
-    await expect(page.getByRole("region", { name: "LEKIN Lab features" }).getByRole("article")).toHaveCount(3);
+    await expect(page.getByRole("region", { name: "LEKIN features" }).getByRole("article")).toHaveCount(3);
     await page.getByRole("button", { name: "Open example" }).click();
 
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
@@ -52,9 +52,9 @@ test.describe("landing and workspace shell", () => {
     await expect(page.getByText("No validation errors.")).toBeVisible();
   });
 
-  test("returns to the landing screen through the LEKIN Lab brand", async ({ page }) => {
+  test("returns to the landing screen through the LEKIN brand", async ({ page }) => {
     await openExample(page);
-    await page.getByRole("button", { name: /LEKIN Lab/ }).click();
+    await page.getByRole("button", { name: /LEKIN/ }).click();
     await expect(page.getByRole("button", { name: "Open example" })).toBeVisible();
   });
 
