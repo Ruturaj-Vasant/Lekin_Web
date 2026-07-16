@@ -605,8 +605,10 @@ Each entry should follow this format:
   (2 low, 5 moderate, 6 high). No automatic `npm audit fix` was applied
   because forced dependency upgrades could change the vinext/Pyodide stack;
   triage should be a separate reviewed maintenance item.
-- Status: both completed feature branches are merged locally to `main` and
-  the combined non-browser verification is complete.
+- Delivery: pushed to `origin/main` and published as an owner-only Sites
+  deployment at `https://lekin-lab-workbench.rvt2018.chatgpt.site`.
+- Status: both completed feature branches are merged to `main`; combined
+  non-browser verification and private publication are complete.
 
 ## [2026-07-15] Browser execution adapter and first real schedule rendering
 - Branch: `feat/browser-execution-adapter`
