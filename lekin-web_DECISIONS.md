@@ -273,4 +273,14 @@ Each entry should follow this format:
 - Verification: ESLint passes; the production vinext build completes; the
   development server returns HTTP 200 and server-renders the LEKIN landing
   content.
-- Status: implemented, awaiting review before merge.
+- Independent review before merge:
+  - Confirmed the branch contains no Pyodide, schema/registry wiring,
+    scheduling execution, persistence, or drag-and-drop behavior.
+  - Removed unused starter database, authentication-helper, sample API, and
+    generic icon files plus their Drizzle dependencies. The Sites build and
+    Worker adapter remain because they are the actual deployment path.
+  - Added the generated `.vite/` dependency cache to `.gitignore`; without
+    this, running the local server caused ESLint to scan generated vendor
+    bundles and report thousands of irrelevant findings.
+  - Re-ran lint and the production build after cleanup.
+- Status: independently reviewed and approved for merge.
