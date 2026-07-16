@@ -109,10 +109,13 @@ function getRuntime(executionId: string): Promise<PyodideInterface> {
 
 self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
   const request = event.data;
-  if (request.type !== "execute") return;
 
   try {
     const runtime = await getRuntime(request.executionId);
+    if (request.type === "prepare") {
+      post({ type: "prepared", executionId: request.executionId });
+      return;
+    }
     progress(request.executionId, "running");
     runtime.globals.set("system_payload_json", JSON.stringify(request.system));
     runtime.globals.set("algorithm_id", request.algorithmId);

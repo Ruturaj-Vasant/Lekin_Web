@@ -2,6 +2,21 @@ import { expect, test } from "@playwright/test";
 import { expectNoBrowserErrors, monitorBrowserErrors, openExample } from "./helpers";
 
 test.describe("real in-browser scheduling", () => {
+  test("prepares Pyodide and the pinned wheel before the first run", async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.goto("/");
+    await expect(page.getByText("Scheduling engine ready")).toBeVisible({ timeout: 120_000 });
+    await page.getByRole("button", { name: "Open example" }).click();
+    await expect(page.getByText("Engine ready")).toBeVisible();
+
+    await page.getByRole("button", { name: "Run schedule" }).click();
+    await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+    const executionSummary = await page.locator(".canvas-head p").textContent();
+    const runtimeMs = Number(executionSummary?.match(/Last run (\d+) ms/)?.[1]);
+    expect(runtimeMs).toBeGreaterThanOrEqual(0);
+    expect(runtimeMs).toBeLessThan(1_000);
+  });
+
   test("runs all algorithms through Pyodide and renders their real results", async ({ page }) => {
     test.setTimeout(240_000);
     const errors = monitorBrowserErrors(page);

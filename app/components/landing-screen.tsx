@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import type { ProjectSummary } from "../../lib/persistence/local-project-store";
+import type { SchedulerPreparationState } from "../execution/browser-execution-engine";
 import { Brand } from "./brand";
 
 type LandingScreenProps = {
@@ -12,6 +13,7 @@ type LandingScreenProps = {
   onDeleteProject: (problemId: string) => void;
   onImportFile: (file: File) => void;
   notice?: string | null;
+  schedulerPreparation: SchedulerPreparationState;
 };
 
 const features = [
@@ -33,6 +35,7 @@ export function LandingScreen({
   onDeleteProject,
   onImportFile,
   notice,
+  schedulerPreparation,
 }: LandingScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -86,6 +89,14 @@ export function LandingScreen({
             event.currentTarget.value = "";
           }}
         />
+        <p className={`scheduler-preparation scheduler-${schedulerPreparation}`} aria-live="polite">
+          <span />
+          {schedulerPreparation === "ready"
+            ? "Scheduling engine ready"
+            : schedulerPreparation === "error"
+              ? "Scheduling engine will retry when you run"
+              : "Preparing the scheduling engine"}
+        </p>
       </section>
 
       {notice && (
