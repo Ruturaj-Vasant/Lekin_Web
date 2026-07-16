@@ -447,3 +447,134 @@ Each entry should follow this format:
   that it was globally clean was corrected rather than repeated.
 - Status: independently reviewed, corrected, and merged to `main` in
   merge commit `a41c3ac`.
+
+## [2026-07-16] Real-execution fixture and contract tests (framework-independent)
+- Branch: `test/real-execution-fixture`
+- Phase: 1, verification milestone — coordinates with Codex's separate
+  browser/Pyodide/Web Worker integration work but does not implement or
+  edit it (`app/`, `app/components/`, `worker/`, React state, browser APIs,
+  drag-and-drop UI untouched; `main` untouched).
+- Pre-work verification (per this task's explicit instructions): read
+  `MASTER_PROMPT_v2.md`, `PRODUCT_SPEC.md`, `ARCHITECTURE.md` (full, v1.3 —
+  unchanged since the last review except one clarifying sentence on the
+  `.sha256` file's raw-digest format in §2.3), and this file, in full, then
+  confirmed directly rather than assumed: `main` was at `d2c1266` (exactly
+  the specified commit); `feat/scheduling-core-lib` and
+  `feat/browser-ui-shell` were both already merged; `lib/schema`,
+  `lib/registry`, `lib/adapter`, `lib/scheduling` all present;
+  `public/vendor/lekinpy-0.2.0-py3-none-any.whl` + `.sha256` present and
+  self-consistent (recomputed the digest directly, matched the committed
+  file); `app/components/workspace/problem-sidebar.tsx` and `gantt-chart.tsx`
+  still reference presentation-only `demo-data`; `lekin-library` still
+  pinned at tag `v0.2.0` / commit `a3fee48` with no uncommitted source
+  changes (only the pre-existing stale tracked `__pycache__` noise). No
+  inconsistency found — proceeded.
+- What changed:
+  - `test/fixtures/real-execution/problem.ts`: one authored
+    `ProblemDefinition` (the INPUT, never a handwritten expected
+    schedule) — 3 jobs (2-3 operations each), 3 workcenters, 4 machines
+    including two eligible machines at WC1 (`M1`, `M1b`), differing job
+    releases/due dates/weights, and two nonzero machine release times
+    (`M1b`=3, `M3`=1), specifically shaped so FCFS/SPT/EDD/WSPT pick
+    genuinely different first jobs to dispatch (documented inline with the
+    reasoning per algorithm).
+  - `scripts/fixtures/run_lekinpy_fixture.py`: verifies the pinned wheel's
+    SHA-256 against the committed `.sha256` before doing anything else;
+    extracts the wheel into a fresh temp directory and imports `lekinpy`
+    only from there (never a global/ambient install — this is the exact
+    failure mode `lekin-library_DECISIONS.md` already documents once, a
+    stale global install silently shadowing local source); after import,
+    verifies both `lekinpy.__version__` AND that the resolved module's
+    `__file__` actually resolves inside that extracted directory (a
+    version-string match alone wouldn't catch a same-numbered shadowing
+    install elsewhere on `sys.path`); builds a fresh `System` per
+    algorithm (mutation from one algorithm run would otherwise corrupt the
+    next); runs FCFS/SPT/EDD/WSPT; dumps raw `Schedule.to_dict()` +
+    `metadata` per algorithm plus `lekinpy.__version__` as JSON to stdout.
+  - `scripts/fixtures/generate-real-execution-fixture.ts`: orchestrates —
+    validates the sample problem with `lib/schema` (must be zero-error),
+    translates it with the real `toLekinpySystemPayload()`, shells out to
+    the Python script above, translates each raw result back with the
+    real `fromLekinpyScheduleDict()`, computes `Metrics` with the real
+    `computeMetrics()`, cross-checks each algorithm's live metadata
+    against `lib/registry`'s `ALGORITHM_REGISTRY` (abort on any mismatch),
+    and writes `test/fixtures/real-execution/fixture.json`. Supports
+    `--check` (regenerate into memory, deep-compare against the committed
+    file sans the `generatedAt` timestamp, exit non-zero on any
+    difference) for reproducibility verification without mutating the
+    repo.
+  - `lib/fixtures/real-execution.contract.test.ts`: 43 tests reading the
+    committed fixture — translation-shape checks (payload field names
+    exactly match `lekinpy`'s real constructor parameters), per-algorithm
+    invariants (every operation scheduled exactly once, job precedence,
+    no machine overlap, machine/job release times respected, duration ==
+    `processingTime`) run across all four algorithms via
+    `describe.each`, exact reproduction checks (`fromLekinpyScheduleDict()`
+    on the stored raw dict reproduces the stored `webSchedule`;
+    `computeMetrics()` on the stored schedule reproduces the stored
+    `Metrics`; stored `libraryMetadata` matches the live registry),
+    deliberate-drift-detection checks (a mutated raw dict/schedule/registry
+    entry is asserted to actually stop matching, proving the equality
+    checks above aren't vacuous), and JSON-round-trip validity.
+  - `package.json`: added `fixture:generate` and `fixture:check` scripts
+    (both `tsx scripts/fixtures/generate-real-execution-fixture.ts`, with
+    `--check` for the latter); left `test`/`test:unit`/`test:types`
+    untouched.
+- Why: Codex's browser/Pyodide integration needs a stable, authoritative
+  ground truth to build and debug against — real `lekinpy` output, not
+  hand-written fixtures that could silently encode the same misconceptions
+  the architecture review already twice caught in the recalculation logic.
+  Generating the fixture from the actual pinned wheel (with checksum/
+  version/import-path guards) makes it reproducible and tamper-evident
+  rather than a one-time manual capture.
+- Alternatives considered / tradeoffs:
+  - Considered running the Python step against whatever `lekinpy` a
+    developer's environment happens to have installed. Rejected per the
+    task's explicit instruction and the project's own prior incident
+    (`lekin-library_DECISIONS.md`'s stale-global-install entry) — the
+    wheel-extraction-plus-`__file__`-check approach is the only one that
+    actually guarantees the fixture reflects the pinned wheel and not
+    ambient state.
+  - Considered generating the fixture directly from TypeScript via a
+    Pyodide-in-Node harness instead of shelling out to real CPython.
+    Rejected: heavier, slower, and further from what the browser will
+    actually run than just invoking the same CPython the wheel targets;
+    shelling out to `python3` is simpler and the checksum/version/path
+    guards give an equivalent provenance guarantee without it.
+  - Considered a single flat `problem` + `schedules` fixture file without
+    the raw `lekinpy` dict alongside the translated `webSchedule`. Kept
+    both so the contract tests can prove `fromLekinpyScheduleDict()`
+    itself is correct (raw -> translated), not just assume it.
+- Tests added/run:
+  - 43 new contract tests (`lib/fixtures/real-execution.contract.test.ts`).
+  - `npm run test:unit`: 93 passed, 4 opt-in skipped (up from 50 passed
+    before this branch).
+  - `npm run test:types`: clean. Full-project `npx tsc --noEmit -p
+    tsconfig.json` also re-checked: only the pre-existing, already-
+    documented `worker/index.ts` Cloudflare ambient-type errors, no new
+    errors from anything added on this branch.
+  - `eslint lib/` and `eslint scripts/fixtures test/fixtures`: both clean;
+    sanity-checked eslint was actually scanning the new files by
+    temporarily introducing an unused variable and confirming it was
+    flagged, then removing it.
+  - Live registry-drift guard (`LEKINPY_SOURCE=../lekin-library npx vitest
+    run lib/registry/verify.test.ts`): 4/4 passed against the real pinned
+    library.
+  - `npm run fixture:check`: passed — the committed fixture is exactly
+    what a fresh run against the pinned wheel produces right now.
+  - Manually verified both required failure modes fail clearly and exit
+    non-zero: corrupted the committed `.sha256` (checksum-mismatch path)
+    and passed a wrong `--expected-version` directly to the Python script
+    (version-mismatch path); both produced explicit, specific error
+    messages naming the mismatch, not a silent or generic failure. The
+    `.sha256` file was restored immediately after and reverified clean
+    (`git status`/digest recheck) before continuing.
+- Discrepancies found between the real library and `ARCHITECTURE.md`:
+  none. The translation boundary (`toLekinpySystemPayload`'s field names/
+  nesting), the four algorithms' `libraryMetadata`, and every recalculation
+  invariant `ARCHITECTURE.md` documents (precedence, no-overlap, machine/
+  job release floors, duration == processingTime) all matched the real
+  pinned library's actual behavior exactly on this run — no architecture
+  update needed.
+- Status: ready for review, not merged. Committed only to
+  `test/real-execution-fixture`; `main` untouched; not pushed.

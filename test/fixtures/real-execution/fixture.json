@@ -1,0 +1,1259 @@
+{
+  "provenance": {
+    "lekinLibraryTag": "v0.2.0",
+    "lekinLibraryCommit": "a3fee48",
+    "lekinpyVersion": "0.2.0",
+    "wheelPath": "public/vendor/lekinpy-0.2.0-py3-none-any.whl",
+    "wheelSha256": "e374e3d33049513947a943383838227ec383a6f2e2e1356b85c9e8234c1eacea",
+    "pythonVersion": "3.12.6",
+    "generatedAt": "2026-07-16T02:31:27.062Z",
+    "registrySnapshot": [
+      {
+        "id": "fcfs",
+        "displayName": "First-Come, First-Served",
+        "supportsMultiOperation": true,
+        "version": "1.0.0"
+      },
+      {
+        "id": "spt",
+        "displayName": "Shortest Processing Time",
+        "supportsMultiOperation": true,
+        "version": "1.0.0"
+      },
+      {
+        "id": "edd",
+        "displayName": "Earliest Due Date",
+        "supportsMultiOperation": true,
+        "version": "1.0.0"
+      },
+      {
+        "id": "wspt",
+        "displayName": "Weighted Shortest Processing Time",
+        "supportsMultiOperation": true,
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "problem": {
+    "schemaVersion": "1.0.0",
+    "problemId": "real-execution-fixture",
+    "name": "Real execution fixture: 3 jobs, 3 workcenters, parallel machines",
+    "jobs": [
+      {
+        "jobId": "J1",
+        "release": 0,
+        "due": 30,
+        "weight": 2,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J1-O0",
+            "workcenterId": "WC1",
+            "processingTime": 4,
+            "status": "pending"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J1-O1",
+            "workcenterId": "WC2",
+            "processingTime": 3,
+            "status": "pending"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J1-O2",
+            "workcenterId": "WC3",
+            "processingTime": 2,
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "jobId": "J2",
+        "release": 2,
+        "due": 18,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J2-O0",
+            "workcenterId": "WC1",
+            "processingTime": 6,
+            "status": "pending"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J2-O1",
+            "workcenterId": "WC3",
+            "processingTime": 3,
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "jobId": "J3",
+        "release": 0,
+        "due": 12,
+        "weight": 3,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J3-O0",
+            "workcenterId": "WC2",
+            "processingTime": 2,
+            "status": "pending"
+          },
+          {
+            "operationIndex": 1,
+            "operationId": "J3-O1",
+            "workcenterId": "WC1",
+            "processingTime": 5,
+            "status": "pending"
+          },
+          {
+            "operationIndex": 2,
+            "operationId": "J3-O2",
+            "workcenterId": "WC3",
+            "processingTime": 4,
+            "status": "pending"
+          }
+        ]
+      }
+    ],
+    "workcenters": [
+      {
+        "workcenterId": "WC1",
+        "release": 0,
+        "status": "active",
+        "machineIds": [
+          "M1",
+          "M1b"
+        ]
+      },
+      {
+        "workcenterId": "WC2",
+        "release": 0,
+        "status": "active",
+        "machineIds": [
+          "M2"
+        ]
+      },
+      {
+        "workcenterId": "WC3",
+        "release": 0,
+        "status": "active",
+        "machineIds": [
+          "M3"
+        ]
+      }
+    ],
+    "machines": [
+      {
+        "machineId": "M1",
+        "workcenterId": "WC1",
+        "release": 0,
+        "status": "active"
+      },
+      {
+        "machineId": "M1b",
+        "workcenterId": "WC1",
+        "release": 3,
+        "status": "active"
+      },
+      {
+        "machineId": "M2",
+        "workcenterId": "WC2",
+        "release": 0,
+        "status": "active"
+      },
+      {
+        "machineId": "M3",
+        "workcenterId": "WC3",
+        "release": 1,
+        "status": "active"
+      }
+    ]
+  },
+  "results": {
+    "fcfs": {
+      "libraryMetadata": {
+        "id": "fcfs",
+        "displayName": "First-Come, First-Served",
+        "supportsMultiOperation": true,
+        "version": "1.0.0"
+      },
+      "rawLekinpyScheduleDict": {
+        "schedule_type": "FCFS",
+        "time": 21,
+        "rgb": null,
+        "machines": [
+          {
+            "workcenter": "WC1",
+            "machine": "M1",
+            "operations": [
+              {
+                "job_id": "J1",
+                "operation_index": 0,
+                "workcenter": "WC1",
+                "machine": "M1",
+                "start_time": 0,
+                "end_time": 4,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J2",
+                "operation_index": 0,
+                "workcenter": "WC1",
+                "machine": "M1",
+                "start_time": 4,
+                "end_time": 10,
+                "sequence_position": 1,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC1",
+            "machine": "M1b",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 1,
+                "workcenter": "WC1",
+                "machine": "M1b",
+                "start_time": 9,
+                "end_time": 14,
+                "sequence_position": 0,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC2",
+            "machine": "M2",
+            "operations": [
+              {
+                "job_id": "J1",
+                "operation_index": 1,
+                "workcenter": "WC2",
+                "machine": "M2",
+                "start_time": 4,
+                "end_time": 7,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J3",
+                "operation_index": 0,
+                "workcenter": "WC2",
+                "machine": "M2",
+                "start_time": 7,
+                "end_time": 9,
+                "sequence_position": 1,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC3",
+            "machine": "M3",
+            "operations": [
+              {
+                "job_id": "J1",
+                "operation_index": 2,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 7,
+                "end_time": 9,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J3",
+                "operation_index": 2,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 14,
+                "end_time": 18,
+                "sequence_position": 1,
+                "status": "pending"
+              },
+              {
+                "job_id": "J2",
+                "operation_index": 1,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 18,
+                "end_time": 21,
+                "sequence_position": 2,
+                "status": "pending"
+              }
+            ]
+          }
+        ]
+      },
+      "webSchedule": {
+        "scheduleId": "fixture-fcfs",
+        "algorithmId": "fcfs",
+        "scheduleType": "FCFS",
+        "time": 21,
+        "machines": [
+          {
+            "machineId": "M1",
+            "workcenterId": "WC1",
+            "operations": [
+              {
+                "scheduledOperationId": "J1-O0",
+                "jobId": "J1",
+                "operationIndex": 0,
+                "workcenterId": "WC1",
+                "machineId": "M1",
+                "startTime": 0,
+                "endTime": 4,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J2-O0",
+                "jobId": "J2",
+                "operationIndex": 0,
+                "workcenterId": "WC1",
+                "machineId": "M1",
+                "startTime": 4,
+                "endTime": 10,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M1b",
+            "workcenterId": "WC1",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O1",
+                "jobId": "J3",
+                "operationIndex": 1,
+                "workcenterId": "WC1",
+                "machineId": "M1b",
+                "startTime": 9,
+                "endTime": 14,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M2",
+            "workcenterId": "WC2",
+            "operations": [
+              {
+                "scheduledOperationId": "J1-O1",
+                "jobId": "J1",
+                "operationIndex": 1,
+                "workcenterId": "WC2",
+                "machineId": "M2",
+                "startTime": 4,
+                "endTime": 7,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J3-O0",
+                "jobId": "J3",
+                "operationIndex": 0,
+                "workcenterId": "WC2",
+                "machineId": "M2",
+                "startTime": 7,
+                "endTime": 9,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M3",
+            "workcenterId": "WC3",
+            "operations": [
+              {
+                "scheduledOperationId": "J1-O2",
+                "jobId": "J1",
+                "operationIndex": 2,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 7,
+                "endTime": 9,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J3-O2",
+                "jobId": "J3",
+                "operationIndex": 2,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 14,
+                "endTime": 18,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J2-O1",
+                "jobId": "J2",
+                "operationIndex": 1,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 18,
+                "endTime": 21,
+                "sequencePosition": 2,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          }
+        ]
+      },
+      "metrics": {
+        "makespan": 21,
+        "maxTardiness": 6,
+        "tardyJobCount": 2,
+        "totalCompletionTime": 48,
+        "totalTardiness": 9,
+        "weightedCompletionTime": 93,
+        "weightedTardiness": 21,
+        "machineUtilization": {
+          "M1": 0.47619047619047616,
+          "M1b": 0.2777777777777778,
+          "M2": 0.23809523809523808,
+          "M3": 0.45
+        }
+      }
+    },
+    "spt": {
+      "libraryMetadata": {
+        "id": "spt",
+        "displayName": "Shortest Processing Time",
+        "supportsMultiOperation": true,
+        "version": "1.0.0"
+      },
+      "rawLekinpyScheduleDict": {
+        "schedule_type": "SPT",
+        "time": 16,
+        "rgb": null,
+        "machines": [
+          {
+            "workcenter": "WC1",
+            "machine": "M1",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 1,
+                "workcenter": "WC1",
+                "machine": "M1",
+                "start_time": 2,
+                "end_time": 7,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J2",
+                "operation_index": 0,
+                "workcenter": "WC1",
+                "machine": "M1",
+                "start_time": 7,
+                "end_time": 13,
+                "sequence_position": 1,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC1",
+            "machine": "M1b",
+            "operations": [
+              {
+                "job_id": "J1",
+                "operation_index": 0,
+                "workcenter": "WC1",
+                "machine": "M1b",
+                "start_time": 3,
+                "end_time": 7,
+                "sequence_position": 0,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC2",
+            "machine": "M2",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 0,
+                "workcenter": "WC2",
+                "machine": "M2",
+                "start_time": 0,
+                "end_time": 2,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J1",
+                "operation_index": 1,
+                "workcenter": "WC2",
+                "machine": "M2",
+                "start_time": 7,
+                "end_time": 10,
+                "sequence_position": 1,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC3",
+            "machine": "M3",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 2,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 7,
+                "end_time": 11,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J1",
+                "operation_index": 2,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 11,
+                "end_time": 13,
+                "sequence_position": 1,
+                "status": "pending"
+              },
+              {
+                "job_id": "J2",
+                "operation_index": 1,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 13,
+                "end_time": 16,
+                "sequence_position": 2,
+                "status": "pending"
+              }
+            ]
+          }
+        ]
+      },
+      "webSchedule": {
+        "scheduleId": "fixture-spt",
+        "algorithmId": "spt",
+        "scheduleType": "SPT",
+        "time": 16,
+        "machines": [
+          {
+            "machineId": "M1",
+            "workcenterId": "WC1",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O1",
+                "jobId": "J3",
+                "operationIndex": 1,
+                "workcenterId": "WC1",
+                "machineId": "M1",
+                "startTime": 2,
+                "endTime": 7,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J2-O0",
+                "jobId": "J2",
+                "operationIndex": 0,
+                "workcenterId": "WC1",
+                "machineId": "M1",
+                "startTime": 7,
+                "endTime": 13,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M1b",
+            "workcenterId": "WC1",
+            "operations": [
+              {
+                "scheduledOperationId": "J1-O0",
+                "jobId": "J1",
+                "operationIndex": 0,
+                "workcenterId": "WC1",
+                "machineId": "M1b",
+                "startTime": 3,
+                "endTime": 7,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M2",
+            "workcenterId": "WC2",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O0",
+                "jobId": "J3",
+                "operationIndex": 0,
+                "workcenterId": "WC2",
+                "machineId": "M2",
+                "startTime": 0,
+                "endTime": 2,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J1-O1",
+                "jobId": "J1",
+                "operationIndex": 1,
+                "workcenterId": "WC2",
+                "machineId": "M2",
+                "startTime": 7,
+                "endTime": 10,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M3",
+            "workcenterId": "WC3",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O2",
+                "jobId": "J3",
+                "operationIndex": 2,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 7,
+                "endTime": 11,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J1-O2",
+                "jobId": "J1",
+                "operationIndex": 2,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 11,
+                "endTime": 13,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J2-O1",
+                "jobId": "J2",
+                "operationIndex": 1,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 13,
+                "endTime": 16,
+                "sequencePosition": 2,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          }
+        ]
+      },
+      "metrics": {
+        "makespan": 16,
+        "maxTardiness": 0,
+        "tardyJobCount": 0,
+        "totalCompletionTime": 40,
+        "totalTardiness": 0,
+        "weightedCompletionTime": 75,
+        "weightedTardiness": 0,
+        "machineUtilization": {
+          "M1": 0.6875,
+          "M1b": 0.3076923076923077,
+          "M2": 0.3125,
+          "M3": 0.6
+        }
+      }
+    },
+    "edd": {
+      "libraryMetadata": {
+        "id": "edd",
+        "displayName": "Earliest Due Date",
+        "supportsMultiOperation": true,
+        "version": "1.0.0"
+      },
+      "rawLekinpyScheduleDict": {
+        "schedule_type": "EDD",
+        "time": 16,
+        "rgb": null,
+        "machines": [
+          {
+            "workcenter": "WC1",
+            "machine": "M1",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 1,
+                "workcenter": "WC1",
+                "machine": "M1",
+                "start_time": 2,
+                "end_time": 7,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J1",
+                "operation_index": 0,
+                "workcenter": "WC1",
+                "machine": "M1",
+                "start_time": 7,
+                "end_time": 11,
+                "sequence_position": 1,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC1",
+            "machine": "M1b",
+            "operations": [
+              {
+                "job_id": "J2",
+                "operation_index": 0,
+                "workcenter": "WC1",
+                "machine": "M1b",
+                "start_time": 3,
+                "end_time": 9,
+                "sequence_position": 0,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC2",
+            "machine": "M2",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 0,
+                "workcenter": "WC2",
+                "machine": "M2",
+                "start_time": 0,
+                "end_time": 2,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J1",
+                "operation_index": 1,
+                "workcenter": "WC2",
+                "machine": "M2",
+                "start_time": 11,
+                "end_time": 14,
+                "sequence_position": 1,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC3",
+            "machine": "M3",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 2,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 7,
+                "end_time": 11,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J2",
+                "operation_index": 1,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 11,
+                "end_time": 14,
+                "sequence_position": 1,
+                "status": "pending"
+              },
+              {
+                "job_id": "J1",
+                "operation_index": 2,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 14,
+                "end_time": 16,
+                "sequence_position": 2,
+                "status": "pending"
+              }
+            ]
+          }
+        ]
+      },
+      "webSchedule": {
+        "scheduleId": "fixture-edd",
+        "algorithmId": "edd",
+        "scheduleType": "EDD",
+        "time": 16,
+        "machines": [
+          {
+            "machineId": "M1",
+            "workcenterId": "WC1",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O1",
+                "jobId": "J3",
+                "operationIndex": 1,
+                "workcenterId": "WC1",
+                "machineId": "M1",
+                "startTime": 2,
+                "endTime": 7,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J1-O0",
+                "jobId": "J1",
+                "operationIndex": 0,
+                "workcenterId": "WC1",
+                "machineId": "M1",
+                "startTime": 7,
+                "endTime": 11,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M1b",
+            "workcenterId": "WC1",
+            "operations": [
+              {
+                "scheduledOperationId": "J2-O0",
+                "jobId": "J2",
+                "operationIndex": 0,
+                "workcenterId": "WC1",
+                "machineId": "M1b",
+                "startTime": 3,
+                "endTime": 9,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M2",
+            "workcenterId": "WC2",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O0",
+                "jobId": "J3",
+                "operationIndex": 0,
+                "workcenterId": "WC2",
+                "machineId": "M2",
+                "startTime": 0,
+                "endTime": 2,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J1-O1",
+                "jobId": "J1",
+                "operationIndex": 1,
+                "workcenterId": "WC2",
+                "machineId": "M2",
+                "startTime": 11,
+                "endTime": 14,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M3",
+            "workcenterId": "WC3",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O2",
+                "jobId": "J3",
+                "operationIndex": 2,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 7,
+                "endTime": 11,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J2-O1",
+                "jobId": "J2",
+                "operationIndex": 1,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 11,
+                "endTime": 14,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J1-O2",
+                "jobId": "J1",
+                "operationIndex": 2,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 14,
+                "endTime": 16,
+                "sequencePosition": 2,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          }
+        ]
+      },
+      "metrics": {
+        "makespan": 16,
+        "maxTardiness": 0,
+        "tardyJobCount": 0,
+        "totalCompletionTime": 41,
+        "totalTardiness": 0,
+        "weightedCompletionTime": 79,
+        "weightedTardiness": 0,
+        "machineUtilization": {
+          "M1": 0.5625,
+          "M1b": 0.46153846153846156,
+          "M2": 0.3125,
+          "M3": 0.6
+        }
+      }
+    },
+    "wspt": {
+      "libraryMetadata": {
+        "id": "wspt",
+        "displayName": "Weighted Shortest Processing Time",
+        "supportsMultiOperation": true,
+        "version": "1.0.0"
+      },
+      "rawLekinpyScheduleDict": {
+        "schedule_type": "WSPT",
+        "time": 16,
+        "rgb": null,
+        "machines": [
+          {
+            "workcenter": "WC1",
+            "machine": "M1",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 1,
+                "workcenter": "WC1",
+                "machine": "M1",
+                "start_time": 2,
+                "end_time": 7,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J2",
+                "operation_index": 0,
+                "workcenter": "WC1",
+                "machine": "M1",
+                "start_time": 7,
+                "end_time": 13,
+                "sequence_position": 1,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC1",
+            "machine": "M1b",
+            "operations": [
+              {
+                "job_id": "J1",
+                "operation_index": 0,
+                "workcenter": "WC1",
+                "machine": "M1b",
+                "start_time": 3,
+                "end_time": 7,
+                "sequence_position": 0,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC2",
+            "machine": "M2",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 0,
+                "workcenter": "WC2",
+                "machine": "M2",
+                "start_time": 0,
+                "end_time": 2,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J1",
+                "operation_index": 1,
+                "workcenter": "WC2",
+                "machine": "M2",
+                "start_time": 7,
+                "end_time": 10,
+                "sequence_position": 1,
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "workcenter": "WC3",
+            "machine": "M3",
+            "operations": [
+              {
+                "job_id": "J3",
+                "operation_index": 2,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 7,
+                "end_time": 11,
+                "sequence_position": 0,
+                "status": "pending"
+              },
+              {
+                "job_id": "J1",
+                "operation_index": 2,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 11,
+                "end_time": 13,
+                "sequence_position": 1,
+                "status": "pending"
+              },
+              {
+                "job_id": "J2",
+                "operation_index": 1,
+                "workcenter": "WC3",
+                "machine": "M3",
+                "start_time": 13,
+                "end_time": 16,
+                "sequence_position": 2,
+                "status": "pending"
+              }
+            ]
+          }
+        ]
+      },
+      "webSchedule": {
+        "scheduleId": "fixture-wspt",
+        "algorithmId": "wspt",
+        "scheduleType": "WSPT",
+        "time": 16,
+        "machines": [
+          {
+            "machineId": "M1",
+            "workcenterId": "WC1",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O1",
+                "jobId": "J3",
+                "operationIndex": 1,
+                "workcenterId": "WC1",
+                "machineId": "M1",
+                "startTime": 2,
+                "endTime": 7,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J2-O0",
+                "jobId": "J2",
+                "operationIndex": 0,
+                "workcenterId": "WC1",
+                "machineId": "M1",
+                "startTime": 7,
+                "endTime": 13,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M1b",
+            "workcenterId": "WC1",
+            "operations": [
+              {
+                "scheduledOperationId": "J1-O0",
+                "jobId": "J1",
+                "operationIndex": 0,
+                "workcenterId": "WC1",
+                "machineId": "M1b",
+                "startTime": 3,
+                "endTime": 7,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M2",
+            "workcenterId": "WC2",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O0",
+                "jobId": "J3",
+                "operationIndex": 0,
+                "workcenterId": "WC2",
+                "machineId": "M2",
+                "startTime": 0,
+                "endTime": 2,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J1-O1",
+                "jobId": "J1",
+                "operationIndex": 1,
+                "workcenterId": "WC2",
+                "machineId": "M2",
+                "startTime": 7,
+                "endTime": 10,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          },
+          {
+            "machineId": "M3",
+            "workcenterId": "WC3",
+            "operations": [
+              {
+                "scheduledOperationId": "J3-O2",
+                "jobId": "J3",
+                "operationIndex": 2,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 7,
+                "endTime": 11,
+                "sequencePosition": 0,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J1-O2",
+                "jobId": "J1",
+                "operationIndex": 2,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 11,
+                "endTime": 13,
+                "sequencePosition": 1,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              },
+              {
+                "scheduledOperationId": "J2-O1",
+                "jobId": "J2",
+                "operationIndex": 1,
+                "workcenterId": "WC3",
+                "machineId": "M3",
+                "startTime": 13,
+                "endTime": 16,
+                "sequencePosition": 2,
+                "status": "pending",
+                "source": "algorithm",
+                "manuallyModified": false
+              }
+            ]
+          }
+        ]
+      },
+      "metrics": {
+        "makespan": 16,
+        "maxTardiness": 0,
+        "tardyJobCount": 0,
+        "totalCompletionTime": 40,
+        "totalTardiness": 0,
+        "weightedCompletionTime": 75,
+        "weightedTardiness": 0,
+        "machineUtilization": {
+          "M1": 0.6875,
+          "M1b": 0.3076923076923077,
+          "M2": 0.3125,
+          "M3": 0.6
+        }
+      }
+    }
+  }
+}
