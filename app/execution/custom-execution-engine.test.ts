@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CustomAlgorithmEngine } from "./custom-execution-engine";
+import { DEFAULT_CUSTOM_ALGORITHM_POLICY } from "../../lib/custom-algorithm/policy";
 import { SAMPLE_PROBLEM } from "./sample-problem";
 import type { CustomWorkerRequest, CustomWorkerResponse } from "../../worker/custom-scheduling-protocol";
 import type { LekinpyScheduleDict } from "../../lib/adapter/translate";
@@ -376,6 +377,213 @@ describe("CustomAlgorithmEngine", () => {
         droppedIncumbentUpdates: 0,
       });
       const result = await promise;
+      expect(result.status).toBe("completed");
+    });
+  });
+
+  describe("environment startup timeout", () => {
+    it("settles as runtime_failed when the worker never reaches the running stage", async () => {
+      const engine = new CustomAlgorithmEngine();
+      const promise = engine.runCustomAlgorithm({ source: "def schedule(system, parameters, context):\n    return None\n", problem: SAMPLE_PROBLEM });
+      await Promise.resolve();
+      await Promise.resolve();
+      const worker = lastWorker();
+      // No message ever arrives (a hung Pyodide bootstrap). The dedicated
+      // startup timer - NOT the algorithm timer, which is never armed
+      // before "running" - must settle the run.
+      await vi.advanceTimersByTimeAsync(60_001);
+      const result = await promise;
+      expect(result.status).toBe("runtime_failed");
+      expect(result.issues[0]!.message).toContain("did not start");
+      expect(worker.terminated).toBe(true);
+    });
+
+    it("does not fire once the running stage has arrived", async () => {
+      // A short startup ceiling and a longer algorithm limit, so the test
+      // can cross the startup deadline while the run is legitimately mid-
+      // algorithm.
+      const engine = new CustomAlgorithmEngine({ ...DEFAULT_CUSTOM_ALGORITHM_POLICY, environmentStartupTimeoutMs: 1_000 });
+      const promise = engine.runCustomAlgorithm({
+        source: "def schedule(system, parameters, context):\n    return None\n",
+        problem: SAMPLE_PROBLEM,
+        limits: { timeLimitMs: 10_000 },
+      });
+      await Promise.resolve();
+      await Promise.resolve();
+      const worker = lastWorker();
+      const runId = (worker.messages[0] as { runId: string }).runId;
+      worker.emit({ type: "progress", runId, stage: "running" });
+      // Cross the startup deadline while the (much longer) algorithm time
+      // limit is still running - nothing must settle yet.
+      await vi.advanceTimersByTimeAsync(2_000);
+      worker.emit({
+        type: "completed",
+        runId,
+        scheduleDict: feasibleScheduleDict(),
+        lekinpyVersion: "0.2.0",
+        stdout: "",
+        stdoutTruncated: false,
+        stderr: "",
+        stderrTruncated: false,
+        droppedProgressMessages: 0,
+        droppedIncumbentUpdates: 0,
+      });
+      const result = await promise;
+      expect(result.status).toBe("completed");
+    });
+
+    it("settles a hung validation instead of leaving it pending forever", async () => {
+      const engine = new CustomAlgorithmEngine();
+      const promise = engine.validateCustomAlgorithm("def schedule(system, parameters, context):\n    return None\n");
+      await Promise.resolve();
+      const worker = lastWorker();
+      await vi.advanceTimersByTimeAsync(60_001);
+      const result = await promise;
+      expect(result.valid).toBe(false);
+      expect(result.reachedPythonCheck).toBe(false);
+      expect(result.issues[0]!.message).toContain("did not start");
+      expect(worker.terminated).toBe(true);
+    });
+
+    it("dispose() also settles an in-flight validation", async () => {
+      const engine = new CustomAlgorithmEngine();
+      const promise = engine.validateCustomAlgorithm("def schedule(system, parameters, context):\n    return None\n");
+      await Promise.resolve();
+      const worker = lastWorker();
+      engine.dispose();
+      const result = await promise;
+      expect(result.valid).toBe(false);
+      expect(result.issues[0]!.message).toContain("disposed");
+      expect(worker.terminated).toBe(true);
+    });
+  });
+
+  describe("hostile or malformed worker messages", () => {
+    it("treats a malformed completed scheduleDict as invalid_result instead of crashing the handler", async () => {
+      const engine = new CustomAlgorithmEngine();
+      const promise = engine.runCustomAlgorithm({ source: "def schedule(system, parameters, context):\n    return None\n", problem: SAMPLE_PROBLEM });
+      await Promise.resolve();
+      await Promise.resolve();
+      const worker = lastWorker();
+      const runId = (worker.messages[0] as { runId: string }).runId;
+      worker.emit({
+        type: "completed",
+        runId,
+        // Not a LekinpyScheduleDict at all - e.g. a Schedule subclass with
+        // an overridden to_dict(), or a message forged via js.postMessage.
+        scheduleDict: { garbage: true } as unknown as LekinpyScheduleDict,
+        lekinpyVersion: "0.2.0",
+        stdout: "",
+        stdoutTruncated: false,
+        stderr: "",
+        stderrTruncated: false,
+        droppedProgressMessages: 0,
+        droppedIncumbentUpdates: 0,
+      });
+      const result = await promise;
+      expect(result.status).toBe("invalid_result");
+      expect(result.issues.some((i) => i.code === "SCHEDULE_SCHEMA_INVALID")).toBe(true);
+      expect(worker.terminated).toBe(true);
+    });
+
+    it("counts a malformed incumbent dict as invalid and keeps the run alive", async () => {
+      const engine = new CustomAlgorithmEngine();
+      const incumbents: unknown[] = [];
+      const promise = engine.runCustomAlgorithm({
+        source: "def schedule(system, parameters, context):\n    return None\n",
+        problem: SAMPLE_PROBLEM,
+        onIncumbent: (event) => incumbents.push(event),
+      });
+      await Promise.resolve();
+      await Promise.resolve();
+      const worker = lastWorker();
+      const runId = (worker.messages[0] as { runId: string }).runId;
+      worker.emit({
+        type: "custom-incumbent",
+        runId,
+        scheduleDict: null as unknown as LekinpyScheduleDict,
+        objective: 1,
+        message: null,
+      });
+      worker.emit({
+        type: "completed",
+        runId,
+        scheduleDict: feasibleScheduleDict(),
+        lekinpyVersion: "0.2.0",
+        stdout: "",
+        stdoutTruncated: false,
+        stderr: "",
+        stderrTruncated: false,
+        droppedProgressMessages: 0,
+        droppedIncumbentUpdates: 0,
+      });
+      const result = await promise;
+      expect(result.status).toBe("completed");
+      expect(incumbents).toHaveLength(0);
+      expect(result.diagnostics.invalidIncumbentUpdates).toBe(1);
+    });
+
+    it("ignores messages carrying a different run's runId", async () => {
+      const engine = new CustomAlgorithmEngine();
+      const promise = engine.runCustomAlgorithm({ source: "def schedule(system, parameters, context):\n    return None\n", problem: SAMPLE_PROBLEM });
+      await Promise.resolve();
+      await Promise.resolve();
+      const worker = lastWorker();
+      const runId = (worker.messages[0] as { runId: string }).runId;
+      worker.emit({
+        type: "completed",
+        runId: "some-other-run",
+        scheduleDict: feasibleScheduleDict(),
+        lekinpyVersion: "0.2.0",
+        stdout: "",
+        stdoutTruncated: false,
+        stderr: "",
+        stderrTruncated: false,
+        droppedProgressMessages: 0,
+        droppedIncumbentUpdates: 0,
+      });
+      expect(worker.terminated).toBe(false); // stale-id message settled nothing
+      worker.emit({
+        type: "completed",
+        runId,
+        scheduleDict: feasibleScheduleDict(),
+        lekinpyVersion: "0.2.0",
+        stdout: "",
+        stdoutTruncated: false,
+        stderr: "",
+        stderrTruncated: false,
+        droppedProgressMessages: 0,
+        droppedIncumbentUpdates: 0,
+      });
+      const result = await promise;
+      expect(result.status).toBe("completed");
+    });
+
+    it("rejects a second concurrent run reusing an in-flight runId instead of cross-wiring the two", async () => {
+      const engine = new CustomAlgorithmEngine();
+      const source = "def schedule(system, parameters, context):\n    return None\n";
+      const first = engine.runCustomAlgorithm({ runId: "shared-id", source, problem: SAMPLE_PROBLEM });
+      await Promise.resolve();
+      await Promise.resolve();
+      const firstWorker = lastWorker();
+      const second = await engine.runCustomAlgorithm({ runId: "shared-id", source, problem: SAMPLE_PROBLEM });
+      expect(second.status).toBe("validation_failed");
+      expect(second.issues[0]!.message).toContain("already in progress");
+      expect(FakeWorker.instances).toHaveLength(1); // no second worker was built
+      // The original run is untouched and still completes normally.
+      firstWorker.emit({
+        type: "completed",
+        runId: "shared-id",
+        scheduleDict: feasibleScheduleDict(),
+        lekinpyVersion: "0.2.0",
+        stdout: "",
+        stdoutTruncated: false,
+        stderr: "",
+        stderrTruncated: false,
+        droppedProgressMessages: 0,
+        droppedIncumbentUpdates: 0,
+      });
+      const result = await first;
       expect(result.status).toBe("completed");
     });
   });

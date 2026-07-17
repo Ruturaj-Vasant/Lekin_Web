@@ -55,6 +55,10 @@ interface PendingRun {
 export class CustomAlgorithmEngine {
   private readonly policy: CustomAlgorithmPolicy;
   private readonly pending = new Map<string, PendingRun>();
+  /** Abort callbacks for in-flight validateCustomAlgorithm workers, so
+   * dispose() can settle and terminate those too (they are not runs and
+   * never enter `pending`). */
+  private readonly pendingValidations = new Set<() => void>();
 
   constructor(policy: CustomAlgorithmPolicy = DEFAULT_CUSTOM_ALGORITHM_POLICY) {
     this.policy = policy;
@@ -81,9 +85,42 @@ export class CustomAlgorithmEngine {
       const finish = (result: CustomValidationResult) => {
         if (settled) return;
         settled = true;
+        clearTimeout(startupTimer);
+        this.pendingValidations.delete(abort);
         worker.terminate();
         resolve(result);
       };
+      const abort = () =>
+        finish({
+          valid: false,
+          issues: [
+            makeIssue({
+              code: "CUSTOM_ALGORITHM_RUNTIME_ERROR",
+              message: "Validation was aborted because the engine was disposed.",
+              path: [],
+              source: "custom-algorithm",
+            }),
+          ],
+          reachedPythonCheck: false,
+        });
+      this.pendingValidations.add(abort);
+      // A hung Pyodide bootstrap would otherwise leave this promise pending
+      // forever - "validated" is the only settling message and it requires
+      // a live runtime. Same rationale as runOnWorker()'s startup timer.
+      const startupTimer = setTimeout(() => {
+        finish({
+          valid: false,
+          issues: [
+            makeIssue({
+              code: "CUSTOM_ALGORITHM_RUNTIME_ERROR",
+              message: `The Python environment did not start within ${this.policy.environmentStartupTimeoutMs} ms; validation was abandoned.`,
+              path: [],
+              source: "custom-algorithm",
+            }),
+          ],
+          reachedPythonCheck: false,
+        });
+      }, this.policy.environmentStartupTimeoutMs);
 
       worker.onmessage = (event: MessageEvent<CustomWorkerResponse>) => {
         const msg = event.data;
@@ -148,6 +185,19 @@ export class CustomAlgorithmEngine {
     // *awaits* reproPromise at the point it actually assembles a result.
     const reproPromise = this.buildReproducibility(options.source, algorithmName, parameters, randomSeed, timeLimitMs);
 
+    // A caller-supplied runId that collides with an in-flight run would
+    // otherwise silently overwrite the pending-map entry, cross-wiring
+    // cancellation and teardown between the two runs.
+    if (this.pending.has(runId)) {
+      const issue = makeIssue({
+        code: "CUSTOM_ALGORITHM_LIMITS_EXCEED_POLICY",
+        message: `A run with runId '${runId}' is already in progress; runIds must be unique per run.`,
+        path: ["runId"],
+        source: "custom-algorithm",
+      });
+      return reproPromise.then((repro) => emptyResult(runId, "validation_failed", "validation_error", [issue], repro));
+    }
+
     const preflightIssues = collectPreflightIssues(
       { source: options.source, parameters, timeLimitMs: options.limits?.timeLimitMs },
       this.policy,
@@ -188,6 +238,9 @@ export class CustomAlgorithmEngine {
   dispose(): void {
     for (const runId of [...this.pending.keys()]) {
       this.cancelCustomAlgorithm(runId);
+    }
+    for (const abort of [...this.pendingValidations]) {
+      abort();
     }
   }
 
@@ -240,6 +293,7 @@ export class CustomAlgorithmEngine {
       let invalidIncumbentUpdates = 0;
       let settled = false;
       let timer: ReturnType<typeof setTimeout> | null = null;
+      let startupTimer: ReturnType<typeof setTimeout> | null = null;
 
       const elapsedMs = () => Math.round(performance.now() - startedAt);
 
@@ -255,10 +309,33 @@ export class CustomAlgorithmEngine {
         if (settled) return;
         settled = true;
         if (timer !== null) clearTimeout(timer);
+        if (startupTimer !== null) clearTimeout(startupTimer);
         this.pending.delete(runId);
         worker.terminate();
         reproPromise.then((repro) => resolve(build(repro)));
       };
+
+      /** Bounds Pyodide/wheel bootstrap, which the algorithm timeout below
+       * deliberately excludes - without this, a hung loadPyodide() (e.g. an
+       * unreachable CDN that neither resolves nor rejects) would leave this
+       * promise pending forever, permanently occupying the caller. Cleared
+       * the moment "running" arrives. */
+      startupTimer = setTimeout(() => {
+        finishWithRepro((repro) =>
+          buildResult(runId, "runtime_failed", "runtime_exception", [
+            makeIssue({
+              code: "CUSTOM_ALGORITHM_RUNTIME_ERROR",
+              message: `The Python environment did not start within ${this.policy.environmentStartupTimeoutMs} ms; the run was abandoned before the algorithm ever started.`,
+              path: [],
+              source: "custom-algorithm",
+            }),
+          ], repro, {
+            runtimeMs: elapsedMs(),
+            progress: progressEvents,
+            diagnostics: { droppedProgressMessages: 0, droppedIncumbentUpdates: 0, invalidIncumbentUpdates },
+          }),
+        );
+      }, this.policy.environmentStartupTimeoutMs);
 
       /** Armed only once Python actually starts running (see the
        * "progress"/"running" case below) - the whole point of the fix. */
@@ -308,6 +385,10 @@ export class CustomAlgorithmEngine {
         switch (msg.type) {
           case "progress":
             if (msg.stage === "running") {
+              if (startupTimer !== null) {
+                clearTimeout(startupTimer);
+                startupTimer = null;
+              }
               startedAt = performance.now();
               armTimeout();
             }
@@ -325,7 +406,18 @@ export class CustomAlgorithmEngine {
           }
 
           case "custom-incumbent": {
-            const schedule = fromLekinpyScheduleDict(msg.scheduleDict, `incumbent-${runId}-${progressEvents.length}`, "custom");
+            // fromLekinpyScheduleDict() assumes lekinpy's to_dict() shape and
+            // throws on anything else (e.g. a Schedule subclass overriding
+            // to_dict(), or a message forged via Pyodide's JS interop) - an
+            // uncaught throw here would crash this onmessage handler, so a
+            // malformed dict is treated exactly like an infeasible incumbent.
+            let schedule: ReturnType<typeof fromLekinpyScheduleDict>;
+            try {
+              schedule = fromLekinpyScheduleDict(msg.scheduleDict, `incumbent-${runId}-${progressEvents.length}`, "custom");
+            } catch {
+              invalidIncumbentUpdates += 1;
+              return;
+            }
             const issues = validateScheduleAgainstProblem(schedule, options.problem);
             if (issues.length > 0) {
               invalidIncumbentUpdates += 1;
@@ -344,7 +436,37 @@ export class CustomAlgorithmEngine {
           }
 
           case "completed": {
-            const schedule = fromLekinpyScheduleDict(msg.scheduleDict, `schedule-${runId}`, "custom");
+            // Same throw hazard as the "custom-incumbent" case above: a
+            // malformed dict must settle the run as invalid_result, not
+            // crash the handler and leave the run to die by timeout.
+            let schedule: ReturnType<typeof fromLekinpyScheduleDict>;
+            try {
+              schedule = fromLekinpyScheduleDict(msg.scheduleDict, `schedule-${runId}`, "custom");
+            } catch (error) {
+              finishWithRepro((repro) =>
+                buildResult(runId, "invalid_result", "invalid_return_value", [
+                  makeIssue({
+                    code: "SCHEDULE_SCHEMA_INVALID",
+                    message: `The returned schedule could not be translated: ${error instanceof Error ? error.message : String(error)}`,
+                    path: ["schedule"],
+                    source: "schedule",
+                  }),
+                ], repro, {
+                  runtimeMs: elapsedMs(),
+                  stdout: msg.stdout,
+                  stdoutTruncated: msg.stdoutTruncated,
+                  stderr: msg.stderr,
+                  stderrTruncated: msg.stderrTruncated,
+                  progress: progressEvents,
+                  diagnostics: {
+                    droppedProgressMessages: msg.droppedProgressMessages,
+                    droppedIncumbentUpdates: msg.droppedIncumbentUpdates,
+                    invalidIncumbentUpdates,
+                  },
+                }),
+              );
+              return;
+            }
             const issues = validateScheduleAgainstProblem(schedule, options.problem);
             if (issues.length > 0) {
               finishWithRepro((repro) =>

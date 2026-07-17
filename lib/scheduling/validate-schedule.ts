@@ -81,6 +81,48 @@ function validateParsedSchedule(schedule: Schedule, problem: ProblemDefinition):
   const placedByExpectedId = new Map<string, Placed>();
   const duplicateIdsReported = new Set<string>();
 
+  // --- Machine-entry-level checks: these must not depend on the entry
+  // carrying any operations, or an unknown/duplicate machine entry with an
+  // empty operations list would sail through the per-operation loop below. ---
+  const seenMachineEntries = new Set<string>();
+  for (const ms of schedule.machines) {
+    const machine = machinesById.get(ms.machineId);
+    if (!machine) {
+      issues.push(
+        makeIssue({
+          code: "SCHEDULE_UNKNOWN_REFERENCE",
+          message: `The schedule lists a machine entry for unknown machine '${ms.machineId}'.`,
+          path: ["schedule", "machines"],
+          source: "schedule",
+          machineId: ms.machineId,
+        }),
+      );
+    } else if (ms.workcenterId !== null && ms.workcenterId !== machine.workcenterId) {
+      issues.push(
+        makeIssue({
+          code: "SCHEDULE_UNKNOWN_REFERENCE",
+          message: `The schedule places machine '${ms.machineId}' in workcenter '${ms.workcenterId}', but the problem places it in '${machine.workcenterId}'.`,
+          path: ["schedule", "machines"],
+          source: "schedule",
+          machineId: ms.machineId,
+          workcenterId: ms.workcenterId,
+        }),
+      );
+    }
+    if (seenMachineEntries.has(ms.machineId)) {
+      issues.push(
+        makeIssue({
+          code: "SCHEDULE_SCHEMA_INVALID",
+          message: `The schedule lists machine '${ms.machineId}' more than once.`,
+          path: ["schedule", "machines"],
+          source: "schedule",
+          machineId: ms.machineId,
+        }),
+      );
+    }
+    seenMachineEntries.add(ms.machineId);
+  }
+
   for (const ms of schedule.machines) {
     for (const op of ms.operations) {
       if (op.machineId !== ms.machineId) {
@@ -167,6 +209,21 @@ function validateParsedSchedule(schedule: Schedule, problem: ProblemDefinition):
       }
 
       const expectedId = makeOperationId(op.jobId, op.operationIndex);
+      if (op.scheduledOperationId !== expectedId) {
+        // A schedule whose identity fields disagree with each other (the
+        // right operation COUNT but the wrong operation identities) must
+        // never pass as consistent - downstream code keys on this id.
+        issues.push(
+          makeIssue({
+            code: "SCHEDULE_SCHEMA_INVALID",
+            message: `Operation with jobId '${op.jobId}' and operationIndex ${op.operationIndex} carries scheduledOperationId '${op.scheduledOperationId}', expected '${expectedId}'.`,
+            path: ["schedule", "machines"],
+            source: "schedule",
+            jobId: op.jobId,
+            operationIndex: op.operationIndex,
+          }),
+        );
+      }
       if (placedByExpectedId.has(expectedId)) {
         if (!duplicateIdsReported.has(expectedId)) {
           issues.push(

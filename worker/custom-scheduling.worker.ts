@@ -64,6 +64,11 @@ def _issue(code, message, line=None, column=None):
     issues.append(entry)
 
 def _accepts_three_positional(args: ast.arguments) -> bool:
+    # A keyword-only parameter without a default makes schedule(a, b, c)
+    # uncallable no matter how the positional parameters line up - the
+    # runtime signature.bind() check would reject it, so validate must too.
+    if any(default is None for default in (args.kw_defaults or [])):
+        return False
     posonly = len(getattr(args, "posonlyargs", []) or [])
     normal = len(args.args)
     total_positional = posonly + normal
@@ -139,8 +144,11 @@ async function installLekinpy(runtime: PyodideInterface, runId: string): Promise
 const RUN_PYTHON = String.raw`
 import asyncio
 import contextlib
+import importlib.util
 import inspect
 import json
+import shutil
+import sys
 import time
 import traceback
 
@@ -149,6 +157,21 @@ from lekinpy.system import System
 from lekinpy.job import Job, Operation
 from lekinpy.machine import Machine, Workcenter
 from lekinpy.exceptions import LekinValidationError
+
+# Best-effort removal of micropip before any user code runs: it was only
+# ever needed to install the pinned lekinpy wheel (see installLekinpy in
+# this worker), and leaving it importable would let an 'async def schedule'
+# await micropip.install(...) for arbitrary PyPI packages. Removing both
+# the installed files and the sys.modules entries makes 'import micropip'
+# raise ImportError. This is a robustness/policy measure, NOT a security
+# boundary - Pyodide's JS interop (the 'js' and 'pyodide_js' modules)
+# remains reachable, as docs/CUSTOM_PYTHON_ALGORITHMS.md section 8 states.
+_micropip_spec = importlib.util.find_spec("micropip")
+if _micropip_spec is not None and _micropip_spec.submodule_search_locations:
+    for _loc in list(_micropip_spec.submodule_search_locations):
+        shutil.rmtree(_loc, ignore_errors=True)
+for _name in [m for m in list(sys.modules) if m == "micropip" or m.startswith("micropip.")]:
+    del sys.modules[_name]
 
 
 def _stable_rgb(value):
@@ -214,19 +237,30 @@ class ExecutionContext:
     def should_stop(self):
         return self.time_remaining() <= 0.0
 
+    @staticmethod
+    def _coerce_message(message, limit=2000):
+        # Coerced to a bounded str before crossing into JS: a non-str
+        # message (dict, list, arbitrary object) would otherwise cross the
+        # Pyodide FFI as a PyProxy and fail postMessage's structured clone,
+        # and an unbounded str would defeat the policy's per-run output
+        # bounding.
+        if message is None:
+            return None
+        return str(message)[:limit]
+
     def report_progress(self, progress, message=None):
         try:
             p = float(progress)
         except (TypeError, ValueError):
             raise TypeError("report_progress(progress=...) must be a number") from None
         p = min(1.0, max(0.0, p))
-        self._report_progress_js(p, message)
+        self._report_progress_js(p, self._coerce_message(message))
 
     def report_incumbent(self, schedule, objective=None, message=None):
         if not isinstance(schedule, self._schedule_class):
             raise TypeError("report_incumbent(schedule=...) must be a real lekinpy.Schedule instance")
         obj = float(objective) if objective is not None else None
-        self._report_incumbent_js(json.dumps(schedule.to_dict()), obj, message)
+        self._report_incumbent_js(json.dumps(schedule.to_dict()), obj, self._coerce_message(message))
 
 
 def _fail(code, message, traceback_text, stdout_writer, stderr_writer):
@@ -243,6 +277,13 @@ def _fail(code, message, traceback_text, stdout_writer, stderr_writer):
 
 
 async def _run():
+    # The budget starts NOW - aligned (as closely as possible) with the JS
+    # hard-kill timer, which arms when the "running" stage was posted just
+    # before this script started. Computing it here rather than after the
+    # user's top-level code executes means a script that burns seconds at
+    # import time cannot be promised more time by should_stop()/
+    # time_remaining() than the JS timer will actually allow.
+    deadline = time.monotonic() + time_limit_seconds
     stdout_writer = _BoundedWriter(max_stdout_chars)
     stderr_writer = _BoundedWriter(max_stderr_chars)
 
@@ -318,7 +359,6 @@ async def _run():
         )
 
     parameters = json.loads(parameters_json)
-    deadline = time.monotonic() + time_limit_seconds
     context = ExecutionContext(deadline, _report_progress_js, _report_incumbent_js, lekinpy.Schedule)
 
     try:

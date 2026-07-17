@@ -21,7 +21,15 @@ import type { RunCustomAlgorithmOptions, CustomProgressEvent, CustomIncumbentEve
  *
  * Playwright drives it entirely through `window.__customAlgorithmHarness`,
  * not through clicking anything on this page.
+ *
+ * The route ships in the production build (the app router builds every
+ * route), so it is gated to loopback hosts: on any non-local deployment it
+ * renders an inert "unavailable" marker and never instantiates the engine
+ * or registers the window API. Playwright's own webServer runs on
+ * 127.0.0.1, so e2e coverage is unaffected.
  */
+
+const LOOPBACK_HOSTNAMES = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
 type HarnessRunOutcome = {
   result: CustomRunResult;
@@ -44,6 +52,10 @@ export default function CustomAlgorithmHarnessPage() {
   const markerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (!LOOPBACK_HOSTNAMES.has(window.location.hostname)) {
+      if (markerRef.current) markerRef.current.textContent = "unavailable";
+      return;
+    }
     const engine = new CustomAlgorithmEngine();
     const results = new Map<string, HarnessRunOutcome>();
 

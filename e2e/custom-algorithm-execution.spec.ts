@@ -251,6 +251,61 @@ test.describe("custom Python algorithm execution (real Pyodide)", () => {
     expect(Date.now() - startedAt).toBeLessThan(5000);
   });
 
+  test("two successive custom runs get fresh interpreters: globals, builtins pollution, and sys.modules do not survive", async ({ page }) => {
+    test.setTimeout(120_000);
+    await gotoHarness(page);
+
+    // Run 1 pollutes every channel state could plausibly leak through:
+    // module globals, builtins, an injected sys.module - then completes
+    // (invalidly, which is fine: the interpreter still ran to completion).
+    const first = await runAndAwait(page, {
+      source:
+        "import builtins, sys, types\n" +
+        "LEAKED_GLOBAL = 'from-run-1'\n" +
+        "builtins.LEAKED_BUILTIN = 'from-run-1'\n" +
+        "sys.modules['leaked_module'] = types.ModuleType('leaked_module')\n" +
+        "def schedule(system, parameters, context):\n" +
+        "    context.report_progress(0.5, {'non': 'string message'})\n" +
+        "    return None\n",
+    });
+    expect(first.result.status).toBe("invalid_result"); // returned None, as intended
+    // The dict message was coerced to a bounded string, not a crash.
+    expect(first.progress.length).toBe(1);
+    expect(typeof first.progress[0]!.message).toBe("string");
+
+    // Run 2 reports what survived. Nothing must have.
+    const second = await runAndAwait(page, {
+      source:
+        "import builtins, sys\n" +
+        "def schedule(system, parameters, context):\n" +
+        "    print('global-survived:', 'LEAKED_GLOBAL' in globals())\n" +
+        "    print('builtin-survived:', hasattr(builtins, 'LEAKED_BUILTIN'))\n" +
+        "    print('module-survived:', 'leaked_module' in sys.modules)\n" +
+        "    return None\n",
+    });
+    expect(second.result.stdout).toContain("global-survived: False");
+    expect(second.result.stdout).toContain("builtin-survived: False");
+    expect(second.result.stdout).toContain("module-survived: False");
+  });
+
+  test("micropip is not importable from custom code, so package installation fails at import time", async ({ page }) => {
+    test.setTimeout(90_000);
+    await gotoHarness(page);
+
+    const { result } = await runAndAwait(page, {
+      source:
+        "def schedule(system, parameters, context):\n" +
+        "    import micropip\n" +
+        "    return None\n",
+    });
+    expect(result.status).toBe("runtime_failed");
+    expect(result.issues[0]?.code).toBe("CUSTOM_ALGORITHM_RUNTIME_ERROR");
+    expect(result.issues[0]?.message).toContain("ModuleNotFoundError");
+    // lekinpy itself must still be importable after the micropip purge.
+    const lekinpyStillWorks = await runAndAwait(page, { source: MINIMAL_SPT });
+    expect(lekinpyStillWorks.result.status).toBe("completed");
+  });
+
   test("a cancelled/failed custom run does not affect a later built-in algorithm run on the main workspace", async ({ page }) => {
     test.setTimeout(120_000);
     await gotoHarness(page);

@@ -110,7 +110,9 @@ context.report_incumbent(schedule, objective=None, message=None)
 - **`time_remaining()`** - seconds left in the current run's time budget
   (never negative).
 - **`report_progress(progress, message=None)`** - `progress` is clamped to
-  `[0, 1]`; `message` is an optional short human-readable string. Delivered
+  `[0, 1]`; `message` is an optional short human-readable string (coerced
+  with `str()` and truncated to 2,000 characters before delivery, as is
+  `report_incumbent`'s `message`). Delivered
   in order, but capped at a fixed count per run (`maxProgressMessages` in
   `lib/custom-algorithm/policy.ts`) - calls beyond the cap are silently
   dropped, not queued or erroring, so a tight loop calling this every
@@ -178,6 +180,13 @@ real option for a future milestone, not implemented here.
   a small fixed grace window, so a cooperating algorithm returning right at
   the deadline isn't unfairly raced against the hard kill) is terminated and
   reported as `status: "timed_out"`.
+- The time limit deliberately excludes environment startup (Pyodide
+  download/boot + wheel verify/install): the hard-kill timer only starts
+  once the "running" stage is reached. Startup itself is separately bounded
+  by `environmentStartupTimeoutMs` (policy, default 60 s) - if Pyodide never
+  finishes booting (e.g. an unreachable CDN that hangs rather than fails),
+  the run settles as `status: "runtime_failed"` instead of staying pending
+  forever. The same startup bound applies to `validateCustomAlgorithm`.
 - `cancelCustomAlgorithm(runId)` terminates the run's Worker immediately and
   reports `status: "cancelled"`. This does not wait for your code to
   cooperate (§3).
@@ -274,15 +283,19 @@ Concretely:
   `runCustomAlgorithm(...)` executes it. The future UI is expected to put a
   confirmation step in front of that call; this foundation makes that
   possible but does not enforce it, since there is no UI here yet.
-- **No unrestricted package installation.** The worker installs only the
+- **No supported package installation.** The worker installs only the
   pinned `lekinpy` wheel (`deps: false`, no dependency resolution) - see
-  `worker/custom-scheduling.worker.ts`. There is no `micropip.install(...)`
-  exposed to custom code, and no automatic fetching of arbitrary PyPI
-  packages. Only Python's standard library (whatever Pyodide's base CPython
-  build includes) plus `lekinpy` are available. `import numpy`,
-  `import requests`, or any other third-party package will fail with an
-  `ImportError`, surfaced as `CUSTOM_ALGORITHM_RUNTIME_ERROR` - not silently
-  downloaded.
+  `worker/custom-scheduling.worker.ts`. `micropip` (which the worker itself
+  uses for that one install) is then actively removed from the interpreter
+  before any custom code runs, so `import micropip` raises `ImportError`.
+  Only Python's standard library (whatever Pyodide's base CPython build
+  includes) plus `lekinpy` are available. `import numpy`, `import requests`,
+  or any other third-party package will fail with an `ImportError`,
+  surfaced as `CUSTOM_ALGORITHM_RUNTIME_ERROR` - not silently downloaded.
+  Note the removal is a policy/robustness measure, not a security boundary:
+  Pyodide's JS interop (`js`, `pyodide_js` - the latter including
+  `loadPackage`) remains reachable by determined code, per the last bullet
+  below.
 - **Syntax/signature checks are not a security boundary.** The AST-based
   checks in `validateCustomAlgorithm` (§ worker's `VALIDATE_PYTHON` script)
   confirm your code parses and has a callable `schedule` with a usable
@@ -295,11 +308,13 @@ Concretely:
   imports - all destroyed when the disposable worker terminates, so nothing
   leaks into another run or into the trusted built-in-algorithm worker).
 - **What remains true or uncertain inside a Pyodide Worker, explicitly not
-  hidden**: Pyodide's JS interop means Python code *can* reach JavaScript
-  objects exposed to it (in this codebase, only the three narrow proxy
-  functions the worker explicitly sets - `_report_progress_js`,
-  `_report_incumbent_js`, and the run's input globals - are exposed; nothing
-  else is deliberately bridged). A Worker still has `fetch`, and Pyodide's
+  hidden**: Pyodide's JS interop means Python code *can* reach JavaScript -
+  beyond the proxy functions this worker deliberately sets
+  (`_report_progress_js`, `_report_incumbent_js`, and the run's input
+  globals), Pyodide itself always exposes the `js` module (the Worker's
+  entire global scope, including `fetch` and `postMessage`) and the
+  `pyodide_js` module (including `loadPackage`) to any Python code that
+  imports them. Nothing blocks those. A Worker still has `fetch`, and Pyodide's
   own JS runtime has the same network/storage access any Worker script
   does - none of that is blocked or sandboxed away. `sys.path`, in-memory
   filesystem access (Pyodide's virtual FS), and CPU/memory are effectively
@@ -318,8 +333,9 @@ Only `lekinpy` and Python's standard library are available. Explicitly
   Pyodide-compatible wheels in principle - none are preloaded here).
 - Native/compiled extensions beyond what Pyodide's base build already
   includes.
-- `micropip.install(...)` or any other package-installation call from
-  custom code - not exposed.
+- `micropip.install(...)` - `micropip` is removed from the interpreter
+  before custom code runs; `import micropip` raises `ImportError`. (A
+  policy measure, not a security boundary - see §8.)
 - Filesystem access beyond Pyodide's in-memory virtual filesystem (no real
   disk, no persistence between runs).
 - Network access from custom code is not deliberately provided and is not a
@@ -342,6 +358,7 @@ Centralized in `lib/custom-algorithm/policy.ts`
 | `maxSourceBytes` | 200,000 | Max UTF-8 size of your source. |
 | `defaultTimeLimitMs` | 5,000 | Time limit when none is requested. |
 | `maxTimeLimitMs` | 20,000 | Hard ceiling on a requested time limit. |
+| `environmentStartupTimeoutMs` | 60,000 | Ceiling on Pyodide/wheel bootstrap before a run or validation settles as failed (see §4). |
 | `maxProgressMessages` | 200 | `report_progress` calls delivered per run; excess silently dropped. |
 | `maxIncumbentUpdates` | 50 | `report_incumbent` calls delivered per run; excess silently dropped. |
 | `maxStdoutChars` / `maxStderrChars` | 20,000 each | Captured output cap per stream. |

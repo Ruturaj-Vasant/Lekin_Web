@@ -33,6 +33,15 @@ export interface CustomAlgorithmPolicy {
    * here is a long worst-case unresponsive-tab window per run.
    */
   maxTimeLimitMs: number;
+  /**
+   * Hard ceiling on environment bootstrap (Pyodide download/startup + wheel
+   * verify/install - everything before the "running" stage). Deliberately
+   * separate from the algorithm time limit, which only starts counting once
+   * "running" arrives: without this, a hung Pyodide CDN load would leave
+   * `runCustomAlgorithm`/`validateCustomAlgorithm` pending forever, since
+   * the algorithm timeout is never armed before "running".
+   */
+  environmentStartupTimeoutMs: number;
   /** Progress updates beyond this count are silently dropped, not queued. */
   maxProgressMessages: number;
   /** Incumbent-schedule updates beyond this count are silently dropped. */
@@ -47,6 +56,7 @@ export const DEFAULT_CUSTOM_ALGORITHM_POLICY: CustomAlgorithmPolicy = {
   maxSourceBytes: 200_000,
   defaultTimeLimitMs: 5_000,
   maxTimeLimitMs: 20_000,
+  environmentStartupTimeoutMs: 60_000,
   maxProgressMessages: 200,
   maxIncumbentUpdates: 50,
   maxStdoutChars: 20_000,

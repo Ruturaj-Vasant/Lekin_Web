@@ -29,7 +29,7 @@ export const VALIDATION_ERROR_CODES = [
   "UNCLEAR_STATUS",
   "APPROACHING_BROWSER_LIMIT",
   // Custom user-authored Python algorithm validation/execution (source:
-  // "custom-algorithm"). See lib/custom-algorithm/README.md and
+  // "custom-algorithm"). See lib/custom-algorithm/policy.ts and
   // docs/CUSTOM_PYTHON_ALGORITHMS.md. All severity "error" - a custom run
   // either fully succeeds or is rejected, there is no warning-only case here.
   "CUSTOM_ALGORITHM_EMPTY_SOURCE",

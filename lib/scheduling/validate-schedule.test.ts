@@ -179,6 +179,47 @@ describe("validateScheduleAgainstProblem", () => {
     expect(issues.some((i) => i.code === "SCHEDULE_INVALID_TIME")).toBe(true);
   });
 
+  it("accepts back-to-back operations where one ends exactly when the next starts", () => {
+    // feasibleSchedule() already has A-O0 (0-5) and B-O0 (5-9) adjacent on
+    // M1, and A-O1 starting at 5 exactly when A-O0 ends - assert that
+    // adjacency explicitly so boundary semantics can't regress silently.
+    const s = feasibleSchedule();
+    expect(s.machines[0]!.operations[0]!.endTime).toBe(s.machines[0]!.operations[1]!.startTime);
+    expect(validateScheduleAgainstProblem(s, problem())).toEqual([]);
+  });
+
+  it("flags a machine entry for an unknown machine even when it carries no operations", () => {
+    const s = feasibleSchedule();
+    s.machines.push({ machineId: "GHOST", workcenterId: "WC1", operations: [] });
+    const issues = validateScheduleAgainstProblem(s, problem());
+    expect(issues.some((i) => i.code === "SCHEDULE_UNKNOWN_REFERENCE" && i.machineId === "GHOST")).toBe(true);
+  });
+
+  it("flags duplicate machine entries for the same machine", () => {
+    const s = feasibleSchedule();
+    // Split M1's operations across two entries - individually feasible,
+    // structurally malformed.
+    const [first, second] = s.machines[0]!.operations;
+    s.machines[0]!.operations = [first!];
+    s.machines.push({ machineId: "M1", workcenterId: "WC1", operations: [second!] });
+    const issues = validateScheduleAgainstProblem(s, problem());
+    expect(issues.some((i) => i.code === "SCHEDULE_SCHEMA_INVALID" && i.machineId === "M1")).toBe(true);
+  });
+
+  it("flags a machine entry whose workcenter disagrees with the problem", () => {
+    const s = feasibleSchedule();
+    s.machines[0]!.workcenterId = "WC2"; // M1 actually belongs to WC1
+    const issues = validateScheduleAgainstProblem(s, problem());
+    expect(issues.some((i) => i.code === "SCHEDULE_UNKNOWN_REFERENCE" && i.machineId === "M1" && i.workcenterId === "WC2")).toBe(true);
+  });
+
+  it("flags a scheduledOperationId inconsistent with its jobId/operationIndex", () => {
+    const s = feasibleSchedule();
+    s.machines[0]!.operations[0]!.scheduledOperationId = "B-O0"; // actually A-O0
+    const issues = validateScheduleAgainstProblem(s, problem());
+    expect(issues.some((i) => i.code === "SCHEDULE_SCHEMA_INVALID" && i.jobId === "A" && i.operationIndex === 0)).toBe(true);
+  });
+
   it("flags startTime >= endTime", () => {
     const s = feasibleSchedule();
     s.machines[0]!.operations[0] = op({ jobId: "A", operationIndex: 0, machineId: "M1", workcenterId: "WC1", startTime: 5, endTime: 5, sequencePosition: 0 });
