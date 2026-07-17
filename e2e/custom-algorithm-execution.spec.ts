@@ -245,10 +245,14 @@ test.describe("custom Python algorithm execution (real Pyodide)", () => {
     );
     expect(result.status).toBe("timed_out");
     expect(result.terminationReason).toBe("timeout");
-    // Resolves close to the 1000ms limit (plus the fixed grace window),
-    // not after the full 20s poll timeout - proves the worker was actually
-    // killed rather than just eventually abandoned.
-    expect(Date.now() - startedAt).toBeLessThan(5000);
+    // runtimeMs deliberately excludes the disposable worker's Pyodide and
+    // wheel cold start, so it is the correct clock for the algorithm budget.
+    // The wider wall-clock assertion still proves the worker was killed well
+    // before the full poll timeout without making CDN/startup speed part of
+    // the timeout contract.
+    expect(result.runtimeMs).toBeGreaterThanOrEqual(1000);
+    expect(result.runtimeMs).toBeLessThan(3000);
+    expect(Date.now() - startedAt).toBeLessThan(15_000);
   });
 
   test("two successive custom runs get fresh interpreters: globals, builtins pollution, and sys.modules do not survive", async ({ page }) => {
