@@ -7,7 +7,7 @@ export const ValidationIssueSchema = z.object({
   message: z.string(),
   /** Zod-issue-path style, e.g. ["jobs", 2, "operations", 1, "processingTime"]. */
   path: z.array(z.union([z.string(), z.number()])),
-  source: z.enum(["schema", "library", "schedule"]),
+  source: z.enum(["schema", "library", "schedule", "custom-algorithm"]),
   severity: z.enum(["error", "warning"]),
   jobId: z.string().optional(),
   operationIndex: z.number().optional(),
