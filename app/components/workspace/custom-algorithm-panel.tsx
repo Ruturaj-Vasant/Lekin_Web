@@ -36,6 +36,13 @@ export function CustomAlgorithmPanel(props: Props) {
   const fileInput = useRef<HTMLInputElement | null>(null);
   const lastProgress = props.progressEvents.at(-1);
   const lineCount = props.source.split("\n").length;
+  const executionMessage = lastProgress?.message ?? (props.running
+    ? lastProgress
+      ? `${Math.round(lastProgress.progress * 100)}% complete`
+      : "Preparing a disposable Python worker..."
+    : props.runResult?.status === "completed"
+      ? null
+      : props.runResult?.terminationReason.replaceAll("_", " "));
 
   function loadTemplate() {
     const template = CUSTOM_ALGORITHM_TEMPLATES[templateId];
@@ -189,7 +196,7 @@ export function CustomAlgorithmPanel(props: Props) {
             <span>{props.runResult ? `${props.runResult.runtimeMs} ms` : `${Math.round((lastProgress?.progress ?? 0) * 100)}%`}</span>
           </header>
           {props.running && <div className="custom-progress-track"><span style={{ width: `${Math.max(3, (lastProgress?.progress ?? 0) * 100)}%` }} /></div>}
-          <p>{lastProgress?.message ?? (props.running ? "Preparing a disposable Python worker..." : props.runResult?.terminationReason.replaceAll("_", " "))}</p>
+          {executionMessage && <p>{executionMessage}</p>}
           {props.incumbentCount > 0 && <p>{props.incumbentCount} independently validated incumbent schedule{props.incumbentCount === 1 ? "" : "s"} received.</p>}
           {props.runResult?.issues.length ? (
             <ul className="custom-console-errors">

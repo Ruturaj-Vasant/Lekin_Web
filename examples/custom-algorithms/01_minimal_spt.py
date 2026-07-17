@@ -72,7 +72,7 @@ def schedule(system, parameters, context):
             )
 
         unscheduled.remove(job)
-        context.report_progress((total_jobs - len(unscheduled)) / total_jobs, f"scheduled {job.job_id}")
+        context.report_progress((total_jobs - len(unscheduled)) / total_jobs)
 
     machines = [
         MachineSchedule(

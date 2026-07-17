@@ -33,7 +33,7 @@ test.describe("custom Python editor", () => {
     await expect(page.locator(".bar")).toHaveCount(8);
     await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).toHaveText("16");
     await expect(page.locator(".custom-console").getByText("completed", { exact: true })).toBeVisible();
-    await expect(page.getByText(/scheduled J-/).last()).toBeVisible();
+    await expect(page.getByText(/scheduled J-/)).toHaveCount(0);
 
     await page.getByRole("tab", { name: "Algorithm comparison" }).click();
     await expect(page.locator(".comparison-table tbody tr")).toHaveCount(1);
