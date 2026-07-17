@@ -40,7 +40,9 @@ export interface AlgorithmComparisonResult {
 export function buildAlgorithmComparison(results: readonly ExecutionResult[]): AlgorithmComparisonResult {
   const rows: AlgorithmComparisonRow[] = results.map((result) => {
     const definition = getAlgorithmDefinition(result.algorithmId);
-    const limitations = definition
+    const limitations = result.algorithmId === "custom"
+      ? ["User-defined Python"]
+      : definition
       ? [
           ...(!definition.supportsWeights ? ["Ignores job weights"] : []),
           ...(!definition.supportsReleaseTimes ? ["Ignores release times"] : []),

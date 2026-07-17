@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import type { ExecutionResult } from "../../../lib/schema/algorithm";
-import type { ProblemDefinition } from "../../../lib/schema/problem";
+import { validateProblemDefinition, type ProblemDefinition } from "../../../lib/schema/problem";
 import { hasBlockingError } from "../../../lib/schema/issue";
 import { validateExecutionRequest } from "../../../lib/adapter/validate-request";
 import { problemEditorReducer } from "../../../lib/editor/problem-editor";
 import { isResultStale, type ResultContext } from "../../../lib/editor/result-staleness";
-import { recordComparisonResult, comparisonResultsFor, type ComparisonHistory } from "../../../lib/editor/comparison-history";
+import { recordComparisonResult, comparisonResultsFor, removeComparisonResult, type ComparisonHistory } from "../../../lib/editor/comparison-history";
 import type { ManualStartConstraints } from "../../../lib/schema/manual-edit";
 import type { DragRejection } from "../../../lib/scheduling/recalculate";
 import { checkDropValidity, isNoOpEdit, recalculate } from "../../../lib/scheduling/recalculate";
@@ -21,6 +21,11 @@ import { GanttChart } from "./gantt-chart";
 import { ProblemSidebar } from "./problem-sidebar";
 import { ScheduleSummary } from "./schedule-summary";
 import { downloadProblemFile, readProblemFile } from "../../import-export/browser-problem-files";
+import { CustomAlgorithmEngine } from "../../execution/custom-execution-engine";
+import { DEFAULT_CUSTOM_ALGORITHM_TEMPLATE } from "../../execution/custom-algorithm-templates";
+import type { CustomProgressEvent, CustomRunResult, CustomValidationResult } from "../../../lib/custom-algorithm/types";
+import { parseCustomParameters } from "../../../lib/editor/custom-algorithm-input";
+import { CustomAlgorithmPanel } from "./custom-algorithm-panel";
 
 export function WorkspaceShell({ initialProblem, onClose, executionEngine, schedulerPreparation }: {
   initialProblem: ProblemDefinition;
@@ -29,6 +34,7 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
   schedulerPreparation: SchedulerPreparationState;
 }) {
   const activeExecution = useRef<string | null>(null);
+  const [customExecutionEngine] = useState(() => new CustomAlgorithmEngine());
   const importInput = useRef<HTMLInputElement | null>(null);
   const [problem, dispatch] = useReducer(problemEditorReducer, initialProblem);
   const [algorithmId, setAlgorithmId] = useState("spt");
@@ -41,7 +47,7 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
   // and trips the react-hooks/set-state-in-effect lint rule.
   const [resultFor, setResultFor] = useState<ResultContext | null>(null);
   const [comparisonHistory, setComparisonHistory] = useState<ComparisonHistory | null>(null);
-  const [progress, setProgress] = useState<ExecutionProgress | null>(null);
+  const [progress, setProgress] = useState<ExecutionProgress | "cancelling" | null>(null);
   const [running, setRunning] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [manualBaseResult, setManualBaseResult] = useState<ExecutionResult | null>(null);
@@ -51,6 +57,16 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
   const [dragMessage, setDragMessage] = useState<string | null>(null);
   const [manualProblem, setManualProblem] = useState(problem);
   const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
+  const [customName, setCustomName] = useState(DEFAULT_CUSTOM_ALGORITHM_TEMPLATE.name);
+  const [customSource, setCustomSource] = useState(DEFAULT_CUSTOM_ALGORITHM_TEMPLATE.source);
+  const [customParametersText, setCustomParametersText] = useState("{}");
+  const [customTimeLimitSeconds, setCustomTimeLimitSeconds] = useState(5);
+  const [customTrusted, setCustomTrusted] = useState(false);
+  const [customValidation, setCustomValidation] = useState<CustomValidationResult | null>(null);
+  const [customValidating, setCustomValidating] = useState(false);
+  const [customRunResult, setCustomRunResult] = useState<CustomRunResult | null>(null);
+  const [customProgressEvents, setCustomProgressEvents] = useState<CustomProgressEvent[]>([]);
+  const [customIncumbentCount, setCustomIncumbentCount] = useState(0);
 
   if (result !== null && isResultStale(resultFor, problem, algorithmId)) {
     setResult(null);
@@ -85,6 +101,8 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
     return () => clearTimeout(timer);
   }, [saveFeedback]);
 
+  useEffect(() => () => customExecutionEngine.dispose(), [customExecutionEngine]);
+
   function saveLocally() {
     const storage = getBrowserLocalStorage();
     if (!storage) {
@@ -100,15 +118,32 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
     }
   }
 
-  const validationIssues = useMemo(
-    () => validateExecutionRequest(problem, algorithmId),
-    [problem, algorithmId],
-  );
-  const canRun = !hasBlockingError(validationIssues);
+  const customParameters = useMemo(() => parseCustomParameters(customParametersText), [customParametersText]);
+  const validationIssues = useMemo(() => {
+    const problemIssues = algorithmId === "custom"
+      ? validateProblemDefinition(problem)
+      : validateExecutionRequest(problem, algorithmId);
+    return algorithmId === "custom" && customValidation
+      ? [...problemIssues, ...customValidation.issues]
+      : problemIssues;
+  }, [problem, algorithmId, customValidation]);
+  const canRunProblem = !hasBlockingError(validationIssues);
+  const customTimeLimitValid = Number.isFinite(customTimeLimitSeconds) && customTimeLimitSeconds >= 1 && customTimeLimitSeconds <= 20;
+  const canRunCustom = canRunProblem
+    && customValidation?.valid === true
+    && customParameters.ok
+    && customTimeLimitValid
+    && customName.trim().length > 0
+    && customTrusted;
+  const canRun = algorithmId === "custom" ? canRunCustom : canRunProblem;
   const comparisonResults = comparisonResultsFor(comparisonHistory, problem);
 
   async function run() {
     if (!canRun) return;
+    if (algorithmId === "custom") {
+      await runCustom();
+      return;
+    }
     const executionId = crypto.randomUUID();
     activeExecution.current = executionId;
     setRunning(true);
@@ -130,15 +165,74 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
     activeExecution.current = null;
   }
 
+  async function runCustom() {
+    if (!customParameters.ok || !canRunCustom) return;
+    const executionId = crypto.randomUUID();
+    activeExecution.current = executionId;
+    setRunning(true);
+    setProgress("loading-runtime");
+    setResult(null);
+    setCustomRunResult(null);
+    setCustomProgressEvents([]);
+    setCustomIncumbentCount(0);
+    const next = await customExecutionEngine.runCustomAlgorithm({
+      runId: executionId,
+      source: customSource,
+      problem,
+      parameters: customParameters.value,
+      algorithmName: customName.trim(),
+      limits: { timeLimitMs: customTimeLimitSeconds * 1000 },
+      onProgress: (event) => setCustomProgressEvents((current) => [...current, event]),
+      onIncumbent: () => setCustomIncumbentCount((count) => count + 1),
+    });
+    if (activeExecution.current !== executionId) return;
+    setCustomRunResult(next);
+    setResult(next.result);
+    setResultFor(next.result ? { problem, algorithmId: "custom" } : null);
+    if (next.result) setComparisonHistory((previous) => recordComparisonResult(previous, problem, next.result!));
+    setManualBaseResult(next.result?.status === "completed" ? next.result : null);
+    setManualProblem(problem);
+    setManualStartConstraints({});
+    setUndoStack([]);
+    setRedoStack([]);
+    setDragMessage(null);
+    setRunning(false);
+    setProgress(null);
+    activeExecution.current = null;
+  }
+
+  async function validateCustomSource() {
+    setCustomValidating(true);
+    setCustomValidation(null);
+    const checked = await customExecutionEngine.validateCustomAlgorithm(customSource);
+    setCustomValidation(checked);
+    setCustomValidating(false);
+  }
+
   function cancel() {
+    if (activeExecution.current && algorithmId === "custom") {
+      customExecutionEngine.cancelCustomAlgorithm(activeExecution.current);
+      setProgress("cancelling");
+      return;
+    }
     if (activeExecution.current) executionEngine.cancel(activeExecution.current);
     activeExecution.current = null;
     setRunning(false);
     setProgress(null);
   }
 
+  function abandonActiveExecution() {
+    if (activeExecution.current) {
+      executionEngine.cancel(activeExecution.current);
+      customExecutionEngine.cancelCustomAlgorithm(activeExecution.current);
+    }
+    activeExecution.current = null;
+    setRunning(false);
+    setProgress(null);
+  }
+
   function replaceProblem(nextProblem: ProblemDefinition) {
-    cancel();
+    abandonActiveExecution();
     dispatch({ type: "replaceProblem", problem: nextProblem });
     setAlgorithmId("spt");
     setResult(null);
@@ -150,6 +244,9 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
     setRedoStack([]);
     setDragMessage(null);
     setSidebarCollapsed(false);
+    setCustomRunResult(null);
+    setCustomProgressEvents([]);
+    setCustomIncumbentCount(0);
   }
 
   function createNewProblem() {
@@ -185,6 +282,35 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
     setUndoStack([]);
     setRedoStack([]);
     setDragMessage(null);
+  }
+
+  function invalidateCustomResult({ sourceChanged = false }: { sourceChanged?: boolean } = {}) {
+    setResult(null);
+    setResultFor(null);
+    setCustomRunResult(null);
+    setCustomProgressEvents([]);
+    setCustomIncumbentCount(0);
+    setManualBaseResult(null);
+    setManualStartConstraints({});
+    setUndoStack([]);
+    setRedoStack([]);
+    setDragMessage(null);
+    if (sourceChanged) {
+      setCustomValidation(null);
+      setCustomTrusted(false);
+      setComparisonHistory((history) => removeComparisonResult(history, problem, "custom"));
+    }
+  }
+
+  function customRunDisabledReason(): string | null {
+    if (hasBlockingError(validationIssues)) return "Fix the problem validation errors first.";
+    if (!customSource.trim()) return "Add Python source code.";
+    if (!customValidation?.valid) return "Validate the Python contract first.";
+    if (!customParameters.ok) return "Fix the parameters JSON.";
+    if (!customTimeLimitValid) return "Choose a time limit from 1 to 20 seconds.";
+    if (!customName.trim()) return "Name the algorithm.";
+    if (!customTrusted) return "Confirm that you trust this code.";
+    return null;
   }
 
   function findScheduledOperation(scheduledOperationId: string) {
@@ -278,6 +404,8 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
     ? "Running locally"
     : result?.status === "completed"
       ? "Valid schedule"
+      : customRunResult && algorithmId === "custom"
+        ? customRunResult.status.replaceAll("_", " ")
       : result
         ? result.status
         : !canRun
@@ -345,6 +473,11 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             onRun={run}
             onCancel={cancel}
             onCollapse={() => setSidebarCollapsed(true)}
+            runLabel={algorithmId === "custom"
+              ? canRunCustom ? "▶ Run custom algorithm" : customRunDisabledReason() ?? undefined
+              : undefined}
+            localNote={algorithmId === "custom" ? "Custom Python runs in a disposable local worker" : undefined}
+            showRunButton={algorithmId !== "custom"}
           />
         )}
         <div className="canvas">
@@ -356,12 +489,12 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
                 {running
                   ? progress?.replaceAll("-", " ")
                   : result
-                    ? `${result.algorithmId.toUpperCase()} · Last run ${result.runtimeMs} ms`
+                    ? `${algorithmId === "custom" ? customName : result.algorithmId.toUpperCase()} · Last run ${result.runtimeMs} ms`
                     : "Edit the problem, choose an algorithm, and run it in your browser"}
               </p>
             </div>
-            <span className={result && result.status !== "completed" ? "valid-pill error-pill" : "valid-pill"}>
-              {running ? "…" : result?.status === "completed" ? "✓" : "○"} {stateLabel}
+            <span className={(result && result.status !== "completed") || (customRunResult && customRunResult.status !== "completed") ? "valid-pill error-pill" : "valid-pill"}>
+              {running ? "…" : result?.status === "completed" || customRunResult?.status === "completed" ? "✓" : "○"} {stateLabel}
             </span>
           </div>
           {result?.warnings.map((warning) => (
@@ -369,6 +502,41 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
               {warning}
             </p>
           ))}
+          {algorithmId === "custom" && (
+            <CustomAlgorithmPanel
+              name={customName}
+              source={customSource}
+              parametersText={customParametersText}
+              parametersError={customParameters.ok ? null : customParameters.message}
+              timeLimitSeconds={customTimeLimitSeconds}
+              trusted={customTrusted}
+              validation={customValidation}
+              validating={customValidating}
+              running={running}
+              canRun={canRunCustom}
+              runDisabledReason={customRunDisabledReason()}
+              runResult={customRunResult}
+              progressEvents={customProgressEvents}
+              incumbentCount={customIncumbentCount}
+              onNameChange={setCustomName}
+              onSourceChange={(source) => {
+                setCustomSource(source);
+                invalidateCustomResult({ sourceChanged: true });
+              }}
+              onParametersChange={(parameters) => {
+                setCustomParametersText(parameters);
+                invalidateCustomResult();
+              }}
+              onTimeLimitChange={(seconds) => {
+                setCustomTimeLimitSeconds(seconds);
+                invalidateCustomResult();
+              }}
+              onTrustedChange={setCustomTrusted}
+              onValidate={() => void validateCustomSource()}
+              onRun={() => void runCustom()}
+              onCancel={cancel}
+            />
+          )}
           <GanttChart
             schedule={result?.schedule ?? null}
             problem={problem}
@@ -390,6 +558,7 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
             problem={problem}
             comparisonResults={comparisonResults}
             onSelectComparisonResult={selectComparisonResult}
+            customAlgorithmName={customName}
           />
         </div>
       </div>

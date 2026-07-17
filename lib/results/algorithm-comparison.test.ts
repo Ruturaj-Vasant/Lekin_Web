@@ -102,4 +102,9 @@ describe("buildAlgorithmComparison", () => {
     expect(rows[0]!.limitations).toEqual(["Ignores job weights"]);
     expect(rows[1]!.limitations).toEqual([]);
   });
+
+  it("identifies custom Python results without pretending registry metadata is missing", () => {
+    const { rows } = buildAlgorithmComparison([completed("custom")]);
+    expect(rows[0]!.limitations).toEqual(["User-defined Python"]);
+  });
 });
