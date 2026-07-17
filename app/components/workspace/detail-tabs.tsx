@@ -12,6 +12,7 @@ type Props = {
   problem: ProblemDefinition;
   comparisonResults: ExecutionResult[];
   onSelectComparisonResult: (result: ExecutionResult) => void;
+  customAlgorithmName?: string;
 };
 
 const METRIC_LABELS: Record<ComparisonMetric, string> = {
@@ -21,7 +22,7 @@ const METRIC_LABELS: Record<ComparisonMetric, string> = {
   totalCompletionTime: "Total completion",
 };
 
-export function DetailTabs({ result, validationIssues, problem, comparisonResults, onSelectComparisonResult }: Props) {
+export function DetailTabs({ result, validationIssues, problem, comparisonResults, onSelectComparisonResult, customAlgorithmName }: Props) {
   const [activeTab, setActiveTab] = useState("Machine sequence");
   const schedule = result?.schedule ?? null;
   const errorCount = validationIssues.filter((issue) => issue.severity === "error").length;
@@ -102,7 +103,7 @@ export function DetailTabs({ result, validationIssues, problem, comparisonResult
                       if (selected) onSelectComparisonResult(selected);
                     }}
                   >
-                    {row.algorithmId.toUpperCase()}
+                    {row.algorithmId === "custom" ? customAlgorithmName ?? "Custom Python" : row.algorithmId.toUpperCase()}
                     {result?.algorithmId === row.algorithmId && <span>Viewing</span>}
                   </button>
                 </td>
@@ -136,7 +137,7 @@ export function DetailTabs({ result, validationIssues, problem, comparisonResult
     ),
     Execution: result ? (
       <p className="tab-empty">
-        {result.algorithmId.toUpperCase()} {result.status} locally in {result.runtimeMs} ms · lekinpy {result.lekinpyVersion}
+        {result.algorithmId === "custom" ? customAlgorithmName ?? "Custom Python" : result.algorithmId.toUpperCase()} {result.status} locally in {result.runtimeMs} ms · lekinpy {result.lekinpyVersion}
         {result.metrics ? ` · weighted completion ${result.metrics.weightedCompletionTime} · weighted tardiness ${result.metrics.weightedTardiness}` : ""}
       </p>
     ) : (

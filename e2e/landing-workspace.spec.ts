@@ -34,16 +34,17 @@ test.describe("landing and workspace shell", () => {
     await expectNoBrowserErrors(errors);
   });
 
-  test("exposes every built-in algorithm and starts with empty result panels", async ({ page }) => {
+  test("exposes every built-in and custom algorithm choice and starts with empty result panels", async ({ page }) => {
     await openExample(page);
     const algorithm = page.getByLabel("Dispatching rule");
     await expect(algorithm).toHaveValue("spt");
-    await expect(algorithm.locator("option")).toHaveCount(4);
+    await expect(algorithm.locator("option")).toHaveCount(5);
     await expect(algorithm.locator("option")).toHaveText([
       "SPT - Shortest processing time",
       "FCFS - First come, first served",
       "EDD - Earliest due date",
       "WSPT - Weighted SPT",
+      "Custom Python algorithm",
     ]);
     await expect(page.getByText("Run a schedule", { exact: true })).toBeVisible();
     await expect(page.getByText("No schedule yet", { exact: true })).toBeVisible();

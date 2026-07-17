@@ -2,7 +2,6 @@ import type { Dispatch } from "react";
 import type { ProblemEditorAction } from "../../../lib/editor/problem-editor";
 import type { ProblemDefinition } from "../../../lib/schema/problem";
 import type { ValidationIssue } from "../../../lib/schema/issue";
-import type { ExecutionProgress } from "../../../worker/scheduling-protocol";
 
 type Props = {
   problem: ProblemDefinition;
@@ -10,12 +9,15 @@ type Props = {
   algorithmId: string;
   running: boolean;
   canRun: boolean;
-  progress: ExecutionProgress | null;
+  progress: string | null;
   validationIssues: ValidationIssue[];
   onAlgorithmChange: (id: string) => void;
   onRun: () => void;
   onCancel: () => void;
   onCollapse: () => void;
+  runLabel?: string;
+  localNote?: string;
+  showRunButton?: boolean;
 };
 
 function matches(
@@ -84,6 +86,9 @@ export function ProblemSidebar({
   onRun,
   onCancel,
   onCollapse,
+  runLabel,
+  localNote,
+  showRunButton = true,
 }: Props) {
   return (
     <aside className="sidebar" aria-label="Problem setup">
@@ -385,14 +390,17 @@ export function ProblemSidebar({
             <option value="fcfs">FCFS - First come, first served</option>
             <option value="edd">EDD - Earliest due date</option>
             <option value="wspt">WSPT - Weighted SPT</option>
+            <option value="custom">Custom Python algorithm</option>
           </select>
         </label>
       </details>
 
-      <button className="run-button" type="button" disabled={!running && !canRun} onClick={running ? onCancel : onRun}>
-        {running ? "■ Cancel execution" : canRun ? "▶ Run schedule" : "Fix validation errors to run"}
-      </button>
-      <p className="local-note">{progress ? progress.replaceAll("-", " ") : "Runs locally in your browser"}</p>
+      {showRunButton && (
+        <button className="run-button" type="button" disabled={!running && !canRun} onClick={running ? onCancel : onRun}>
+          {running ? "■ Cancel execution" : runLabel ?? (canRun ? "▶ Run schedule" : "Fix validation errors to run")}
+        </button>
+      )}
+      <p className="local-note">{progress ? progress.replaceAll("-", " ") : localNote ?? "Runs locally in your browser"}</p>
     </aside>
   );
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { recordComparisonResult, comparisonResultsFor } from "./comparison-history";
+import { recordComparisonResult, comparisonResultsFor, removeComparisonResult } from "./comparison-history";
 import type { ExecutionResult } from "../schema/algorithm";
 import type { ProblemDefinition } from "../schema/problem";
 
@@ -72,5 +72,15 @@ describe("recordComparisonResult / comparisonResultsFor", () => {
 
   it("returns an empty array for a null history", () => {
     expect(comparisonResultsFor(null, problem("P1"))).toEqual([]);
+  });
+
+  it("removes a stale custom result without discarding built-in comparisons", () => {
+    const p = problem("P1");
+    let history = recordComparisonResult(null, p, result("spt"));
+    history = recordComparisonResult(history, p, result("custom"));
+
+    const withoutCustom = removeComparisonResult(history, p, "custom");
+
+    expect(comparisonResultsFor(withoutCustom, p).map((entry) => entry.algorithmId)).toEqual(["spt"]);
   });
 });

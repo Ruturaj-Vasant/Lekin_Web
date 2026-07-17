@@ -33,3 +33,15 @@ export function comparisonResultsFor(
   if (history === null || history.problem !== problem) return [];
   return Object.values(history.results);
 }
+
+/** Removes one algorithm's stale result while preserving other comparisons for the same unchanged problem. */
+export function removeComparisonResult(
+  history: ComparisonHistory | null,
+  problem: ProblemDefinition,
+  algorithmId: string,
+): ComparisonHistory | null {
+  if (history === null || history.problem !== problem || !(algorithmId in history.results)) return history;
+  const results = { ...history.results };
+  delete results[algorithmId];
+  return { problem, results };
+}
