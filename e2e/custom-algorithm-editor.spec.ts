@@ -19,8 +19,10 @@ test.describe("custom Python editor", () => {
     await openExample(page);
     await selectCustomPython(page);
 
-    const source = page.getByLabel("Python algorithm source");
-    await expect(source).toHaveValue(/def schedule\(system, parameters, context\)/);
+    const source = page.getByRole("textbox", { name: "Python algorithm source" });
+    await expect(source).toContainText(/def schedule\(system, parameters, context\)/);
+    await expect(page.locator(".cm-lineNumbers")).toBeVisible();
+    await expect(page.locator(".cm-line span").first()).toBeVisible();
     await expect(page.getByRole("button", { name: "Run custom algorithm", exact: true })).toBeDisabled();
 
     await validateAndTrust(page);
@@ -56,7 +58,7 @@ test.describe("custom Python editor", () => {
       buffer: Buffer.from("def schedule(system, parameters, context):\n    while True:\n        pass\n"),
     });
     await expect(page.getByLabel("Algorithm name")).toHaveValue("infinite-study");
-    await expect(page.getByLabel("Python algorithm source")).toHaveValue(/while True/);
+    await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText(/while True/);
     await expect(page.getByLabel(/I trust this Python code/)).not.toBeChecked();
 
     const downloadPromise = page.waitForEvent("download");
@@ -90,8 +92,8 @@ test.describe("custom Python editor", () => {
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
     await expect(page.locator(".bar")).toHaveCount(8);
 
-    const source = page.getByLabel("Python algorithm source");
-    await source.fill(`${await source.inputValue()}\n# changed`);
+    const source = page.getByRole("textbox", { name: "Python algorithm source" });
+    await source.fill(`${await source.innerText()}\n# changed`);
     await expect(page.locator(".bar")).toHaveCount(0);
     await expect(page.getByText("Code contract validated")).toHaveCount(0);
     await expect(page.getByLabel(/I trust this Python code/)).not.toBeChecked();
@@ -99,7 +101,7 @@ test.describe("custom Python editor", () => {
     await page.getByLabel("Starter").selectOption("blank");
     await page.getByRole("button", { name: "Load template" }).click();
     await expect(page.getByLabel("Algorithm name")).toHaveValue("Untitled custom algorithm");
-    await expect(page.getByLabel("Python algorithm source")).toHaveValue(/NotImplementedError/);
+    await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText(/NotImplementedError/);
 
     await validateAndTrust(page);
     await page.getByRole("button", { name: "Run custom algorithm", exact: true }).click();

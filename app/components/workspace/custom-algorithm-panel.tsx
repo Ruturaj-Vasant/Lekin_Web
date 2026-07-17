@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { CustomProgressEvent, CustomRunResult, CustomValidationResult } from "../../../lib/custom-algorithm/types";
 import { customAlgorithmFilename } from "../../../lib/editor/custom-algorithm-input";
 import { CUSTOM_ALGORITHM_TEMPLATES, type CustomAlgorithmTemplateId } from "../../execution/custom-algorithm-templates";
+import { PythonCodeEditor } from "./python-code-editor";
 
 type Props = {
   name: string;
@@ -127,19 +128,18 @@ export function CustomAlgorithmPanel(props: Props) {
 
       <div className="custom-code-shell">
         <div className="custom-code-title">
-          <span>algorithm.py</span>
+          <span>algorithm.py <i>Python</i></span>
           <span>{lineCount} lines</span>
         </div>
-        <textarea
-          aria-label="Python algorithm source"
+        <PythonCodeEditor
           value={props.source}
-          onChange={(event) => props.onSourceChange(event.target.value)}
           disabled={props.running || props.validating}
-          spellCheck={false}
-          autoCapitalize="off"
-          autoCorrect="off"
+          onChange={props.onSourceChange}
         />
       </div>
+      <p className="custom-editor-help" id="python-editor-help">
+        Python syntax, matching brackets, line numbers, folding, and search are enabled. Press Ctrl+F or Command+F to search within the code.
+      </p>
 
       <div className="custom-contract-grid">
         <div><b>system</b><span>Validated lekinpy.System</span></div>
