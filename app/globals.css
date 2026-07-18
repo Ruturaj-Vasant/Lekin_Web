@@ -440,3 +440,11 @@
 .custom-persistence-note{margin:0;padding:0 26px 22px;color:var(--muted);font-size:11px}
 @media(max-width:900px){.custom-algorithm-toolbar{align-items:stretch;flex-wrap:wrap}.custom-algorithm-toolbar label{width:100%}.custom-algorithm-toolbar select{width:100%}.custom-algorithm-fields{grid-template-columns:1fr 1fr}.custom-algorithm-fields>label:last-child{grid-column:1/-1}.custom-contract-grid{grid-template-columns:1fr 1fr}.custom-output-grid{grid-template-columns:1fr}}
 @media(max-width:680px){.custom-algorithm-head{padding:20px;flex-direction:column}.custom-algorithm-toolbar,.custom-algorithm-fields,.custom-template-summary{padding-left:20px;padding-right:20px}.custom-template-summary{align-items:flex-start;flex-direction:column}.custom-algorithm-fields{grid-template-columns:1fr}.custom-algorithm-fields>label:last-child{grid-column:auto}.custom-code-shell,.custom-contract-grid,.custom-trust-check,.custom-validation,.custom-console,.custom-input-inspector,.custom-function-contract{margin-left:20px;margin-right:20px}.custom-input-inspector>summary{align-items:flex-start;flex-wrap:wrap}.custom-input-counts{width:100%;margin-left:0;white-space:normal}.custom-inspector-tabs{overflow:auto}.custom-contract-grid{grid-template-columns:1fr}.custom-editor-help{margin-left:20px;margin-right:20px}.custom-actions{padding-left:20px;padding-right:20px;align-items:stretch;flex-direction:column}.custom-actions button{width:100%}.python-code-editor .cm-editor{font-size:13px}.custom-persistence-note{padding-left:20px;padding-right:20px}}
+
+/* Keep the problem editor in place while the main workspace scrolls. */
+@media(min-width:761px){
+  .workspace{height:100vh;min-height:0;overflow:hidden}
+  .app-body{height:calc(100vh - 58px);min-height:0;align-items:stretch;overflow:hidden}
+  .sidebar,.sidebar-rail{height:100%;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+  .canvas{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+}
