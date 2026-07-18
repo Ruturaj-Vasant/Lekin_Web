@@ -1,7 +1,7 @@
 import minimalSptSource from "../../examples/custom-algorithms/01_minimal_spt.py?raw";
 import iterativeSource from "../../examples/custom-algorithms/03_bounded_iterative_improvement.py?raw";
 
-export type CustomAlgorithmTemplateId = "spt" | "edd" | "wspt" | "composite" | "iterative" | "blank";
+export type CustomAlgorithmTemplateId = "spt" | "edd" | "wspt" | "composite" | "blankRule" | "iterative" | "blank";
 
 export type CustomAlgorithmTemplate = {
   name: string;
@@ -85,6 +85,18 @@ export const CUSTOM_ALGORITHM_TEMPLATES: Record<CustomAlgorithmTemplateId, Custo
       selector: "            return min(\n                available_jobs,\n                key=lambda job: (\n                    job.due,\n                    job.operations[0].processing_time,\n                    -job.weight,\n                    job.job_id,\n                ),\n            )",
     }),
   },
+  blankRule: {
+    name: "Untitled job rule",
+    description: "Start with the complete library pattern and implement only how the next released job is selected.",
+    level: "Beginner job rule",
+    source: jobRuleSource({
+      className: "MyJobRule",
+      id: "custom-job-rule",
+      displayName: "My Job Rule",
+      scheduleType: "Custom Job Rule",
+      selector: "            # Return one Job from available_jobs.\n            # Example: return min(available_jobs, key=lambda job: job.due)\n            raise NotImplementedError(\"Choose the next job\")",
+    }),
+  },
   iterative: {
     name: "Bounded experiment",
     description: "A local-search example with parameters, progress, incumbents, and cooperative stopping.",
@@ -93,7 +105,7 @@ export const CUSTOM_ALGORITHM_TEMPLATES: Record<CustomAlgorithmTemplateId, Custo
   },
   blank: {
     name: "Untitled custom algorithm",
-    description: "A blank advanced entrypoint for building and returning a complete Schedule yourself.",
+    description: "Start from only the required entrypoint and build a complete Schedule yourself.",
     level: "Advanced scheduler",
     source: `def schedule(system, parameters, context):
     # Build and return a real lekinpy.Schedule here.

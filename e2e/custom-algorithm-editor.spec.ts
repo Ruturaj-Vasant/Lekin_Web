@@ -117,6 +117,12 @@ test.describe("custom Python editor", () => {
     await expect(page.getByLabel("Algorithm name")).toHaveValue("Custom EDD");
     await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText("job.due");
 
+    await page.getByLabel("Starter example").selectOption("blankRule");
+    await page.getByRole("button", { name: "Load template" }).click();
+    await expect(page.getByLabel("Algorithm name")).toHaveValue("Untitled job rule");
+    await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText("def pick(available_jobs)");
+    await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText("Choose the next job");
+
     await page.getByLabel("Starter example").selectOption("blank");
     await page.getByRole("button", { name: "Load template" }).click();
     await expect(page.getByLabel("Algorithm name")).toHaveValue("Untitled custom algorithm");

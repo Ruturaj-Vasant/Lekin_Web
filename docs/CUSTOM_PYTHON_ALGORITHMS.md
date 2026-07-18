@@ -94,10 +94,13 @@ EDD, and WSPT algorithms. Once `pick()` returns a job, every operation of that
 job is scheduled in order before `pick()` is called again. It is not an
 operation-level interleaving engine.
 
-The Algorithm Studio includes beginner starters for SPT, EDD, WSPT, and a
-custom composite tuple rule. Its input inspector shows the actual current
-jobs, operations, workcenters, machines, snake_case Python attributes, and the
-JSON-shaped construction payload.
+The Algorithm Studio includes beginner starters for SPT, EDD, WSPT, a custom
+composite tuple rule, and a blank job-rule scaffold that leaves only
+`pick(available_jobs)` to implement. Its input inspector shows the actual
+current jobs, operations, workcenters, machines, snake_case Python attributes,
+and the JSON-shaped construction payload. A separate blank full-scheduler
+template is available for advanced algorithms that construct every schedule
+record directly.
 
 ### Building a complete schedule manually
 

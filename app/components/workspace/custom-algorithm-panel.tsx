@@ -89,10 +89,11 @@ export function CustomAlgorithmPanel(props: Props) {
               <option value="edd">Earliest due date</option>
               <option value="wspt">Weighted shortest processing time</option>
               <option value="composite">Due date, then shortest</option>
+              <option value="blankRule">Blank job rule</option>
             </optgroup>
             <optgroup label="Advanced schedulers">
               <option value="iterative">Bounded iterative experiment</option>
-              <option value="blank">Blank complete scheduler</option>
+              <option value="blank">Blank full scheduler</option>
             </optgroup>
           </select>
         </label>
