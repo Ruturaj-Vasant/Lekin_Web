@@ -6,9 +6,11 @@ its current limitations. It is the reference for anyone writing a custom
 algorithm, and for whoever builds the visual editor and run UI on top of the
 API in `app/execution/custom-execution-engine.ts`.
 
-This is an execution **foundation**, not a finished product feature. There is
-no visual editor yet - custom algorithms are submitted programmatically
-today, via `CustomAlgorithmEngine`.
+LEKIN Lab includes a visual Algorithm Studio with Python syntax highlighting,
+starter examples, an inspector for the current problem input, contract
+validation, execution controls, captured output, and result integration with
+the Gantt chart and performance views. `CustomAlgorithmEngine` remains the
+browser-side execution boundary behind that interface.
 
 ---
 
@@ -45,10 +47,66 @@ script using the library. There is nothing web-specific to learn: you never
 see JSON, camelCase field names, React, TypeScript, Web Workers, or Pyodide
 messaging - all of that lives entirely outside your function.
 
-## 2. Building a valid return value
+## 2. Beginner job-selection rules and valid return values
 
-There is no "return a plain dict/list and we'll figure it out." You build a
-real `lekinpy.Schedule`:
+For the shortest path to a working custom rule, subclass
+`SchedulingAlgorithm` and use its existing `dynamic_schedule()` engine. Your
+only scheduling decision is a function that receives the jobs released at the
+current dispatch time and returns one of them:
+
+```python
+from lekinpy.algorithms import SchedulingAlgorithm
+from lekinpy.schedule import Schedule
+
+
+class MyRule(SchedulingAlgorithm):
+    metadata = {
+        "id": "my-rule",
+        "display_name": "My Rule",
+        "supports_multi_operation": True,
+        "version": "1.0.0",
+    }
+
+    def schedule(self, system):
+        def pick(available_jobs):
+            return min(
+                available_jobs,
+                key=lambda job: (job.due, job.job_id),
+            )
+
+        total_time, machines = self.dynamic_schedule(system, pick)
+        return Schedule("My Rule", total_time, machines)
+
+
+def schedule(system, parameters, context):
+    return MyRule().schedule(system)
+```
+
+`dynamic_schedule()` automatically validates the system, tracks release times
+and machine availability, finds machines in each operation's workcenter,
+respects operation precedence, computes start/end times, builds every
+`ScheduledOperation` and `MachineSchedule`, and returns the total time plus
+machine schedules. The top-level three-argument function is the browser
+entrypoint and returns the completed `Schedule`.
+
+This is deliberately a **job-level** dispatcher, matching the built-in SPT,
+EDD, and WSPT algorithms. Once `pick()` returns a job, every operation of that
+job is scheduled in order before `pick()` is called again. It is not an
+operation-level interleaving engine.
+
+The Algorithm Studio includes beginner starters for SPT, EDD, WSPT, a custom
+composite tuple rule, and a blank job-rule scaffold that leaves only
+`pick(available_jobs)` to implement. Its input inspector shows the actual
+current jobs, operations, workcenters, machines, snake_case Python attributes,
+and the JSON-shaped construction payload. A separate blank full-scheduler
+template is available for advanced algorithms that construct every schedule
+record directly.
+
+### Building a complete schedule manually
+
+Advanced algorithms that do not fit `dynamic_schedule()` still use the full
+contract. There is no "return a plain dict/list and we'll figure it out." They
+build and return a real `lekinpy.Schedule`:
 
 ```python
 from lekinpy import Schedule, MachineSchedule, ScheduledOperation
@@ -62,9 +120,9 @@ Schedule(schedule_type="MY_ALGORITHM", time=total_time, machines=[...])
 ```
 
 This is the exact same `Schedule`/`MachineSchedule`/`ScheduledOperation`
-shape `lekinpy`'s own built-in `FCFSAlgorithm`/`SPTAlgorithm`/etc. produce -
-see `examples/custom-algorithms/01_minimal_spt.py` for a complete, working
-example that builds one from scratch.
+shape `lekinpy`'s own built-in `FCFSAlgorithm`/`SPTAlgorithm`/etc. produce.
+See `examples/custom-algorithms/03_bounded_iterative_improvement.py` for an
+advanced example that constructs candidate schedules directly.
 
 **Reconciliation note**: earlier drafts of this feature considered inventing
 a simpler custom return shape (e.g. a plain list of `(job_id, machine_id,
@@ -251,9 +309,9 @@ are preloaded in this milestone (see §8). If your algorithm uses only
 `random`, the same seed against the same problem and source reproduces the
 same result.
 
-Custom source is **not** persisted anywhere automatically. This foundation
-only executes source you hand it directly - saving, naming, and sharing
-custom algorithms is an explicit future-UI decision, not implemented here.
+Custom source is **not** persisted automatically with a project. The Algorithm
+Studio keeps it for the current workspace session and provides explicit
+`.py` import and download actions.
 
 ## 7. Captured output
 
@@ -279,10 +337,9 @@ none of that exists here and none of it is implied.
 Concretely:
 
 - **Execution never happens automatically.** Importing, pasting, or loading
-  source text does nothing by itself - only an explicit call to
-  `runCustomAlgorithm(...)` executes it. The future UI is expected to put a
-  confirmation step in front of that call; this foundation makes that
-  possible but does not enforce it, since there is no UI here yet.
+  source text does nothing by itself. The Algorithm Studio requires explicit
+  trust acknowledgement and a Run action before calling
+  `runCustomAlgorithm(...)`.
 - **No supported package installation.** The worker installs only the
   pinned `lekinpy` wheel (`deps: false`, no dependency resolution) - see
   `worker/custom-scheduling.worker.ts`. `micropip` (which the worker itself
@@ -367,16 +424,17 @@ Problem-size limits (`maxJobs`/`maxOperations`/`maxMachines`/
 `maxWorkcenters`) reuse the existing, benchmarked
 `DEFAULT_BROWSER_EXECUTION_POLICY` from `lib/adapter/policy.ts` unchanged -
 see `docs/BROWSER_CAPACITY.md`. Unlike that policy, the values in this table
-are conservative defaults for this milestone, **not** benchmarked the same
-way - a disposable per-run Pyodide worker has different cold-start cost than
-the trusted long-lived one, and there is no UI yet generating real usage
-patterns to benchmark against. Revisit once a UI exists.
+are conservative defaults, **not** benchmarked the same way. A disposable
+per-run Pyodide worker has different cold-start cost than the trusted
+long-lived one, so revisit them when custom-algorithm usage has enough real
+measurements.
 
 ## 11. Examples
 
 See `examples/custom-algorithms/`:
 
-1. `01_minimal_spt.py` - a complete, working SPT-style algorithm.
+1. `01_minimal_spt.py` - a short beginner SPT rule using the existing
+   `SchedulingAlgorithm.dynamic_schedule()` engine.
 2. `02_deliberately_invalid.py` - a real `Schedule` object that still gets
    rejected by independent feasibility validation (skips each job's last
    operation).

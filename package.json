@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
     "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
+    "build:pages": "GITHUB_PAGES=true GITHUB_REPOSITORY=Ruturaj-Vasant/Lekin_Web NEXT_PUBLIC_BASE_PATH=/Lekin_Web vinext build && tsx scripts/pages/prepare-static-export.ts",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run lint && npm run build",
     "test:unit": "vitest run",
@@ -21,6 +22,9 @@
     "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@uiw/react-codemirror": "^4.25.11",
     "next": "16.2.6",
     "pyodide": "314.0.2",
     "react": "19.2.6",

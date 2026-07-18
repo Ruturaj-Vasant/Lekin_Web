@@ -19,8 +19,24 @@ test.describe("custom Python editor", () => {
     await openExample(page);
     await selectCustomPython(page);
 
-    const source = page.getByLabel("Python algorithm source");
-    await expect(source).toHaveValue(/def schedule\(system, parameters, context\)/);
+    const source = page.getByRole("textbox", { name: "Python algorithm source" });
+    await expect(source).toContainText("dynamic_schedule");
+    await source.press("ControlOrMeta+End");
+    await expect(source).toContainText(/def schedule\(system, parameters, context\)/);
+    await source.press("ControlOrMeta+Home");
+    await expect(page.locator(".cm-lineNumbers")).toBeVisible();
+    await expect(page.locator(".cm-line span").first()).toBeVisible();
+    await expect(page.getByText("Inspect the input your code receives")).toBeVisible();
+    await expect(page.locator(".custom-input-counts")).toContainText("3 jobs · 8 operations · 4 machines");
+    await expect(page.locator(".custom-input-tables")).toContainText("J-101");
+    await page.getByRole("tab", { name: "Python attributes" }).click();
+    await expect(page.locator(".custom-input-code pre")).toContainText('job_id="J-101"');
+    await expect(page.locator(".custom-input-code pre")).toContainText("processing_time=4");
+    await page.getByRole("tab", { name: "JSON payload" }).click();
+    await expect(page.locator(".custom-input-code pre")).toContainText('"processing_time": 4');
+    await expect(page.getByRole("heading", { name: "What LEKIN Lab passes in and expects back" })).toBeVisible();
+    await expect(page.locator(".custom-contract-return")).toContainText("lekinpy.Schedule");
+    await expect(page.locator(".custom-selector-contract")).toContainText("pick(available_jobs)");
     await expect(page.getByRole("button", { name: "Run custom algorithm", exact: true })).toBeDisabled();
 
     await validateAndTrust(page);
@@ -31,7 +47,7 @@ test.describe("custom Python editor", () => {
     await expect(page.locator(".bar")).toHaveCount(8);
     await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).toHaveText("16");
     await expect(page.locator(".custom-console").getByText("completed", { exact: true })).toBeVisible();
-    await expect(page.getByText(/scheduled J-/).last()).toBeVisible();
+    await expect(page.getByText(/scheduled J-/)).toHaveCount(0);
 
     await page.getByRole("tab", { name: "Algorithm comparison" }).click();
     await expect(page.locator(".comparison-table tbody tr")).toHaveCount(1);
@@ -56,7 +72,7 @@ test.describe("custom Python editor", () => {
       buffer: Buffer.from("def schedule(system, parameters, context):\n    while True:\n        pass\n"),
     });
     await expect(page.getByLabel("Algorithm name")).toHaveValue("infinite-study");
-    await expect(page.getByLabel("Python algorithm source")).toHaveValue(/while True/);
+    await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText(/while True/);
     await expect(page.getByLabel(/I trust this Python code/)).not.toBeChecked();
 
     const downloadPromise = page.waitForEvent("download");
@@ -90,21 +106,52 @@ test.describe("custom Python editor", () => {
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
     await expect(page.locator(".bar")).toHaveCount(8);
 
-    const source = page.getByLabel("Python algorithm source");
-    await source.fill(`${await source.inputValue()}\n# changed`);
+    const source = page.getByRole("textbox", { name: "Python algorithm source" });
+    await source.fill(`${await source.innerText()}\n# changed`);
     await expect(page.locator(".bar")).toHaveCount(0);
     await expect(page.getByText("Code contract validated")).toHaveCount(0);
     await expect(page.getByLabel(/I trust this Python code/)).not.toBeChecked();
 
-    await page.getByLabel("Starter").selectOption("blank");
+    await page.getByLabel("Starter example").selectOption("edd");
+    await page.getByRole("button", { name: "Load template" }).click();
+    await expect(page.getByLabel("Algorithm name")).toHaveValue("Custom EDD");
+    await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText("job.due");
+
+    await page.getByLabel("Starter example").selectOption("blankRule");
+    await page.getByRole("button", { name: "Load template" }).click();
+    await expect(page.getByLabel("Algorithm name")).toHaveValue("Untitled job rule");
+    await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText("def pick(available_jobs)");
+    await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText("Choose the next job");
+
+    await page.getByLabel("Starter example").selectOption("blank");
     await page.getByRole("button", { name: "Load template" }).click();
     await expect(page.getByLabel("Algorithm name")).toHaveValue("Untitled custom algorithm");
-    await expect(page.getByLabel("Python algorithm source")).toHaveValue(/NotImplementedError/);
+    await expect(page.getByRole("textbox", { name: "Python algorithm source" })).toContainText(/NotImplementedError/);
 
     await validateAndTrust(page);
     await page.getByRole("button", { name: "Run custom algorithm", exact: true }).click();
     await expect(page.locator(".custom-console").getByText("runtime failed", { exact: true })).toBeVisible({ timeout: 120_000 });
     await expect(page.locator(".custom-console-errors")).toContainText("NotImplementedError");
     await expect(page.getByText("Python traceback")).toBeVisible();
+  });
+
+  test("validates and executes every beginner job-rule starter", async ({ page }) => {
+    test.setTimeout(180_000);
+    await openExample(page);
+    await selectCustomPython(page);
+
+    for (const [templateId, expectedName] of [
+      ["edd", "Custom EDD"],
+      ["wspt", "Custom WSPT"],
+      ["composite", "Due date, then shortest"],
+    ] as const) {
+      await page.getByLabel("Starter example").selectOption(templateId);
+      await page.getByRole("button", { name: "Load template" }).click();
+      await expect(page.getByLabel("Algorithm name")).toHaveValue(expectedName);
+      await validateAndTrust(page);
+      await page.getByRole("button", { name: "Run custom algorithm", exact: true }).click();
+      await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+      await expect(page.locator(".bar")).toHaveCount(8);
+    }
   });
 });

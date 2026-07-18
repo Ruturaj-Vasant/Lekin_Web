@@ -7,6 +7,9 @@ const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
 
 const { d1, r2 } = hostingConfig;
+const isGitHubPages = process.env.GITHUB_PAGES === "true";
+const repositoryName = process.env.GITHUB_REPOSITORY?.split("/").at(-1) ?? "Lekin_Web";
+const pagesBasePath = `/${repositoryName}/`;
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
@@ -41,19 +44,23 @@ export default defineConfig(async () => {
   process.env.MINIFLARE_REGISTRY_PATH ??= ".wrangler/registry";
 
   // Wrangler snapshots its log path while the Cloudflare plugin is imported.
-  const { cloudflare } = await import("@cloudflare/vite-plugin");
+  // A GitHub Pages export is static and must not include the Worker adapter.
+  const cloudflarePlugin = isGitHubPages
+    ? null
+    : (await import("@cloudflare/vite-plugin")).cloudflare({
+        viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
+        config: localBindingConfig,
+      });
 
   return {
+    base: isGitHubPages ? pagesBasePath : "/",
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,
     plugins: [
       vinext(),
-      sites(),
-      cloudflare({
-        viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
-        config: localBindingConfig,
-      }),
+      ...(isGitHubPages ? [] : [sites()]),
+      ...(cloudflarePlugin ? [cloudflarePlugin] : []),
     ],
   };
 });

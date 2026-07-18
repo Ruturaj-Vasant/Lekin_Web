@@ -3,9 +3,13 @@
 import { useRef, useState } from "react";
 import type { CustomProgressEvent, CustomRunResult, CustomValidationResult } from "../../../lib/custom-algorithm/types";
 import { customAlgorithmFilename } from "../../../lib/editor/custom-algorithm-input";
+import type { ProblemDefinition } from "../../../lib/schema/problem";
 import { CUSTOM_ALGORITHM_TEMPLATES, type CustomAlgorithmTemplateId } from "../../execution/custom-algorithm-templates";
+import { CustomAlgorithmInputInspector } from "./custom-algorithm-input-inspector";
+import { PythonCodeEditor } from "./python-code-editor";
 
 type Props = {
+  problem: ProblemDefinition;
   name: string;
   source: string;
   parametersText: string;
@@ -32,9 +36,17 @@ type Props = {
 
 export function CustomAlgorithmPanel(props: Props) {
   const [templateId, setTemplateId] = useState<CustomAlgorithmTemplateId>("spt");
+  const selectedTemplate = CUSTOM_ALGORITHM_TEMPLATES[templateId];
   const fileInput = useRef<HTMLInputElement | null>(null);
   const lastProgress = props.progressEvents.at(-1);
   const lineCount = props.source.split("\n").length;
+  const executionMessage = lastProgress?.message ?? (props.running
+    ? lastProgress
+      ? `${Math.round(lastProgress.progress * 100)}% complete`
+      : "Preparing a disposable Python worker..."
+    : props.runResult?.status === "completed"
+      ? null
+      : props.runResult?.terminationReason.replaceAll("_", " "));
 
   function loadTemplate() {
     const template = CUSTOM_ALGORITHM_TEMPLATES[templateId];
@@ -70,11 +82,19 @@ export function CustomAlgorithmPanel(props: Props) {
 
       <div className="custom-algorithm-toolbar">
         <label>
-          Starter
+          Starter example
           <select value={templateId} onChange={(event) => setTemplateId(event.target.value as CustomAlgorithmTemplateId)} disabled={props.running || props.validating}>
-            <option value="spt">Complete SPT example</option>
-            <option value="iterative">Bounded iterative example</option>
-            <option value="blank">Blank function</option>
+            <optgroup label="Beginner job rules">
+              <option value="spt">Shortest processing time</option>
+              <option value="edd">Earliest due date</option>
+              <option value="wspt">Weighted shortest processing time</option>
+              <option value="composite">Due date, then shortest</option>
+              <option value="blankRule">Blank job rule</option>
+            </optgroup>
+            <optgroup label="Advanced schedulers">
+              <option value="iterative">Bounded iterative experiment</option>
+              <option value="blank">Blank full scheduler</option>
+            </optgroup>
           </select>
         </label>
         <button type="button" onClick={loadTemplate} disabled={props.running || props.validating}>Load template</button>
@@ -92,6 +112,11 @@ export function CustomAlgorithmPanel(props: Props) {
           }}
         />
         <button type="button" onClick={downloadPython} disabled={!props.source}>Download .py</button>
+      </div>
+
+      <div className="custom-template-summary">
+        <span>{selectedTemplate.level}</span>
+        <p>{selectedTemplate.description}</p>
       </div>
 
       <div className="custom-algorithm-fields">
@@ -125,27 +150,40 @@ export function CustomAlgorithmPanel(props: Props) {
       </div>
       {props.parametersError && <p className="custom-inline-error" role="alert">{props.parametersError}</p>}
 
+      <CustomAlgorithmInputInspector problem={props.problem} parametersText={props.parametersText} />
+
+      <section className="custom-function-contract" aria-labelledby="custom-function-contract-heading">
+        <header>
+          <span className="section-kicker">Function contract</span>
+          <h3 id="custom-function-contract-heading">What LEKIN Lab passes in and expects back</h3>
+        </header>
+        <div className="custom-contract-grid">
+          <div><b>system</b><span>The real validated <code>lekinpy.System</code> built from the current problem.</span></div>
+          <div><b>parameters</b><span>The Parameters JSON above, converted to a normal Python <code>dict</code>.</span></div>
+          <div><b>context</b><span>Helpers for time remaining, cancellation, progress, and incumbent schedules.</span></div>
+          <div className="custom-contract-return"><b>return</b><span>A real <code>lekinpy.Schedule</code> containing every operation exactly once.</span></div>
+        </div>
+        <div className="custom-selector-contract">
+          <b>Beginner job-rule examples</b>
+          <p><code>pick(available_jobs)</code> receives only jobs released at the current dispatch time and must return one Job from that list.</p>
+          <p><code>dynamic_schedule()</code> then handles validation, release-time advancement, eligible machines, precedence, timing, and Schedule records. It schedules every operation of the selected job before asking <code>pick()</code> again.</p>
+        </div>
+      </section>
+
       <div className="custom-code-shell">
         <div className="custom-code-title">
-          <span>algorithm.py</span>
+          <span>algorithm.py <i>Python</i></span>
           <span>{lineCount} lines</span>
         </div>
-        <textarea
-          aria-label="Python algorithm source"
+        <PythonCodeEditor
           value={props.source}
-          onChange={(event) => props.onSourceChange(event.target.value)}
           disabled={props.running || props.validating}
-          spellCheck={false}
-          autoCapitalize="off"
-          autoCorrect="off"
+          onChange={props.onSourceChange}
         />
       </div>
-
-      <div className="custom-contract-grid">
-        <div><b>system</b><span>Validated lekinpy.System</span></div>
-        <div><b>parameters</b><span>Your JSON object as a Python dict</span></div>
-        <div><b>context</b><span>Time, progress, incumbent, and stop helpers</span></div>
-      </div>
+      <p className="custom-editor-help" id="python-editor-help">
+        Python syntax, matching brackets, line numbers, folding, and search are enabled. Press Ctrl+F or Command+F to search within the code.
+      </p>
 
       <label className="custom-trust-check">
         <input
@@ -189,7 +227,7 @@ export function CustomAlgorithmPanel(props: Props) {
             <span>{props.runResult ? `${props.runResult.runtimeMs} ms` : `${Math.round((lastProgress?.progress ?? 0) * 100)}%`}</span>
           </header>
           {props.running && <div className="custom-progress-track"><span style={{ width: `${Math.max(3, (lastProgress?.progress ?? 0) * 100)}%` }} /></div>}
-          <p>{lastProgress?.message ?? (props.running ? "Preparing a disposable Python worker..." : props.runResult?.terminationReason.replaceAll("_", " "))}</p>
+          {executionMessage && <p>{executionMessage}</p>}
           {props.incumbentCount > 0 && <p>{props.incumbentCount} independently validated incumbent schedule{props.incumbentCount === 1 ? "" : "s"} received.</p>}
           {props.runResult?.issues.length ? (
             <ul className="custom-console-errors">
