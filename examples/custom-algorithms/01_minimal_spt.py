@@ -1,86 +1,42 @@
-# Minimal custom SPT-style algorithm.
+# Beginner example: shortest-processing-time job rule.
 #
-# Dispatches whichever released job has the shortest first-operation
-# processing time, then runs every operation of that job back-to-back -
-# the same "pick a job, then run all of its operations" pattern lekinpy's
-# own built-in SPT/EDD/WSPT algorithms use internally (see lekin-library's
-# lekinpy/algorithms/base.py: dynamic_schedule). This is intentionally
-# close to the built-in SPT algorithm so you can compare it against
-# "Run SPT" in the app on the same problem and see they agree.
+# The only scheduling decision in this file is `pick()`. The existing
+# SchedulingAlgorithm.dynamic_schedule() engine handles validation, release
+# times, workcenters, machines, operation precedence, start/end times, and
+# construction of every ScheduledOperation and MachineSchedule.
 #
-# See docs/CUSTOM_PYTHON_ALGORITHMS.md for the full contract this
-# schedule(system, parameters, context) function follows.
+# The selector receives the jobs released at the current dispatch time and
+# must return one of those Job objects. Once selected, all operations of that
+# job are scheduled in order. This is the same job-level behavior used by the
+# built-in SPT, EDD, and WSPT algorithms.
 
-from lekinpy import Schedule, MachineSchedule, ScheduledOperation
+from lekinpy.algorithms import SchedulingAlgorithm
+from lekinpy.schedule import Schedule
 
 
-def schedule(system, parameters, context):
-    machine_workcenter = {}
-    machine_available = {}
-    for workcenter in system.workcenters:
-        for machine in workcenter.machines:
-            machine_workcenter[machine.name] = workcenter.name
-            machine_available[machine.name] = machine.release
+class MySPTRule(SchedulingAlgorithm):
+    metadata = {
+        "id": "custom-spt",
+        "display_name": "My Shortest Processing Time",
+        "supports_multi_operation": True,
+        "version": "1.0.0",
+    }
 
-    machine_ops = {machine.name: [] for machine in system.machines}
-    unscheduled = list(system.jobs)
-    total_jobs = len(unscheduled)
-
-    while unscheduled:
-        if context.should_stop():
-            break
-
-        current_time = min(machine_available.values())
-        available = [job for job in unscheduled if job.release <= current_time]
-        if not available:
-            # Nothing is released yet - fast-forward the earliest machine to
-            # the next job's release time, same idea as lekinpy's own
-            # dynamic_schedule loop.
-            next_release = min(job.release for job in unscheduled)
-            earliest_machine = min(machine_available, key=machine_available.get)
-            machine_available[earliest_machine] = next_release
-            continue
-
-        job = min(available, key=lambda j: j.operations[0].processing_time)
-
-        for index, operation in enumerate(job.operations):
-            candidates = [m for m in system.machines if machine_workcenter[m.name] == operation.workcenter]
-            chosen_machine = min(candidates, key=lambda m: machine_available[m.name])
-
-            previous_end = job.operations[index - 1].end_time if index > 0 else job.release
-            start_time = max(previous_end, machine_available[chosen_machine.name])
-            end_time = start_time + operation.processing_time
-
-            # lekinpy's own algorithms record timing on the Operation object
-            # too - not required by the schedule(...) contract, but harmless
-            # and matches the built-in style.
-            operation.start_time = start_time
-            operation.end_time = end_time
-
-            machine_available[chosen_machine.name] = end_time
-            machine_ops[chosen_machine.name].append(
-                ScheduledOperation(
-                    job_id=job.job_id,
-                    operation_index=index,
-                    workcenter=machine_workcenter[chosen_machine.name],
-                    machine=chosen_machine.name,
-                    start_time=start_time,
-                    end_time=end_time,
-                    sequence_position=len(machine_ops[chosen_machine.name]),
-                    status=operation.status,
-                )
+    def schedule(self, system):
+        def pick(available_jobs):
+            return min(
+                available_jobs,
+                key=lambda job: (
+                    job.operations[0].processing_time,
+                    job.job_id,
+                ),
             )
 
-        unscheduled.remove(job)
-        context.report_progress((total_jobs - len(unscheduled)) / total_jobs)
+        total_time, machines = self.dynamic_schedule(system, pick)
+        return Schedule("Custom SPT", total_time, machines)
 
-    machines = [
-        MachineSchedule(
-            workcenter=machine_workcenter.get(machine.name),
-            machine=machine.name,
-            operations=machine_ops[machine.name],
-        )
-        for machine in system.machines
-    ]
-    total_time = max(machine_available.values()) if machine_available else 0
-    return Schedule(schedule_type="CUSTOM_SPT", time=total_time, machines=machines)
+
+# LEKIN Lab calls this top-level function automatically. `parameters` and
+# `context` are available for parameterized or long-running advanced rules.
+def schedule(system, parameters, context):
+    return MySPTRule().schedule(system)

@@ -504,6 +504,7 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
           ))}
           {algorithmId === "custom" && (
             <CustomAlgorithmPanel
+              problem={problem}
               name={customName}
               source={customSource}
               parametersText={customParametersText}
