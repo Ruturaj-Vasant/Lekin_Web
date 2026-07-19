@@ -1,0 +1,108 @@
+{
+  "format": "lekin-lab.problem",
+  "formatVersion": 1,
+  "exportedAt": "2026-07-19T00:00:00.000Z",
+  "problemId": "pinedo-3-3-3",
+  "name": "Pinedo 3.3.3: Number of tardy jobs",
+  "schemaVersion": "1.0.0",
+  "problem": {
+    "schemaVersion": "1.0.0",
+    "problemId": "pinedo-3-3-3",
+    "name": "Pinedo 3.3.3: Number of tardy jobs",
+    "jobs": [
+      {
+        "jobId": "J1",
+        "release": 0,
+        "due": 9,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J1-O1",
+            "workcenterId": "WC-M1",
+            "processingTime": 7,
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "jobId": "J2",
+        "release": 0,
+        "due": 17,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J2-O1",
+            "workcenterId": "WC-M1",
+            "processingTime": 8,
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "jobId": "J3",
+        "release": 0,
+        "due": 18,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J3-O1",
+            "workcenterId": "WC-M1",
+            "processingTime": 4,
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "jobId": "J4",
+        "release": 0,
+        "due": 19,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J4-O1",
+            "workcenterId": "WC-M1",
+            "processingTime": 6,
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "jobId": "J5",
+        "release": 0,
+        "due": 21,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J5-O1",
+            "workcenterId": "WC-M1",
+            "processingTime": 6,
+            "status": "pending"
+          }
+        ]
+      }
+    ],
+    "workcenters": [
+      {
+        "workcenterId": "WC-M1",
+        "release": 0,
+        "status": "active",
+        "machineIds": [
+          "M1"
+        ]
+      }
+    ],
+    "machines": [
+      {
+        "machineId": "M1",
+        "workcenterId": "WC-M1",
+        "release": 0,
+        "status": "active"
+      }
+    ]
+  }
+}
