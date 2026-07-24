@@ -106,7 +106,7 @@ export function ProblemSidebar({
         />
       </label>
 
-      <details>
+      <details className="sidebar-section-jobs">
         <summary>
           <span>
             Jobs <em>{problem.jobs.length}</em>
@@ -264,7 +264,7 @@ export function ProblemSidebar({
         </button>
       </details>
 
-      <details open={problem.workcenters.length === 0}>
+      <details className="sidebar-section-workcenters" open={problem.workcenters.length === 0}>
         <summary>
           <span>
             Workcenters <em>{problem.workcenters.length}</em>
@@ -315,7 +315,7 @@ export function ProblemSidebar({
         </button>
       </details>
 
-      <details>
+      <details className="sidebar-section-machines">
         <summary>
           <span>
             Machines <em>{problem.machines.length}</em>
@@ -378,7 +378,7 @@ export function ProblemSidebar({
         </button>
       </details>
 
-      <details open>
+      <details className="sidebar-section-algorithm" open>
         <summary>
           <span>Algorithm</span>
           <b aria-hidden="true">⌄</b>
