@@ -331,6 +331,7 @@ test.describe("custom Python algorithm execution (real Pyodide)", () => {
     await page.goto("/");
     await expect(page.getByText("Scheduling engine ready")).toBeVisible({ timeout: 120_000 });
     await page.getByRole("button", { name: "Open example" }).click();
+    await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });

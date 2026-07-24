@@ -3,6 +3,7 @@ import { expect, type Page } from "@playwright/test";
 export async function openExample(page: Page) {
   await page.goto("/");
   await page.getByRole("button", { name: "Open example" }).click();
+  await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
   await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
 }
 

@@ -12,10 +12,11 @@ import {
   type ProjectSummary,
 } from "../lib/persistence/local-project-store";
 import type { ProblemDefinition } from "../lib/schema/problem";
+import { ExampleLibraryDialog } from "./components/example-library-dialog";
 import { LandingScreen } from "./components/landing-screen";
 import { WorkspaceShell } from "./components/workspace/workspace-shell";
 import { createBlankProblem } from "./execution/blank-problem";
-import { SAMPLE_PROBLEM } from "./execution/sample-problem";
+import { createExampleProblem } from "./examples/example-library";
 import { getBrowserLocalStorage } from "./persistence/browser-storage";
 import { readProblemFile } from "./import-export/browser-problem-files";
 import { BrowserExecutionEngine, type SchedulerPreparationState } from "./execution/browser-execution-engine";
@@ -26,6 +27,7 @@ export default function Home() {
   const [checkingRestore, setCheckingRestore] = useState(true);
   const [recentProjects, setRecentProjects] = useState<ProjectSummary[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
+  const [exampleLibraryOpen, setExampleLibraryOpen] = useState(false);
   const [schedulerPreparation, setSchedulerPreparation] = useState<SchedulerPreparationState>("idle");
 
   useEffect(() => {
@@ -122,23 +124,40 @@ export default function Home() {
 
   if (checkingRestore) return null;
 
-  return initialProblem ? (
-    <WorkspaceShell
-      initialProblem={initialProblem}
-      onClose={closeWorkspace}
-      executionEngine={executionEngine}
-      schedulerPreparation={schedulerPreparation}
-    />
-  ) : (
-    <LandingScreen
-      onCreateProblem={() => setInitialProblem(createBlankProblem())}
-      onOpenExample={() => setInitialProblem({ ...SAMPLE_PROBLEM, problemId: crypto.randomUUID() })}
-      recentProjects={recentProjects}
-      onOpenProject={openProject}
-      onDeleteProject={deleteSavedProject}
-      onImportFile={importFromLanding}
-      notice={notice}
-      schedulerPreparation={schedulerPreparation}
-    />
+  function openExample(exampleId: string) {
+    setNotice(null);
+    setInitialProblem(createExampleProblem(exampleId));
+    setExampleLibraryOpen(false);
+  }
+
+  return (
+    <>
+      {initialProblem ? (
+        <WorkspaceShell
+          key={initialProblem.problemId}
+          initialProblem={initialProblem}
+          onClose={closeWorkspace}
+          onBrowseExamples={() => setExampleLibraryOpen(true)}
+          executionEngine={executionEngine}
+          schedulerPreparation={schedulerPreparation}
+        />
+      ) : (
+        <LandingScreen
+          onCreateProblem={() => setInitialProblem(createBlankProblem())}
+          onOpenExample={() => setExampleLibraryOpen(true)}
+          recentProjects={recentProjects}
+          onOpenProject={openProject}
+          onDeleteProject={deleteSavedProject}
+          onImportFile={importFromLanding}
+          notice={notice}
+          schedulerPreparation={schedulerPreparation}
+        />
+      )}
+      <ExampleLibraryDialog
+        open={exampleLibraryOpen}
+        onClose={() => setExampleLibraryOpen(false)}
+        onSelect={openExample}
+      />
+    </>
   );
 }

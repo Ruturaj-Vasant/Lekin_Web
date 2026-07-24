@@ -7,6 +7,7 @@ test.describe("problem import and export", () => {
     const errors = monitorBrowserErrors(page);
     await page.goto("/");
     await page.getByRole("button", { name: "Open example" }).click();
+    await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
     await page.getByLabel("Problem name").fill("Round trip study");
 
     const downloadPromise = page.waitForEvent("download");
@@ -48,6 +49,7 @@ test.describe("problem import and export", () => {
 
     await page.goto("/");
     await page.getByRole("button", { name: "Open example" }).click();
+    await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
     await page.getByLabel("Problem name").fill("Keep this problem");
     await page.getByLabel("Import a LEKIN JSON file").setInputFiles(invalidPath);
 

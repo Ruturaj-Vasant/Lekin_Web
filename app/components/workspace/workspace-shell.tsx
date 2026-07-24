@@ -27,9 +27,10 @@ import type { CustomProgressEvent, CustomRunResult, CustomValidationResult } fro
 import { parseCustomParameters } from "../../../lib/editor/custom-algorithm-input";
 import { CustomAlgorithmPanel } from "./custom-algorithm-panel";
 
-export function WorkspaceShell({ initialProblem, onClose, executionEngine, schedulerPreparation }: {
+export function WorkspaceShell({ initialProblem, onClose, onBrowseExamples, executionEngine, schedulerPreparation }: {
   initialProblem: ProblemDefinition;
   onClose: () => void;
+  onBrowseExamples: () => void;
   executionEngine: BrowserExecutionEngine;
   schedulerPreparation: SchedulerPreparationState;
 }) {
@@ -431,6 +432,7 @@ export function WorkspaceShell({ initialProblem, onClose, executionEngine, sched
         </div>
         <div className="app-actions">
           <button type="button" onClick={createNewProblem}>＋ New</button>
+          <button type="button" onClick={onBrowseExamples}>▦ Examples</button>
           <button type="button" onClick={() => importInput.current?.click()}>⇧ Import</button>
           <input
             ref={importInput}
