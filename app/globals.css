@@ -297,6 +297,14 @@
 .summary-grid article>strong{font-size:28px}
 .summary-grid article>small{font-size:13px;font-weight:500;color:var(--muted)}
 .tab-empty{padding:24px;font-size:14px;font-weight:500;line-height:1.55;color:var(--muted)}
+.sidebar{display:flex;flex-direction:column}
+.sidebar>*{flex:0 0 auto}
+.sidebar-section-workcenters{order:1}
+.sidebar-section-machines{order:2}
+.sidebar-section-jobs{order:3}
+.sidebar-section-algorithm{order:4}
+.sidebar>.run-button{order:5}
+.sidebar>.local-note{order:6}
 .sidebar>.field-label{gap:9px;font-size:12px;font-weight:700}
 .sidebar>.field-label>input{height:44px;padding:10px 12px;font-size:15px;font-weight:600}
 .sidebar>details{padding:17px 0}

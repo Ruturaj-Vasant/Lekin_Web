@@ -8,6 +8,19 @@ function entityDetails(page: import("@playwright/test").Page, id: string): Locat
 }
 
 test.describe("problem editor", () => {
+  test("orders the setup sections by production structure", async ({ page }) => {
+    await openExample(page);
+
+    const workcentersTop = (await page.locator(".sidebar-section-workcenters").boundingBox())?.y;
+    const machinesTop = (await page.locator(".sidebar-section-machines").boundingBox())?.y;
+    const jobsTop = (await page.locator(".sidebar-section-jobs").boundingBox())?.y;
+    const algorithmTop = (await page.locator(".sidebar-section-algorithm").boundingBox())?.y;
+
+    expect(workcentersTop).toBeLessThan(machinesTop!);
+    expect(machinesTop).toBeLessThan(jobsTop!);
+    expect(jobsTop).toBeLessThan(algorithmTop!);
+  });
+
   test("renames jobs, workcenters, and machines while preserving references", async ({ page }) => {
     await openExample(page);
     await page.getByText(/^Jobs/).click();
