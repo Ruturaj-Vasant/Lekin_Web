@@ -245,6 +245,7 @@
 .bar:hover,.bar:focus,.bar:focus-within{z-index:9;overflow:visible}
 .operation-hover-card{position:absolute;display:none;z-index:20;left:50%;top:46px;width:210px;padding:12px;transform:translateX(-50%);border:1px solid #ddd8e2;border-radius:7px;background:white;color:var(--ink);box-shadow:0 12px 28px #20152c2e;pointer-events:none}
 .bar:hover .operation-hover-card,.bar:focus .operation-hover-card,.bar:focus-within .operation-hover-card{display:block}
+.operation-hover-card-floating{position:fixed;display:block;z-index:1000;transform:none}
 .operation-hover-card>strong{display:block;font-size:11px}
 .operation-hover-card-above{top:auto;bottom:46px}
 .operation-hover-card>span{display:block;margin-top:3px;color:var(--muted);font-size:9px;font-weight:400}

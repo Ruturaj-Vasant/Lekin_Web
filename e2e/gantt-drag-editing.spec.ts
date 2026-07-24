@@ -41,20 +41,46 @@ test.describe("manual Gantt editing", () => {
     const operation = page.getByLabel("Drag J-103-O0");
     await expect(operation).not.toHaveAttribute("title");
     await operation.hover();
-    await expect(operation.getByRole("tooltip")).toContainText("Start to end");
-    await expect(operation.getByRole("tooltip")).toContainText("Weight");
+    await expect(page.getByRole("tooltip")).toContainText("Start to end");
+    await expect(page.getByRole("tooltip")).toContainText("Weight");
 
     const bottomOperation = page.getByLabel("Drag J-102-O1");
     await bottomOperation.hover();
-    const bottomCardBox = await bottomOperation.getByRole("tooltip").boundingBox();
-    const ganttBox = await page.locator(".gantt").boundingBox();
+    const bottomCardBox = await page.getByRole("tooltip").boundingBox();
+    const viewport = page.viewportSize();
     expect(bottomCardBox).not.toBeNull();
-    expect(ganttBox).not.toBeNull();
-    expect(bottomCardBox!.y).toBeGreaterThanOrEqual(ganttBox!.y);
-    expect(bottomCardBox!.y + bottomCardBox!.height).toBeLessThanOrEqual(ganttBox!.y + ganttBox!.height);
+    expect(viewport).not.toBeNull();
+    expect(bottomCardBox!.x).toBeGreaterThanOrEqual(0);
+    expect(bottomCardBox!.y).toBeGreaterThanOrEqual(0);
+    expect(bottomCardBox!.x + bottomCardBox!.width).toBeLessThanOrEqual(viewport!.width);
+    expect(bottomCardBox!.y + bottomCardBox!.height).toBeLessThanOrEqual(viewport!.height);
 
     await page.getByRole("button", { name: "Idle time" }).click();
     await expect(page.locator(".idle-segment")).toHaveCount(0);
+  });
+
+  test("keeps a one-machine operation hover card fully visible", async ({ page }) => {
+    test.setTimeout(150_000);
+    await page.goto("/");
+    await page.getByRole("button", { name: "Open example" }).click();
+    await page.getByRole("button", { name: "Open Pinedo 3.2.5: Maximum lateness" }).click();
+    await page.getByRole("button", { name: "Run schedule" }).click();
+    await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+    await expect(page.locator(".bar")).toHaveCount(4);
+
+    await page.locator(".bar").first().hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText("Start to end");
+
+    const tooltipBox = await tooltip.boundingBox();
+    const viewport = page.viewportSize();
+    expect(tooltipBox).not.toBeNull();
+    expect(viewport).not.toBeNull();
+    expect(tooltipBox!.x).toBeGreaterThanOrEqual(0);
+    expect(tooltipBox!.y).toBeGreaterThanOrEqual(0);
+    expect(tooltipBox!.x + tooltipBox!.width).toBeLessThanOrEqual(viewport!.width);
+    expect(tooltipBox!.y + tooltipBox!.height).toBeLessThanOrEqual(viewport!.height);
   });
 
   test("aligns a time-9 operation with the time-9 tick and grid line", async ({ page }) => {
