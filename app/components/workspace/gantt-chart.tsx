@@ -4,11 +4,21 @@ import type { Schedule } from "../../../lib/schema/schedule";
 import type { ScheduledOperation } from "../../../lib/schema/schedule";
 import type { DragRejection } from "../../../lib/scheduling/recalculate";
 import { timelineGeometry } from "../../../lib/scheduling/timeline-geometry";
-import { useState, type DragEvent, type KeyboardEvent, type MouseEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type DragEvent, type KeyboardEvent, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 
 type DropCandidate = { machineId: string; sequencePosition: number; requestedStartTime: number; rejection: DragRejection | null };
 type EditState = { operationId: string; machineId: string; sequencePosition: number; requestedStartTime: string; error: string | null };
 type MoveResult = { accepted: boolean; message: string; scheduledStartTime?: number };
+type HoveredOperation = {
+  operation: ScheduledOperation;
+  workcenterId: string;
+  anchor: { left: number; right: number; top: number; bottom: number };
+};
+type TooltipPosition = { left: number; top: number };
+
+const TOOLTIP_MARGIN = 12;
+const TOOLTIP_GAP = 10;
 
 function timelineTicks(makespan: number, targetIntervals = 7): number[] {
   const step = Math.max(1, Math.ceil(makespan / targetIntervals));
@@ -40,6 +50,9 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
   const [zoom, setZoom] = useState(1);
   const [cursorTime, setCursorTime] = useState<number | null>(null);
   const [showIdle, setShowIdle] = useState(true);
+  const [hoveredOperation, setHoveredOperation] = useState<HoveredOperation | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
   const machineSchedules = schedule?.machines ?? problem.machines.map((machine) => ({ machineId: machine.machineId, workcenterId: machine.workcenterId, operations: [] }));
   const makespan = Math.max(1, ...machineSchedules.flatMap((machine) => machine.operations.map((operation) => operation.endTime)));
   const ticks = timelineTicks(makespan, Math.max(7, Math.round(7 * zoom)));
@@ -72,6 +85,35 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
       ).length ?? 0)
     : 0;
 
+  useLayoutEffect(() => {
+    if (!hoveredOperation || !tooltipRef.current) return;
+    const tooltip = tooltipRef.current.getBoundingClientRect();
+    const { anchor } = hoveredOperation;
+    const maximumLeft = Math.max(TOOLTIP_MARGIN, window.innerWidth - tooltip.width - TOOLTIP_MARGIN);
+    const left = Math.min(
+      maximumLeft,
+      Math.max(TOOLTIP_MARGIN, (anchor.left + anchor.right - tooltip.width) / 2),
+    );
+    const below = anchor.bottom + TOOLTIP_GAP;
+    const above = anchor.top - tooltip.height - TOOLTIP_GAP;
+    const maximumTop = Math.max(TOOLTIP_MARGIN, window.innerHeight - tooltip.height - TOOLTIP_MARGIN);
+    const top = below + tooltip.height <= window.innerHeight - TOOLTIP_MARGIN
+      ? below
+      : Math.min(maximumTop, Math.max(TOOLTIP_MARGIN, above));
+    setTooltipPosition({ left, top });
+  }, [hoveredOperation]);
+
+  useEffect(() => {
+    if (!hoveredOperation) return;
+    const closeTooltip = () => setHoveredOperation(null);
+    window.addEventListener("resize", closeTooltip);
+    window.addEventListener("scroll", closeTooltip, true);
+    return () => {
+      window.removeEventListener("resize", closeTooltip);
+      window.removeEventListener("scroll", closeTooltip, true);
+    };
+  }, [hoveredOperation]);
+
   function machineUtilization(machineId: string, operations: ScheduledOperation[]): number {
     const release = problem.machines.find((machine) => machine.machineId === machineId)?.release ?? 0;
     const available = makespan - release;
@@ -93,12 +135,32 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
   }
 
   function openEditor(operation: ScheduledOperation) {
+    setHoveredOperation(null);
     setEdit({
       operationId: operation.scheduledOperationId,
       machineId: operation.machineId,
       sequencePosition: operation.sequencePosition,
       requestedStartTime: String(manualStartConstraints[operation.scheduledOperationId] ?? operation.startTime),
       error: null,
+    });
+  }
+
+  function showOperationTooltip(
+    target: HTMLElement,
+    operation: ScheduledOperation,
+    workcenterId: string,
+  ) {
+    const bounds = target.getBoundingClientRect();
+    setTooltipPosition(null);
+    setHoveredOperation({
+      operation,
+      workcenterId,
+      anchor: {
+        left: bounds.left,
+        right: bounds.right,
+        top: bounds.top,
+        bottom: bounds.bottom,
+      },
     });
   }
 
@@ -226,6 +288,12 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
               aria-label={`Drag ${operation.scheduledOperationId}`}
               tabIndex={0}
               onContextMenu={(event) => operationContextMenu(event, operation)}
+              onMouseEnter={(event) => showOperationTooltip(event.currentTarget, operation, machine.workcenterId)}
+              onMouseLeave={() => setHoveredOperation(null)}
+              onFocus={(event) => showOperationTooltip(event.currentTarget, operation, machine.workcenterId)}
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) setHoveredOperation(null);
+              }}
               onDragOver={(event) => dragOver(event, machine.machineId)}
               onDrop={(event) => drop(event, machine.machineId)}
               onKeyDown={(event) => {
@@ -240,16 +308,6 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
             >
               <i className="drag-handle" aria-hidden="true">⋮⋮</i><span>{operation.jobId} · O{operation.operationIndex + 1}</span><small>{operation.startTime}–{operation.endTime} · {operation.endTime - operation.startTime}u</small>
               <button type="button" draggable={false} className="operation-edit-trigger" aria-label={`Edit ${operation.scheduledOperationId}`} onClick={(event) => { event.stopPropagation(); openEditor(operation); }}>Edit</button>
-              <div className={`operation-hover-card${machineIndex >= Math.ceil(machineSchedules.length / 2) ? " operation-hover-card-above" : ""}`} role="tooltip">
-                <strong>{operation.jobId} · Operation {operation.operationIndex + 1}</strong>
-                <span>{operation.machineId} · {machine.workcenterId}</span>
-                <dl>
-                  <div><dt>Start to end</dt><dd>{operation.startTime}–{operation.endTime}</dd></div>
-                  <div><dt>Duration</dt><dd>{operation.endTime - operation.startTime}u</dd></div>
-                  <div><dt>Due</dt><dd>{problem.jobs.find((job) => job.jobId === operation.jobId)?.due ?? "-"}</dd></div>
-                  <div><dt>Weight</dt><dd>{problem.jobs.find((job) => job.jobId === operation.jobId)?.weight ?? "-"}</dd></div>
-                </dl>
-              </div>
             </div>
             );
           }))}
@@ -271,6 +329,28 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
           <footer><button type="button" className="editor-clear" disabled={manualStartConstraints[edit.operationId] === undefined} onClick={() => applyEditor(null)}>Clear manual time</button><span /><button type="button" onClick={() => setEdit(null)}>Cancel</button><button type="button" className="editor-apply" onClick={() => edit.requestedStartTime.trim() ? applyEditor(Number(edit.requestedStartTime)) : setEdit({ ...edit, error: "Enter a requested start time." })}>Apply change</button></footer>
         </div>
       </div>}
+      {hoveredOperation && typeof document !== "undefined" && createPortal(
+        <div
+          ref={tooltipRef}
+          className="operation-hover-card operation-hover-card-floating"
+          role="tooltip"
+          style={{
+            left: tooltipPosition?.left ?? -9999,
+            top: tooltipPosition?.top ?? -9999,
+            visibility: tooltipPosition ? "visible" : "hidden",
+          }}
+        >
+          <strong>{hoveredOperation.operation.jobId} · Operation {hoveredOperation.operation.operationIndex + 1}</strong>
+          <span>{hoveredOperation.operation.machineId} · {hoveredOperation.workcenterId}</span>
+          <dl>
+            <div><dt>Start to end</dt><dd>{hoveredOperation.operation.startTime}–{hoveredOperation.operation.endTime}</dd></div>
+            <div><dt>Duration</dt><dd>{hoveredOperation.operation.endTime - hoveredOperation.operation.startTime}u</dd></div>
+            <div><dt>Due</dt><dd>{problem.jobs.find((job) => job.jobId === hoveredOperation.operation.jobId)?.due ?? "-"}</dd></div>
+            <div><dt>Weight</dt><dd>{problem.jobs.find((job) => job.jobId === hoveredOperation.operation.jobId)?.weight ?? "-"}</dd></div>
+          </dl>
+        </div>,
+        document.body,
+      )}
     </section>
   );
 }
