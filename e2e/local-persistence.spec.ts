@@ -95,6 +95,7 @@ test.describe("local persistence", () => {
   test("does not restore stale schedules or comparison history when a refreshed project reopens", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Open example" }).click();
+    await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
     await expect(page.locator(".bar").first()).toBeVisible();

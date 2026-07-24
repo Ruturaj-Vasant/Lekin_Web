@@ -21,6 +21,7 @@ test.describe("landing and workspace shell", () => {
     await expect(page.getByRole("heading", { name: /Build, run, and understand/ })).toBeVisible();
     await expect(page.getByRole("region", { name: "LEKIN features" }).getByRole("article")).toHaveCount(3);
     await page.getByRole("button", { name: "Open example" }).click();
+    await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
 
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
     await expect(page.getByRole("complementary", { name: "Problem setup" })).toBeVisible();
@@ -65,7 +66,28 @@ test.describe("landing and workspace shell", () => {
     await page.goto("/");
     await page.getByRole("button", { name: "Open example" }).focus();
     await page.keyboard.press("Enter");
+    await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
+  });
+
+  test("opens examples from the landing page and switches examples inside the workspace", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Open example" }).click();
+
+    const library = page.getByRole("dialog", { name: "Example library" });
+    await expect(library).toBeVisible();
+    await expect(library.locator(".example-card")).toHaveCount(8);
+
+    await library.getByRole("button", { name: "Open Pinedo 6.1.1: Four-machine flow shop" }).click();
+    await expect(page.getByLabel("Problem name")).toHaveValue("Pinedo 6.1.1: Flow shop");
+    await page.getByRole("button", { name: "Run schedule" }).click();
+    await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
+    await expect(page.locator(".bar")).toHaveCount(20);
+
+    await page.getByRole("button", { name: /Examples/ }).click();
+    await page.getByRole("button", { name: "Open Pinedo 3.2.5: Maximum lateness" }).click();
+    await expect(page.getByLabel("Problem name")).toHaveValue("Pinedo 3.2.5: Maximum lateness");
+    await expect(page.locator(".bar")).toHaveCount(0);
   });
 
   test("provides working About and Help guidance with project credits", async ({ page }) => {

@@ -45,6 +45,7 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+**/graphify-out/
 
 # Local project context and working log
 /ARCHITECTURE.md

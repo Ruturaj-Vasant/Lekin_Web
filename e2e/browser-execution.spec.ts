@@ -7,6 +7,7 @@ test.describe("real in-browser scheduling", () => {
     await page.goto("/");
     await expect(page.getByText("Scheduling engine ready")).toBeVisible({ timeout: 120_000 });
     await page.getByRole("button", { name: "Open example" }).click();
+    await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
     await expect(page.getByText("Engine ready")).toBeVisible();
 
     await page.getByRole("button", { name: "Run schedule" }).click();

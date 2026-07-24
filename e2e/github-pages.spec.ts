@@ -9,6 +9,7 @@ test("runs a real schedule from the static GitHub Pages artifact", async ({ page
   await page.goto(`${basePath}/`);
   await expect(page.getByText("Scheduling engine ready")).toBeVisible({ timeout: 90_000 });
   await page.getByRole("button", { name: "Open example" }).click();
+  await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
   await page.getByRole("button", { name: "Run schedule" }).click();
 
   await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 90_000 });

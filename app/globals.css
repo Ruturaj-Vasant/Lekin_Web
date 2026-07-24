@@ -456,3 +456,34 @@
   .sidebar,.sidebar-rail{height:100%;min-height:0;overflow-y:auto;overscroll-behavior:contain}
   .canvas{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
 }
+
+/* Shared landing and workspace example chooser. */
+.example-library-backdrop{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:#17121dcc;backdrop-filter:blur(4px)}
+.example-library-dialog{width:min(1120px,100%);max-height:min(860px,calc(100vh - 48px));display:flex;flex-direction:column;border:1px solid #ded8e2;border-radius:14px;background:#fbfaf8;box-shadow:0 30px 90px #120c1866;overflow:hidden}
+.example-library-head{display:flex;align-items:flex-start;justify-content:space-between;gap:30px;padding:28px 30px 22px;border-bottom:1px solid var(--line);background:white}
+.example-library-head h2{margin:8px 0 5px;font-size:28px;letter-spacing:-.025em}
+.example-library-head p{margin:0;color:#555761;font-size:14px;line-height:1.55}
+.example-library-head>button{flex:0 0 auto;width:36px;height:36px;border:1px solid var(--line);border-radius:7px;background:white;color:#4d4f57;font-size:23px;line-height:1}
+.example-library-head>button:hover{border-color:#c8b5d3;background:var(--violet-soft);color:var(--violet)}
+.example-library-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;padding:22px 24px 26px;overflow-y:auto}
+.example-card{min-height:320px;display:flex;flex-direction:column;padding:18px;border:1px solid #dfdfe3;border-radius:9px;background:white;box-shadow:0 3px 12px #26202c0a}
+.example-card:hover{border-color:#c7b4d2;box-shadow:0 8px 22px #3a1c4d10}
+.example-card-topline{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.example-card-topline>span{color:var(--violet);font:650 11px var(--font-geist-mono);letter-spacing:.045em;text-transform:uppercase}
+.example-card-topline>strong{padding:4px 7px;border-radius:12px;background:#edf6f1;color:var(--success);font-size:10px;white-space:nowrap}
+.example-partial .example-card-topline>strong{background:#fff4dd;color:#8a5a10}
+.example-card h3{margin:14px 0 12px;font-size:19px;letter-spacing:-.02em}
+.example-card dl{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0}
+.example-card dl>div{min-width:0}
+.example-card dt{color:#777982;font-size:10px;font-weight:650;text-transform:uppercase;letter-spacing:.055em}
+.example-card dd{margin:3px 0 0;color:#303137;font-size:12px;font-weight:600;line-height:1.35}
+.example-card>p{margin:14px 0 12px;color:#5b5d66;font-size:12px;line-height:1.5}
+.example-counts{display:flex;gap:12px;margin:0 0 12px;color:#686a72;font-size:11px}
+.example-counts b{color:#28292e;font-size:13px}
+.example-card>small{display:block;margin-top:auto;color:#777982;font-size:10px;line-height:1.45}
+.example-card>button{width:100%;margin-top:14px;padding:9px 12px;border:1px solid var(--violet);border-radius:6px;background:white;color:var(--violet);font-size:12px;font-weight:650}
+.example-card>button:hover{background:var(--violet);color:white}
+.example-card>button:disabled{cursor:not-allowed;border-color:#d4d4d6;background:#eeeeef;color:#85868b}
+.example-library-dialog>footer{padding:13px 30px;border-top:1px solid var(--line);background:white;color:#666870;font-size:11px;line-height:1.45}
+@media(max-width:900px){.example-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.example-library-backdrop{padding:10px}.example-library-dialog{max-height:calc(100vh - 20px)}.example-library-head{padding:20px}.example-library-head h2{font-size:24px}.example-library-grid{grid-template-columns:1fr;padding:16px}.example-card{min-height:360px}.example-library-dialog>footer{padding:12px 18px}}

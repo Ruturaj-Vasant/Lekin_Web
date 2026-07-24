@@ -1,0 +1,93 @@
+{
+  "format": "lekin-lab.problem",
+  "formatVersion": 1,
+  "exportedAt": "2026-07-19T00:00:00.000Z",
+  "problemId": "pinedo-3-2-5",
+  "name": "Pinedo 3.2.5: Maximum lateness",
+  "schemaVersion": "1.0.0",
+  "problem": {
+    "schemaVersion": "1.0.0",
+    "problemId": "pinedo-3-2-5",
+    "name": "Pinedo 3.2.5: Maximum lateness",
+    "jobs": [
+      {
+        "jobId": "J1",
+        "release": 0,
+        "due": 8,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J1-O1",
+            "workcenterId": "WC-M1",
+            "processingTime": 4,
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "jobId": "J2",
+        "release": 1,
+        "due": 12,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J2-O1",
+            "workcenterId": "WC-M1",
+            "processingTime": 2,
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "jobId": "J3",
+        "release": 3,
+        "due": 11,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J3-O1",
+            "workcenterId": "WC-M1",
+            "processingTime": 6,
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "jobId": "J4",
+        "release": 5,
+        "due": 10,
+        "weight": 1,
+        "operations": [
+          {
+            "operationIndex": 0,
+            "operationId": "J4-O1",
+            "workcenterId": "WC-M1",
+            "processingTime": 5,
+            "status": "pending"
+          }
+        ]
+      }
+    ],
+    "workcenters": [
+      {
+        "workcenterId": "WC-M1",
+        "release": 0,
+        "status": "active",
+        "machineIds": [
+          "M1"
+        ]
+      }
+    ],
+    "machines": [
+      {
+        "machineId": "M1",
+        "workcenterId": "WC-M1",
+        "release": 0,
+        "status": "active"
+      }
+    ]
+  }
+}
