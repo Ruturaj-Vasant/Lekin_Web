@@ -10,7 +10,6 @@ import {
 const compatibilityLabels: Record<ExampleCompatibility, string> = {
   ready: "Ready to run",
   partial: "Input compatible",
-  unavailable: "Not yet supported",
 };
 
 export function ExampleLibraryDialog({

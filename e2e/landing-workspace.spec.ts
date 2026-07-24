@@ -76,8 +76,7 @@ test.describe("landing and workspace shell", () => {
 
     const library = page.getByRole("dialog", { name: "Example library" });
     await expect(library).toBeVisible();
-    await expect(library.locator(".example-card")).toHaveCount(9);
-    await expect(library.getByRole("button", { name: "Open Pinedo 2.3.2: Scheduling anomaly" })).toBeDisabled();
+    await expect(library.locator(".example-card")).toHaveCount(8);
 
     await library.getByRole("button", { name: "Open Pinedo 6.1.1: Four-machine flow shop" }).click();
     await expect(page.getByLabel("Problem name")).toHaveValue("Pinedo 6.1.1: Flow shop");

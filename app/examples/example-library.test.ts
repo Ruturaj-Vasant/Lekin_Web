@@ -2,12 +2,10 @@ import { describe, expect, it } from "vitest";
 import { EXAMPLE_LIBRARY, createExampleProblem, exampleCounts } from "./example-library";
 
 describe("example library", () => {
-  it("publishes every extracted example and explains the unsupported anomaly", () => {
-    expect(EXAMPLE_LIBRARY).toHaveLength(9);
+  it("publishes only examples that can be opened in the current application", () => {
+    expect(EXAMPLE_LIBRARY).toHaveLength(8);
     expect(EXAMPLE_LIBRARY.filter((example) => example.problem)).toHaveLength(8);
-    const anomaly = EXAMPLE_LIBRARY.find((example) => example.id === "pinedo-2-3-2");
-    expect(anomaly?.compatibility).toBe("unavailable");
-    expect(anomaly?.problem).toBeUndefined();
+    expect(EXAMPLE_LIBRARY.every((example) => example.problem)).toBe(true);
   });
 
   it("creates independent projects without mutating the bundled example", () => {
@@ -20,9 +18,5 @@ describe("example library", () => {
 
     first.jobs[0].jobId = "EDITED";
     expect(second.jobs[0].jobId).not.toBe("EDITED");
-  });
-
-  it("rejects an example that cannot be represented by the current schema", () => {
-    expect(() => createExampleProblem("pinedo-2-3-2")).toThrow("is not available");
   });
 });

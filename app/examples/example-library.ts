@@ -8,7 +8,7 @@ import pinedo611 from "../../examples/pinedo/pinedo-6.1.1-flow-shop.lekin.json";
 import { ProblemDefinitionSchema, type ProblemDefinition } from "../../lib/schema/problem";
 import { SAMPLE_PROBLEM } from "../execution/sample-problem";
 
-export type ExampleCompatibility = "ready" | "partial" | "unavailable";
+export type ExampleCompatibility = "ready" | "partial";
 
 export type ExampleDefinition = {
   id: string;
@@ -122,16 +122,6 @@ export const EXAMPLE_LIBRARY: readonly ExampleDefinition[] = [
     compatibility: "ready",
     compatibilityNote: "The route and processing times map directly into LEKIN workcenters.",
     problem: problemFromEnvelope(pinedo611),
-  },
-  {
-    id: "pinedo-2-3-2",
-    title: "Scheduling anomaly",
-    reference: "Pinedo 2.3.2",
-    environment: "Parallel machines",
-    objective: "Precedence-constrained makespan",
-    description: "A classic anomaly involving arbitrary precedence relations between jobs.",
-    compatibility: "unavailable",
-    compatibilityNote: "Not yet runnable because LEKIN does not model arbitrary cross-job precedence constraints.",
   },
 ] as const;
 
