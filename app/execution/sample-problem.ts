@@ -9,7 +9,7 @@ import type { ProblemDefinition } from "../../lib/schema/problem";
 export const SAMPLE_PROBLEM: ProblemDefinition = {
   schemaVersion: "1.0.0",
   problemId: "sample-job-shop",
-  name: "Sample job shop",
+  name: "Sample Flexible Flow Shop",
   jobs: [
     {
       jobId: "J-101", release: 0, due: 30, weight: 2, rgb: [91, 120, 165],
