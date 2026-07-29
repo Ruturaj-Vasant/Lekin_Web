@@ -1,5 +1,6 @@
 import type { Job, Machine, Operation, ProblemDefinition, Workcenter } from "../schema/problem";
 import { makeOperationId } from "../schema/schedule";
+import { automaticJobColor } from "../presentation/job-colors";
 
 /**
  * Pure ProblemDefinition state-transition functions for the Problem Editor
@@ -66,6 +67,7 @@ export function createDefaultJob(problem: ProblemDefinition): Job {
     release: 0,
     due: 10,
     weight: 1,
+    rgb: automaticJobColor(problem.jobs),
     operations: [createDefaultOperation(jobId, 0, defaultWorkcenterId)],
   };
 }

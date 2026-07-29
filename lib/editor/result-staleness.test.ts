@@ -17,13 +17,19 @@ describe("isResultStale", () => {
     expect(isResultStale({ problem, algorithmId: "fcfs" }, problem, "fcfs")).toBe(false);
   });
 
-  it("is stale after any problem edit, even one that produces deep-equal content", () => {
+  it("is stale after a scheduling input changes", () => {
     const problem = baseProblem();
-    // every lib/editor mutation returns a new object, even a no-op-shaped one
     const edited = addJob(problem, createDefaultJob(problem));
-    const revertedShape = { ...problem }; // same content as `problem`, different reference
     expect(isResultStale({ problem, algorithmId: "fcfs" }, edited, "fcfs")).toBe(true);
-    expect(isResultStale({ problem, algorithmId: "fcfs" }, revertedShape, "fcfs")).toBe(true);
+  });
+
+  it("keeps a valid result after a presentation-only color edit", () => {
+    const problem = addJob(baseProblem(), createDefaultJob(baseProblem()));
+    const recolored = {
+      ...problem,
+      jobs: problem.jobs.map((job) => ({ ...job, rgb: [12, 34, 56] as [number, number, number] })),
+    };
+    expect(isResultStale({ problem, algorithmId: "fcfs" }, recolored, "fcfs")).toBe(false);
   });
 
   it("is stale after an algorithm change alone, with the same problem", () => {
