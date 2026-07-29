@@ -26,6 +26,8 @@ import { DEFAULT_CUSTOM_ALGORITHM_TEMPLATE } from "../../execution/custom-algori
 import type { CustomProgressEvent, CustomRunResult, CustomValidationResult } from "../../../lib/custom-algorithm/types";
 import { parseCustomParameters } from "../../../lib/editor/custom-algorithm-input";
 import { CustomAlgorithmPanel } from "./custom-algorithm-panel";
+import { assignMissingJobColors } from "../../../lib/presentation/job-colors";
+import { sameSchedulingInput } from "../../../lib/editor/scheduling-input-equality";
 
 export function WorkspaceShell({ initialProblem, onClose, onBrowseExamples, executionEngine, schedulerPreparation }: {
   initialProblem: ProblemDefinition;
@@ -37,7 +39,7 @@ export function WorkspaceShell({ initialProblem, onClose, onBrowseExamples, exec
   const activeExecution = useRef<string | null>(null);
   const [customExecutionEngine] = useState(() => new CustomAlgorithmEngine());
   const importInput = useRef<HTMLInputElement | null>(null);
-  const [problem, dispatch] = useReducer(problemEditorReducer, initialProblem);
+  const [problem, dispatch] = useReducer(problemEditorReducer, initialProblem, assignMissingJobColors);
   const [algorithmId, setAlgorithmId] = useState("spt");
   const [result, setResult] = useState<ExecutionResult | null>(null);
   // What (problem, algorithmId) `result` was actually computed for, so a
@@ -73,7 +75,7 @@ export function WorkspaceShell({ initialProblem, onClose, onBrowseExamples, exec
     setResult(null);
     setResultFor(null);
   }
-  if (manualProblem !== problem) {
+  if (!sameSchedulingInput(manualProblem, problem)) {
     setManualProblem(problem);
     setManualBaseResult(null);
     setManualStartConstraints({});
@@ -234,7 +236,7 @@ export function WorkspaceShell({ initialProblem, onClose, onBrowseExamples, exec
 
   function replaceProblem(nextProblem: ProblemDefinition) {
     abandonActiveExecution();
-    dispatch({ type: "replaceProblem", problem: nextProblem });
+    dispatch({ type: "replaceProblem", problem: assignMissingJobColors(nextProblem) });
     setAlgorithmId("spt");
     setResult(null);
     setResultFor(null);

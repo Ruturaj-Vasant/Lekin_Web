@@ -21,12 +21,12 @@ test.describe("landing and workspace shell", () => {
     await expect(page.getByRole("heading", { name: /Build, run, and understand/ })).toBeVisible();
     await expect(page.getByRole("region", { name: "LEKIN features" }).getByRole("article")).toHaveCount(3);
     await page.getByRole("button", { name: "Open example" }).click();
-    await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
+    await page.getByRole("button", { name: "Open LEKIN starter: Sample Flexible Flow Shop" }).click();
 
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
     await expect(page.getByRole("complementary", { name: "Problem setup" })).toBeVisible();
     const problemName = page.getByLabel("Problem name");
-    await expect(problemName).toHaveValue("Sample job shop");
+    await expect(problemName).toHaveValue("Sample Flexible Flow Shop");
     await problemName.fill("My scheduling experiment");
     await expect(page.locator(".project strong")).toHaveText("My scheduling experiment");
     await expect(page.locator(".breadcrumb")).toContainText("My scheduling experiment");
@@ -66,7 +66,7 @@ test.describe("landing and workspace shell", () => {
     await page.goto("/");
     await page.getByRole("button", { name: "Open example" }).focus();
     await page.keyboard.press("Enter");
-    await page.getByRole("button", { name: "Open LEKIN starter: Sample job shop" }).click();
+    await page.getByRole("button", { name: "Open LEKIN starter: Sample Flexible Flow Shop" }).click();
     await expect(page.getByRole("heading", { name: "Schedule overview" })).toBeVisible();
   });
 

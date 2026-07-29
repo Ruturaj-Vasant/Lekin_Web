@@ -1,7 +1,16 @@
-import type { Dispatch } from "react";
+import { useState, type Dispatch } from "react";
 import type { ProblemEditorAction } from "../../../lib/editor/problem-editor";
-import type { ProblemDefinition } from "../../../lib/schema/problem";
+import type { Job, ProblemDefinition } from "../../../lib/schema/problem";
 import type { ValidationIssue } from "../../../lib/schema/issue";
+import {
+  JOB_COLOR_PALETTE,
+  automaticJobColor,
+  hexToRgb,
+  rgbToCss,
+  rgbToHex,
+  sameRgb,
+  type RgbColor,
+} from "../../../lib/presentation/job-colors";
 
 type Props = {
   problem: ProblemDefinition;
@@ -74,6 +83,84 @@ function IssueBadge({ issues, filter }: { issues: ValidationIssue[]; filter: { j
   return <em className="issue-badge">{count}</em>;
 }
 
+function JobColorControl({
+  job,
+  jobIndex,
+  jobs,
+  running,
+  dispatch,
+}: {
+  job: Job;
+  jobIndex: number;
+  jobs: readonly Job[];
+  running: boolean;
+  dispatch: Dispatch<ProblemEditorAction>;
+}) {
+  const [message, setMessage] = useState<string | null>(null);
+  const current = job.rgb ?? automaticJobColor(jobs, jobIndex);
+  const currentHex = rgbToHex(current);
+
+  function applyColor(rgb: RgbColor) {
+    const duplicate = jobs.find((candidate, index) => index !== jobIndex && sameRgb(candidate.rgb, rgb));
+    if (duplicate) {
+      setMessage(`${duplicate.jobId} already uses that color. Choose another color.`);
+      return;
+    }
+    setMessage(null);
+    dispatch({ type: "updateJob", jobId: job.jobId, patch: { rgb } });
+  }
+
+  return (
+    <fieldset className="job-color-editor">
+      <legend>Job color</legend>
+      <div className="job-color-main">
+        <label className="job-color-picker">
+          <span>Custom color for {job.jobId}</span>
+          <input
+            type="color"
+            value={currentHex}
+            disabled={running}
+            aria-label={`Color for job ${job.jobId}`}
+            onChange={(event) => {
+              const rgb = hexToRgb(event.target.value);
+              if (rgb) applyColor(rgb);
+            }}
+          />
+        </label>
+        <code>{currentHex.toUpperCase()}</code>
+        <button
+          type="button"
+          disabled={running}
+          onClick={() => applyColor(automaticJobColor(jobs, jobIndex))}
+        >
+          Automatic
+        </button>
+      </div>
+      <div className="job-color-presets" aria-label={`Recommended colors for ${job.jobId}`}>
+        {JOB_COLOR_PALETTE.map((rgb) => {
+          const hex = rgbToHex(rgb);
+          const selected = sameRgb(current, rgb);
+          const usedBy = jobs.find((candidate, index) => index !== jobIndex && sameRgb(candidate.rgb, rgb));
+          return (
+            <button
+              key={hex}
+              type="button"
+              className={selected ? "selected" : undefined}
+              style={{ backgroundColor: rgbToCss(rgb) }}
+              aria-label={`Use color ${hex} for ${job.jobId}${selected ? ", selected" : ""}`}
+              aria-pressed={selected}
+              disabled={running || Boolean(usedBy)}
+              title={usedBy ? `Used by ${usedBy.jobId}` : `Use ${hex}`}
+              onClick={() => applyColor([...rgb] as RgbColor)}
+            />
+          );
+        })}
+      </div>
+      {message && <p className="job-color-message" role="alert">{message}</p>}
+    </fieldset>
+  );
+}
+
 export function ProblemSidebar({
   problem,
   dispatch,
@@ -118,14 +205,21 @@ export function ProblemSidebar({
             <details key={jobIndex} className="entity-row">
               <summary>
                 <span className="job-summary-title">
-                  <input
-                    className="entity-name-input"
-                    aria-label={`Job name ${job.jobId}`}
-                    value={job.jobId}
-                    disabled={running}
-                    onClick={(event) => event.stopPropagation()}
-                    onChange={(event) => dispatch({ type: "renameJob", jobIndex, jobId: event.target.value })}
-                  />
+                  <span className="job-title-line">
+                    <i
+                      className="job-color-dot"
+                      style={{ backgroundColor: rgbToCss(job.rgb ?? automaticJobColor(problem.jobs, jobIndex)) }}
+                      aria-hidden="true"
+                    />
+                    <input
+                      className="entity-name-input"
+                      aria-label={`Job name ${job.jobId}`}
+                      value={job.jobId}
+                      disabled={running}
+                      onClick={(event) => event.stopPropagation()}
+                      onChange={(event) => dispatch({ type: "renameJob", jobIndex, jobId: event.target.value })}
+                    />
+                  </span>
                   <small>{job.operations.length} operation{job.operations.length === 1 ? "" : "s"}</small>
                 </span>
                 <span className="job-summary-meta"><small>Due {job.due}</small><small>Weight {job.weight}</small></span>
@@ -161,6 +255,14 @@ export function ProblemSidebar({
                   />
                 </label>
               </div>
+
+              <JobColorControl
+                job={job}
+                jobIndex={jobIndex}
+                jobs={problem.jobs}
+                running={running}
+                dispatch={dispatch}
+              />
 
               <div className="operation-list">
                 {job.operations.map((operation, index) => (

@@ -37,7 +37,7 @@ function problemFromEnvelope(envelope: unknown): ProblemDefinition {
 export const EXAMPLE_LIBRARY: readonly ExampleDefinition[] = [
   {
     id: "sample-job-shop",
-    title: "Sample job shop",
+    title: "Sample Flexible Flow Shop",
     reference: "LEKIN starter",
     environment: "Flexible job shop",
     objective: "Explore dispatching rules",

@@ -66,6 +66,15 @@ describe("addJob / createDefaultJob", () => {
     expect(validateProblemDefinition(problem).some((i) => i.code === "DUPLICATE_JOB_ID")).toBe(false);
   });
 
+  it("assigns every newly-created job a distinct persisted color", () => {
+    let problem = problemWithOneWorkcenterAndMachine();
+    for (let index = 0; index < 16; index += 1) {
+      problem = addJob(problem, createDefaultJob(problem));
+    }
+    const colors = problem.jobs.map((entry) => entry.rgb!.join(","));
+    expect(new Set(colors).size).toBe(problem.jobs.length);
+  });
+
   it("if a duplicate id is ever produced by any other path, live validation still catches it (defense in depth)", () => {
     // addJob itself never manufactures a duplicate (see the test above);
     // this exercises the safety net that would catch one anyway -- e.g. a

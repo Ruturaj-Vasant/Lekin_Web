@@ -1,14 +1,12 @@
 import type { ProblemDefinition } from "../schema/problem";
 import type { ExecutionResult } from "../schema/algorithm";
+import { sameSchedulingInput } from "./scheduling-input-equality";
 
 /**
  * The set of algorithm results collected so far for one specific problem,
  * keyed by algorithmId (re-running the same algorithm replaces its prior
- * result). Compared by reference against the live problem, mirroring
- * ResultContext/isResultStale in result-staleness.ts: since every
- * problem-editor mutation returns a new ProblemDefinition object, reference
- * inequality is exactly "the problem changed since these results were
- * recorded" -- no deep-equality or hashing needed.
+ * result). Presentation-only edits retain the comparison set; actual
+ * scheduling-input changes start a new set.
  */
 export interface ComparisonHistory {
   problem: ProblemDefinition;
@@ -21,7 +19,7 @@ export function recordComparisonResult(
   problem: ProblemDefinition,
   result: ExecutionResult,
 ): ComparisonHistory {
-  const base = history !== null && history.problem === problem ? history.results : {};
+  const base = history !== null && sameSchedulingInput(history.problem, problem) ? history.results : {};
   return { problem, results: { ...base, [result.algorithmId]: result } };
 }
 
@@ -30,7 +28,7 @@ export function comparisonResultsFor(
   history: ComparisonHistory | null,
   problem: ProblemDefinition,
 ): ExecutionResult[] {
-  if (history === null || history.problem !== problem) return [];
+  if (history === null || !sameSchedulingInput(history.problem, problem)) return [];
   return Object.values(history.results);
 }
 
@@ -40,7 +38,7 @@ export function removeComparisonResult(
   problem: ProblemDefinition,
   algorithmId: string,
 ): ComparisonHistory | null {
-  if (history === null || history.problem !== problem || !(algorithmId in history.results)) return history;
+  if (history === null || !sameSchedulingInput(history.problem, problem) || !(algorithmId in history.results)) return history;
   const results = { ...history.results };
   delete results[algorithmId];
   return { problem, results };

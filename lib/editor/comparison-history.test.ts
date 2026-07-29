@@ -62,12 +62,25 @@ describe("recordComparisonResult / comparisonResultsFor", () => {
     expect(results[0].runtimeMs).toBe(99);
   });
 
-  it("drops prior results and starts fresh once the problem reference changes", () => {
+  it("drops prior results once a scheduling input changes", () => {
     const p1 = problem("P1");
-    const p2 = problem("P1");
+    const p2 = { ...problem("P1"), jobs: [{ jobId: "J1", release: 0, due: 1, weight: 1, operations: [] }] };
     const history = recordComparisonResult(null, p1, result("fcfs"));
 
     expect(comparisonResultsFor(history, p2)).toEqual([]);
+  });
+
+  it("preserves prior results across presentation-only color changes", () => {
+    const p1 = {
+      ...problem("P1"),
+      jobs: [{ jobId: "J1", release: 0, due: 1, weight: 1, rgb: [1, 2, 3] as [number, number, number], operations: [] }],
+    };
+    const p2 = {
+      ...p1,
+      jobs: p1.jobs.map((job) => ({ ...job, rgb: [4, 5, 6] as [number, number, number] })),
+    };
+    const history = recordComparisonResult(null, p1, result("fcfs"));
+    expect(comparisonResultsFor(history, p2)).toEqual([result("fcfs")]);
   });
 
   it("returns an empty array for a null history", () => {

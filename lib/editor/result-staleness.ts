@@ -1,12 +1,11 @@
 import type { ProblemDefinition } from "../schema/problem";
+import { sameSchedulingInput } from "./scheduling-input-equality";
 
 /**
  * What an ExecutionResult was actually computed for. Compared by reference
- * against the live problem/algorithmId: since every problem-editor mutation
- * (lib/editor/problem-editor.ts) returns a new ProblemDefinition object
- * rather than mutating in place, reference inequality is exactly "the
- * problem changed since this result was computed" -- no deep-equality or
- * hashing needed.
+ * against the live problem/algorithmId. Presentation-only changes such as a
+ * job color must not discard a valid schedule, while every actual scheduling
+ * input change still does.
  */
 export interface ResultContext {
   problem: ProblemDefinition;
@@ -29,5 +28,5 @@ export function isResultStale(
   currentAlgorithmId: string,
 ): boolean {
   if (resultFor === null) return false;
-  return resultFor.problem !== currentProblem || resultFor.algorithmId !== currentAlgorithmId;
+  return !sameSchedulingInput(resultFor.problem, currentProblem) || resultFor.algorithmId !== currentAlgorithmId;
 }

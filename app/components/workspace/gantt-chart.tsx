@@ -6,6 +6,7 @@ import type { DragRejection } from "../../../lib/scheduling/recalculate";
 import { timelineGeometry } from "../../../lib/scheduling/timeline-geometry";
 import { useEffect, useLayoutEffect, useRef, useState, type DragEvent, type KeyboardEvent, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
+import { jobColorMap, readableForeground, rgbToCss } from "../../../lib/presentation/job-colors";
 
 type DropCandidate = { machineId: string; sequencePosition: number; requestedStartTime: number; rejection: DragRejection | null };
 type EditState = { operationId: string; machineId: string; sequencePosition: number; requestedStartTime: string; error: string | null };
@@ -59,7 +60,7 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
   const minorStep = Math.max(1, Math.ceil(makespan / 50));
   const minorTicks = Array.from({ length: Math.floor(makespan / minorStep) + 1 }, (_, index) => index * minorStep)
     .filter((time) => time <= makespan && !ticks.includes(time));
-  const colors = new Map(problem.jobs.map((job) => [job.jobId, job.rgb ? `rgb(${job.rgb.join(",")})` : "#57068c"]));
+  const colors = jobColorMap(problem.jobs);
   const draggedOperation = machineSchedules.flatMap((machine) => machine.operations).find(
     (operation) => operation.scheduledOperationId === draggedOperationId,
   );
@@ -247,7 +248,7 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
           <button type="button" onClick={onReset} disabled={!canReset}>Reset schedule</button>
         </div>
       </div>
-      <div className="legend">{problem.jobs.map((job) => <span key={job.jobId}><i style={{ background: colors.get(job.jobId) }} />{job.jobId}</span>)}<span className="legend-note">Time units</span></div>
+      <div className="legend">{problem.jobs.map((job) => <span key={job.jobId}><i style={{ background: rgbToCss(colors.get(job.jobId)!) }} />{job.jobId}</span>)}<span className="legend-note">Time units</span></div>
       <div className="gantt" style={{ height: `${Math.max(190, 30 + machineSchedules.length * 72)}px` }}>
         <div className="machine-labels">{machineSchedules.map((machine) => {
           const utilization = machineUtilization(machine.machineId, machine.operations);
@@ -304,7 +305,13 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
               }}
               onDragStart={(event) => { setDraggedOperationId(operation.scheduledOperationId); event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("text/plain", operation.scheduledOperationId); }}
               onDragEnd={() => { setDraggedOperationId(null); setCandidate(null); }}
-              style={{ background: colors.get(operation.jobId), left: `${geometry.leftPercent}%`, width: `${geometry.widthPercent}%`, top: `${42 + machineIndex * 72}px` }}
+              style={{
+                background: rgbToCss(colors.get(operation.jobId)!),
+                color: readableForeground(colors.get(operation.jobId)!),
+                left: `${geometry.leftPercent}%`,
+                width: `${geometry.widthPercent}%`,
+                top: `${42 + machineIndex * 72}px`,
+              }}
             >
               <i className="drag-handle" aria-hidden="true">⋮⋮</i><span>{operation.jobId} · O{operation.operationIndex + 1}</span><small>{operation.startTime}–{operation.endTime} · {operation.endTime - operation.startTime}u</small>
               <button type="button" draggable={false} className="operation-edit-trigger" aria-label={`Edit ${operation.scheduledOperationId}`} onClick={(event) => { event.stopPropagation(); openEditor(operation); }}>Edit</button>

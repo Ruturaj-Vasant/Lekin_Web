@@ -5,6 +5,7 @@ import type { ExecutionResult } from "../../../lib/schema/algorithm";
 import type { ValidationIssue } from "../../../lib/schema/issue";
 import { buildJobSummaries } from "../../../lib/results/job-summary";
 import { buildAlgorithmComparison, COMPARISON_METRICS, type ComparisonMetric } from "../../../lib/results/algorithm-comparison";
+import { jobColorMap, readableForeground, rgbToCss } from "../../../lib/presentation/job-colors";
 
 type Props = {
   result: ExecutionResult | null;
@@ -28,6 +29,7 @@ export function DetailTabs({ result, validationIssues, problem, comparisonResult
   const errorCount = validationIssues.filter((issue) => issue.severity === "error").length;
   const releaseByMachine = new Map(problem.machines.map((machine) => [machine.machineId, machine.release]));
   const utilization = result?.metrics?.machineUtilization ?? {};
+  const colors = jobColorMap(problem.jobs);
   const { rows: comparisonRows, bestByMetric } = buildAlgorithmComparison(comparisonResults);
   const content: Record<string, ReactNode> = {
     "Machine sequence": schedule ? (
@@ -40,7 +42,14 @@ export function DetailTabs({ result, validationIssues, problem, comparisonResult
               {utilization[machine.machineId] !== undefined ? ` · ${(utilization[machine.machineId] * 100).toFixed(0)}% utilized` : ""}
             </i>
             {machine.operations.map((operation, index) => (
-              <span key={operation.scheduledOperationId} className="chip" style={{ background: "var(--violet)" }}>
+              <span
+                key={operation.scheduledOperationId}
+                className="chip"
+                style={{
+                  background: rgbToCss(colors.get(operation.jobId)!),
+                  color: readableForeground(colors.get(operation.jobId)!),
+                }}
+              >
                 {index > 0 && "→ "}
                 {operation.jobId} · O{operation.operationIndex + 1} · {operation.startTime}–{operation.endTime}
               </span>
@@ -65,7 +74,14 @@ export function DetailTabs({ result, validationIssues, problem, comparisonResult
               </i>
             </div>
             {job.operations.map((operation) => (
-              <span key={operation.scheduledOperationId} className="chip" style={{ background: "var(--blue)" }}>
+              <span
+                key={operation.scheduledOperationId}
+                className="chip"
+                style={{
+                  background: rgbToCss(colors.get(job.jobId)!),
+                  color: readableForeground(colors.get(job.jobId)!),
+                }}
+              >
                 O{operation.operationIndex + 1} · {operation.machineId} · {operation.startTime}–{operation.endTime}
               </span>
             ))}
