@@ -106,7 +106,6 @@ test.describe("landing and workspace shell", () => {
     await expect(page.getByText("Browser first", { exact: true })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Visit the LEKIN Python page" })).toHaveAttribute("href", "https://github.com/mpinedo170/Lekin_Python");
     await expect(page.getByText("Michael Pinedo", { exact: true })).toBeVisible();
-    await expect(page.getByText("Andrew Feldman", { exact: true })).toBeVisible();
     await expect(page.getByText("Ruturaj Tambe", { exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "mpinedo@stern.nyu.edu" })).toHaveAttribute("href", "mailto:mpinedo@stern.nyu.edu");
     await expect(page.getByRole("link", { name: "rvt2018@nyu.edu" })).toHaveAttribute("href", "mailto:rvt2018@nyu.edu");

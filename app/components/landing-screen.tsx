@@ -171,7 +171,6 @@ export function LandingScreen({
           </div>
           <dl>
             <div className="credit-row"><dt>Academic Advisor</dt><dd><span>Michael Pinedo</span><a href="mailto:mpinedo@stern.nyu.edu">mpinedo@stern.nyu.edu</a></dd></div>
-            <div className="credit-row"><dt>Supervisor</dt><dd><span>Andrew Feldman</span></dd></div>
             <div className="credit-row"><dt>Author</dt><dd><span>Ruturaj Tambe</span><a href="mailto:rvt2018@nyu.edu">rvt2018@nyu.edu</a></dd></div>
           </dl>
         </aside>
