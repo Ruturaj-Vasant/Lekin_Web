@@ -35,6 +35,24 @@ export const AlgorithmDefinitionSchema = z.object({
   estimatedComplexity: z.string(),
   defaultBrowserOperationLimit: z.number(),
   parameters: z.array(AlgorithmParameterSchema),
+  /**
+   * Whether the algorithm is only defined on a flow shop - every job
+   * visiting the same workcenters in the same order, one machine per stage.
+   * lekinpy raises NotAFlowShopError for these, so this flag lets
+   * validate-request.ts say so before Pyodide is ever loaded, and lets the
+   * sidebar disable the option instead of offering a run that cannot work.
+   */
+  requiresFlowShop: z.boolean(),
+  /**
+   * What the algorithm actually guarantees. The dispatching rules are
+   * heuristics; Johnson's rule provably minimizes makespan on a two-machine
+   * flow shop. Surfaced in the UI so an optimal result is not presented as
+   * merely another rule's opinion - and so a result that misses the
+   * guarantee's preconditions is not presented as optimal.
+   */
+  guarantee: z.enum(["heuristic", "optimal-under-conditions"]),
+  /** Human-readable statement of those conditions; null for pure heuristics. */
+  optimalityConditions: z.string().nullable(),
 });
 export type AlgorithmDefinition = z.infer<typeof AlgorithmDefinitionSchema>;
 

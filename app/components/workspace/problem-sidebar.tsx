@@ -2,6 +2,9 @@ import { useState, type Dispatch } from "react";
 import type { ProblemEditorAction } from "../../../lib/editor/problem-editor";
 import type { Job, ProblemDefinition } from "../../../lib/schema/problem";
 import type { ValidationIssue } from "../../../lib/schema/issue";
+import { ALGORITHM_REGISTRY } from "../../../lib/registry/algorithms";
+import { analyzeFlowShop } from "../../../lib/scheduling/flow-shop";
+import type { AlgorithmDefinition } from "../../../lib/schema/algorithm";
 import {
   JOB_COLOR_PALETTE,
   automaticJobColor,
@@ -28,6 +31,18 @@ type Props = {
   localNote?: string;
   showRunButton?: boolean;
 };
+
+/**
+ * "FCFS - First-Come, First-Served", but just "Johnson's Rule
+ * (SPT(1)-LPT(2))" where the library's own display name already opens with
+ * the short name, so the acronym isn't printed twice.
+ */
+function optionLabel(algorithm: AlgorithmDefinition): string {
+  const displayName = algorithm.libraryMetadata.displayName;
+  return displayName.startsWith(algorithm.shortName)
+    ? displayName
+    : `${algorithm.shortName} - ${displayName}`;
+}
 
 function matches(
   issue: ValidationIssue,
@@ -177,6 +192,9 @@ export function ProblemSidebar({
   localNote,
   showRunButton = true,
 }: Props) {
+  const flowShop = analyzeFlowShop(problem);
+  const selectedAlgorithm = ALGORITHM_REGISTRY.find((algorithm) => algorithm.id === algorithmId);
+
   return (
     <aside className="sidebar" aria-label="Problem setup">
       <div className="side-heading">
@@ -486,15 +504,33 @@ export function ProblemSidebar({
           <b aria-hidden="true">⌄</b>
         </summary>
         <label className="field-label">
-          Dispatching rule
+          Scheduling rule
           <select value={algorithmId} onChange={(event) => onAlgorithmChange(event.target.value)} disabled={running}>
-            <option value="spt">SPT - Shortest processing time</option>
-            <option value="fcfs">FCFS - First come, first served</option>
-            <option value="edd">EDD - Earliest due date</option>
-            <option value="wspt">WSPT - Weighted SPT</option>
+            {ALGORITHM_REGISTRY.map((algorithm) => {
+              // Johnson's rule is only defined on a flow shop, so offering it
+              // on a job shop would just queue up a guaranteed failure.
+              const ineligible = algorithm.requiresFlowShop && !flowShop.isFlowShop;
+              return (
+                <option key={algorithm.id} value={algorithm.id} disabled={ineligible}>
+                  {optionLabel(algorithm)}
+                  {ineligible ? " - needs a flow shop" : ""}
+                </option>
+              );
+            })}
             <option value="custom">Custom Python algorithm</option>
           </select>
         </label>
+        {selectedAlgorithm?.optimalityConditions && (
+          <p className="algorithm-note">
+            {selectedAlgorithm.guarantee === "optimal-under-conditions" ? "Provably optimal when: " : ""}
+            {selectedAlgorithm.optimalityConditions}
+          </p>
+        )}
+        {selectedAlgorithm?.requiresFlowShop && !flowShop.isFlowShop && (
+          <p className="algorithm-note">
+            Not available here because {flowShop.reason}.
+          </p>
+        )}
       </details>
 
       {showRunButton && (

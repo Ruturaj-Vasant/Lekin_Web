@@ -24,11 +24,11 @@ test.describe("real in-browser scheduling", () => {
     const fetched = new Set<string>();
     page.on("response", (response) => {
       const url = response.url();
-      if (url.includes("lekinpy-0.2.0") || url.includes("pyodide")) fetched.add(url);
+      if (url.includes("lekinpy-0.3.0") || url.includes("pyodide")) fetched.add(url);
     });
     await openExample(page);
 
-    const algorithm = page.getByLabel("Dispatching rule");
+    const algorithm = page.getByLabel("Scheduling rule");
     const scheduleFingerprints = new Map<string, string>();
     for (const id of ["spt", "fcfs", "edd", "wspt"]) {
       await algorithm.selectOption(id);
@@ -46,8 +46,8 @@ test.describe("real in-browser scheduling", () => {
       await expect(page.getByText("No validation errors.")).toBeVisible();
     }
 
-    expect([...fetched].some((url) => url.endsWith("lekinpy-0.2.0-py3-none-any.whl"))).toBe(true);
-    expect([...fetched].some((url) => url.endsWith("lekinpy-0.2.0-py3-none-any.whl.sha256"))).toBe(true);
+    expect([...fetched].some((url) => url.endsWith("lekinpy-0.3.0-py3-none-any.whl"))).toBe(true);
+    expect([...fetched].some((url) => url.endsWith("lekinpy-0.3.0-py3-none-any.whl.sha256"))).toBe(true);
     expect(scheduleFingerprints.get("fcfs")).not.toBe(scheduleFingerprints.get("spt"));
     expect(scheduleFingerprints.get("edd")).not.toBe(scheduleFingerprints.get("spt"));
     expect(errors, "unexpected errors during real browser execution").toEqual([]);
@@ -101,7 +101,7 @@ test.describe("real in-browser scheduling", () => {
     const errors = monitorBrowserErrors(page);
     await openExample(page);
 
-    const algorithm = page.getByLabel("Dispatching rule");
+    const algorithm = page.getByLabel("Scheduling rule");
     const details = page.locator(".details-card");
 
     await algorithm.selectOption("spt");

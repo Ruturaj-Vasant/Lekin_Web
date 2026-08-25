@@ -334,6 +334,7 @@
 .sidebar>details>summary b{font-size:17px;color:var(--muted)}
 .sidebar>details>.field-label{gap:9px;margin-top:14px;font-size:12px;font-weight:700}
 .sidebar>details>.field-label>select{height:44px;padding:10px 12px;font-size:14px;font-weight:600}
+.algorithm-note{margin:9px 0 0;font-size:11px;line-height:1.5;color:var(--muted)}
 .information-section{max-width:1120px;margin:0 auto;padding:64px 24px;border-top:1px solid var(--line)}
 .project-information{display:grid;grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr);align-items:start;gap:56px}
 .information-heading{max-width:520px;padding-top:18px}

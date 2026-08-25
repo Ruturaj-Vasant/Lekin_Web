@@ -24,7 +24,7 @@ import type { ExecutionResult } from "../../lib/schema/algorithm";
 import { validateProblemDefinition } from "../../lib/schema/problem";
 import { computeMetrics } from "../../lib/scheduling/metrics";
 import { validateScheduleAgainstProblem } from "../../lib/scheduling/validate-schedule";
-import { sha256Hex } from "../../worker/wheel-integrity";
+import { sha256Hex, LEKINPY_VERSION } from "../../worker/wheel-integrity";
 import type { CustomWorkerRequest, CustomWorkerResponse } from "../../worker/custom-scheduling-protocol";
 
 /**
@@ -259,7 +259,7 @@ export class CustomAlgorithmEngine {
     return {
       algorithmName,
       sourceChecksum,
-      lekinpyVersion: "0.2.0",
+      lekinpyVersion: LEKINPY_VERSION,
       schemaVersion: "1.0.0",
       parameters,
       randomSeed,

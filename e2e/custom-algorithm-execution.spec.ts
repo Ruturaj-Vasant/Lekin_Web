@@ -92,7 +92,7 @@ test.describe("custom Python algorithm execution (real Pyodide)", () => {
     const totalOps = result.result!.schedule!.machines.reduce((n, m) => n + m.operations.length, 0);
     expect(totalOps).toBe(8); // SAMPLE_PROBLEM has 8 operations across its 3 jobs
     expect(progress).toHaveLength(0); // dynamic_schedule owns the beginner rule's internal dispatch loop
-    expect(result.reproducibility.lekinpyVersion).toBe("0.2.0");
+    expect(result.reproducibility.lekinpyVersion).toBe("0.3.0");
     expect(result.reproducibility.sourceChecksum).toMatch(/^[a-f0-9]{64}$/);
 
     await expectNoBrowserErrors(errors);

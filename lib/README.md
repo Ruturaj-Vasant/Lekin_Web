@@ -21,10 +21,15 @@ piece of that contract actually lives in code.
   is the multi-error, client-side validation layer (§1.4) - collects every
   problem in one pass, no `lekin-library` involvement.
 - **`lib/registry/`** - §1.5. `ALGORITHM_REGISTRY`, the web-owned superset
-  over lekinpy's four built-in algorithms. `verify.test.ts` is the
-  registry-drift guard (opt-in - see its header comment for how to run it
-  against a real `lekin-library` checkout).
-- **`lib/scheduling/`** - §4.2–§4.5 and §1.3. `graph.ts` builds the
+  over lekinpy's built-in algorithms. Beyond `libraryMetadata` it carries the
+  web-owned capability flags the UI and validation are driven from -
+  `requiresFlowShop`, `guarantee`, `optimalityConditions`. `verify.test.ts`
+  is the registry-drift guard (opt-in - see its header comment for how to run
+  it against a real `lekin-library` checkout).
+- **`lib/scheduling/`** - §4.2–§4.5 and §1.3. `flow-shop.ts` mirrors
+  lekinpy's `JohnsonAlgorithm.flow_shop_route()` so a flow-shop-only
+  algorithm can be rejected (or flagged as outside its optimality
+  conditions) before Pyodide is ever loaded; `graph.ts` builds the
   precedence graph and runs Kahn's-algorithm cycle detection;
   `recalculate.ts` is `checkDropValidity()` (§4.4, the two hard-reject
   checks) and `recalculate()` (§4.5, the topological placement pass,

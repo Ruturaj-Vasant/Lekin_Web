@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { expectNoBrowserErrors, monitorBrowserErrors, openExample } from "./helpers";
 
 async function selectCustomPython(page: import("@playwright/test").Page) {
-  await page.getByLabel("Dispatching rule").selectOption("custom");
+  await page.getByLabel("Scheduling rule").selectOption("custom");
   await expect(page.getByRole("heading", { name: "Custom Python algorithm" })).toBeVisible();
 }
 
@@ -88,7 +88,7 @@ test.describe("custom Python editor", () => {
     await expect(page.getByText("cancelled", { exact: true })).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(".bar")).toHaveCount(0);
 
-    await page.getByLabel("Dispatching rule").selectOption("fcfs");
+    await page.getByLabel("Scheduling rule").selectOption("fcfs");
     await page.getByRole("button", { name: "Run schedule" }).click();
     await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
     await expect(page.locator(".bar")).toHaveCount(8);

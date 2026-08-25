@@ -4,14 +4,15 @@ import type { AlgorithmDefinition } from "../schema/algorithm";
  * ARCHITECTURE.md §1.5 - Algorithm registry.
  *
  * `libraryMetadata` for each entry must stay byte-identical (mod
- * snake_case -> camelCase) to the pinned lekinpy v0.2.0 build's
+ * snake_case -> camelCase) to the pinned lekinpy v0.3.0 build's
  * SchedulingAlgorithm.metadata dict. Verified directly against
- * lekin-library/lekinpy/algorithms/{fcfs,spt,edd,wspt}.py at commit
- * a3fee48 (tag v0.2.0):
+ * lekin-library/lekinpy/algorithms/{fcfs,spt,edd,wspt,johnson}.py at commit
+ * 81a100b (v0.3.0):
  *   fcfs: {id: "fcfs", display_name: "First-Come, First-Served", supports_multi_operation: true, version: "1.0.0"}
  *   spt:  {id: "spt",  display_name: "Shortest Processing Time",  supports_multi_operation: true, version: "1.0.0"}
  *   edd:  {id: "edd",  display_name: "Earliest Due Date",         supports_multi_operation: true, version: "1.0.0"}
  *   wspt: {id: "wspt", display_name: "Weighted Shortest Processing Time", supports_multi_operation: true, version: "1.0.0"}
+ *   johnson: {id: "johnson", display_name: "Johnson's Rule (SPT(1)-LPT(2))", supports_multi_operation: true, version: "1.0.0"}
  *
  * Everything else on AlgorithmDefinition is a web-owned addition - lekinpy's
  * plugin contract is deliberately minimal (see lekin-library_DECISIONS.md
@@ -40,6 +41,9 @@ export const ALGORITHM_REGISTRY: readonly AlgorithmDefinition[] = [
     estimatedComplexity: "O(n log n)",
     defaultBrowserOperationLimit: 500,
     parameters: [],
+    requiresFlowShop: false,
+    guarantee: "heuristic",
+    optimalityConditions: null,
   },
   {
     id: "spt",
@@ -59,6 +63,9 @@ export const ALGORITHM_REGISTRY: readonly AlgorithmDefinition[] = [
     estimatedComplexity: "O(n log n)",
     defaultBrowserOperationLimit: 500,
     parameters: [],
+    requiresFlowShop: false,
+    guarantee: "heuristic",
+    optimalityConditions: null,
   },
   {
     id: "edd",
@@ -78,6 +85,9 @@ export const ALGORITHM_REGISTRY: readonly AlgorithmDefinition[] = [
     estimatedComplexity: "O(n log n)",
     defaultBrowserOperationLimit: 500,
     parameters: [],
+    requiresFlowShop: false,
+    guarantee: "heuristic",
+    optimalityConditions: null,
   },
   {
     id: "wspt",
@@ -97,6 +107,39 @@ export const ALGORITHM_REGISTRY: readonly AlgorithmDefinition[] = [
     estimatedComplexity: "O(n log n)",
     defaultBrowserOperationLimit: 500,
     parameters: [],
+    requiresFlowShop: false,
+    guarantee: "heuristic",
+    optimalityConditions: null,
+  },
+  {
+    id: "johnson",
+    libraryMetadata: {
+      id: "johnson",
+      displayName: "Johnson's Rule (SPT(1)-LPT(2))",
+      supportsMultiOperation: true,
+      version: "1.0.0",
+    },
+    shortName: "Johnson",
+    description:
+      "Sequences a flow shop by Johnson's rule: jobs with a shorter first-stage time go first in ascending first-stage order, the rest follow in descending last-stage order. On a two-machine flow shop this provably minimizes makespan.",
+    // Not a dispatching rule: it needs every job's times up front and emits
+    // one permutation both machines follow, so it only applies to a flow
+    // shop, never to the job shops the other four handle.
+    problemTypes: ["two-machine-flow-shop", "flow-shop"],
+    // Release times are honored when building the schedule, but Johnson's
+    // optimality proof assumes all jobs are released at 0 - see
+    // optimalityConditions.
+    supportsReleaseTimes: true,
+    supportsWeights: false,
+    browserCompatible: true,
+    backendRequired: false,
+    estimatedComplexity: "O(n log n)",
+    defaultBrowserOperationLimit: 500,
+    parameters: [],
+    requiresFlowShop: true,
+    guarantee: "optimal-under-conditions",
+    optimalityConditions:
+      "Exactly two stages, one machine per stage, and every job released at time 0. Longer flow shops fall back to a two-machine reduction that is only a heuristic.",
   },
 ] as const;
 

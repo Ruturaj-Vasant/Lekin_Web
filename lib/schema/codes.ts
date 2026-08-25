@@ -28,6 +28,11 @@ export const VALIDATION_ERROR_CODES = [
   "UNUSUALLY_LONG_PROCESSING_TIME",
   "UNCLEAR_STATUS",
   "APPROACHING_BROWSER_LIMIT",
+  // The chosen algorithm will run, but the problem misses a precondition of
+  // whatever optimality it claims, so the result is not provably optimal
+  // (e.g. Johnson's rule on a flow shop with more than two stages, or with
+  // nonzero release times). Never blocking - the schedule is still valid.
+  "OPTIMALITY_CONDITIONS_NOT_MET",
   // Custom user-authored Python algorithm validation/execution (source:
   // "custom-algorithm"). See lib/custom-algorithm/policy.ts and
   // docs/CUSTOM_PYTHON_ALGORITHMS.md. All severity "error" - a custom run
@@ -69,6 +74,7 @@ const WARNING_CODES: ReadonlySet<ValidationErrorCode> = new Set([
   "UNUSUALLY_LONG_PROCESSING_TIME",
   "UNCLEAR_STATUS",
   "APPROACHING_BROWSER_LIMIT",
+  "OPTIMALITY_CONDITIONS_NOT_MET",
 ]);
 
 export function severityForCode(code: ValidationErrorCode): "error" | "warning" {

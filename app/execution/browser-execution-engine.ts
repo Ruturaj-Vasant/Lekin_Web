@@ -6,6 +6,7 @@ import { computeMetrics } from "../../lib/scheduling/metrics";
 import type { ExecutionRequest, ExecutionResult } from "../../lib/schema/algorithm";
 import { hasBlockingError, makeIssue } from "../../lib/schema/issue";
 import type { WorkerRequest, WorkerResponse, ExecutionProgress } from "../../worker/scheduling-protocol";
+import { LEKINPY_VERSION } from "../../worker/wheel-integrity";
 
 export type ExecutionProgressListener = (stage: ExecutionProgress) => void;
 export type SchedulerPreparationState = "idle" | Exclude<ExecutionProgress, "running"> | "ready" | "error";
@@ -31,7 +32,10 @@ function baseResult(request: ExecutionRequest): Omit<ExecutionResult, "status"> 
     executionMode: "browser",
     algorithmId: request.algorithmId,
     algorithmVersion: getAlgorithmDefinition(request.algorithmId)?.libraryMetadata.version ?? "unknown",
-    lekinpyVersion: "0.2.0",
+    // Placeholder for results that never reached the library (rejected,
+    // invalid, errored). A completed run overwrites it with the version the
+    // worker actually reports.
+    lekinpyVersion: LEKINPY_VERSION,
     schemaVersion: "1.0.0",
     runtimeMs: 0,
     schedule: null,

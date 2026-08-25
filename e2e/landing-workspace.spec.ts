@@ -7,7 +7,7 @@ test.describe("landing and workspace shell", () => {
     await page.getByRole("button", { name: /Create new problem/ }).click();
     await expect(page.getByLabel("Problem name")).toHaveValue("Untitled problem");
     await expect(page.locator("details.entity-row")).toHaveCount(0);
-    await expect(page.getByLabel("Dispatching rule")).toHaveValue("spt");
+    await expect(page.getByLabel("Scheduling rule")).toHaveValue("spt");
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");
   });
 
@@ -37,16 +37,21 @@ test.describe("landing and workspace shell", () => {
 
   test("exposes every built-in and custom algorithm choice and starts with empty result panels", async ({ page }) => {
     await openExample(page);
-    const algorithm = page.getByLabel("Dispatching rule");
+    const algorithm = page.getByLabel("Scheduling rule");
     await expect(algorithm).toHaveValue("spt");
-    await expect(algorithm.locator("option")).toHaveCount(5);
+    await expect(algorithm.locator("option")).toHaveCount(6);
+    // Registry order, with each label taken from lekinpy's own display name.
+    // The example opened here is a job shop, so Johnson's rule - which needs
+    // a flow shop - is listed but disabled, with the reason in its label.
     await expect(algorithm.locator("option")).toHaveText([
-      "SPT - Shortest processing time",
-      "FCFS - First come, first served",
-      "EDD - Earliest due date",
-      "WSPT - Weighted SPT",
+      "FCFS - First-Come, First-Served",
+      "SPT - Shortest Processing Time",
+      "EDD - Earliest Due Date",
+      "WSPT - Weighted Shortest Processing Time",
+      "Johnson's Rule (SPT(1)-LPT(2)) - needs a flow shop",
       "Custom Python algorithm",
     ]);
+    await expect(algorithm.locator('option[value="johnson"]')).toHaveAttribute("disabled", "");
     await expect(page.getByText("Run a schedule", { exact: true })).toBeVisible();
     await expect(page.getByText("No schedule yet", { exact: true })).toBeVisible();
 
@@ -76,7 +81,7 @@ test.describe("landing and workspace shell", () => {
 
     const library = page.getByRole("dialog", { name: "Example library" });
     await expect(library).toBeVisible();
-    await expect(library.locator(".example-card")).toHaveCount(8);
+    await expect(library.locator(".example-card")).toHaveCount(9);
 
     await library.getByRole("button", { name: "Open Pinedo 6.1.1: Four-machine flow shop" }).click();
     await expect(page.getByLabel("Problem name")).toHaveValue("Pinedo 6.1.1: Flow shop");
@@ -114,12 +119,12 @@ test.describe("landing and workspace shell", () => {
   test("clears the current workspace with the New button", async ({ page }) => {
     await openExample(page);
     await page.getByLabel("Problem name").fill("Temporary experiment");
-    await page.getByLabel("Dispatching rule").selectOption("edd");
+    await page.getByLabel("Scheduling rule").selectOption("edd");
     await page.getByRole("button", { name: /New/ }).click();
 
     await expect(page.getByLabel("Problem name")).toHaveValue("Untitled problem");
     await expect(page.locator("details.entity-row")).toHaveCount(0);
-    await expect(page.getByLabel("Dispatching rule")).toHaveValue("spt");
+    await expect(page.getByLabel("Scheduling rule")).toHaveValue("spt");
     await expect(page.locator(".schedule-summary article strong")).toHaveText(["-", "-", "-", "-", "-", "-", "-", "-"]);
   });
 

@@ -3,6 +3,7 @@ import { validateProblemDefinition } from "../schema/problem";
 import type { ValidationIssue } from "../schema/issue";
 import { makeIssue } from "../schema/issue";
 import { getAlgorithmDefinition } from "../registry/algorithms";
+import { analyzeFlowShop, meetsJohnsonOptimalityConditions } from "../scheduling/flow-shop";
 
 /**
  * ARCHITECTURE.md §1.4/§2.2 step 2 - layer 1 of validation: Zod problem
@@ -37,6 +38,36 @@ export function validateExecutionRequest(problem: ProblemDefinition, algorithmId
           path: ["algorithmId"],
           source: "schema",
           jobId: multiOpJob.jobId,
+        }),
+      );
+    }
+  }
+
+  // Structural requirement, checked here rather than left to lekinpy so the
+  // user is told before Pyodide boots and the wheel installs. lekinpy raises
+  // NotAFlowShopError for exactly these cases; analyzeFlowShop() mirrors it.
+  if (algorithm.requiresFlowShop) {
+    const analysis = analyzeFlowShop(problem);
+    if (!analysis.isFlowShop) {
+      issues.push(
+        makeIssue({
+          code: "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION",
+          message: `${algorithm.shortName} only applies to a flow shop, but ${analysis.reason}.`,
+          path: ["algorithmId"],
+          source: "schema",
+        }),
+      );
+    } else if (algorithm.guarantee === "optimal-under-conditions" && !meetsJohnsonOptimalityConditions(problem)) {
+      // Runs fine and returns a valid schedule - it just isn't the provably
+      // optimal one, so say so rather than letting the UI imply otherwise.
+      issues.push(
+        makeIssue({
+          code: "OPTIMALITY_CONDITIONS_NOT_MET",
+          message:
+            `This is a ${analysis.route.length}-stage flow shop. ${algorithm.shortName} will still produce a schedule, ` +
+            `but its optimality guarantee needs: ${algorithm.optimalityConditions}`,
+          path: ["algorithmId"],
+          source: "schema",
         }),
       );
     }

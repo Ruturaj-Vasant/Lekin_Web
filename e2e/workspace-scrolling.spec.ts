@@ -4,7 +4,7 @@ import { openExample } from "./helpers";
 test("scrolls the main workspace without moving the problem editor", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await openExample(page);
-  await page.getByLabel("Dispatching rule").selectOption("custom");
+  await page.getByLabel("Scheduling rule").selectOption("custom");
 
   const sidebar = page.getByRole("complementary", { name: "Problem setup" });
   const canvas = page.locator(".canvas");

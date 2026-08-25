@@ -79,3 +79,69 @@ export const REAL_EXECUTION_SAMPLE_PROBLEM: ProblemDefinition = {
     { machineId: "M3", workcenterId: "WC3", release: 1, status: "active" },
   ],
 };
+
+/**
+ * Second real-execution fixture input: a two-machine flow shop.
+ *
+ * The problem above is a job shop - jobs take different routes, and WC1 has
+ * two machines - so Johnson's rule cannot run on it at all (lekinpy raises
+ * NotAFlowShopError). Johnson still needs real-execution coverage, so the
+ * fixture carries this second problem, which is deliberately the shape
+ * Johnson's optimality proof is stated for:
+ *
+ *   - Every job visits Stage1 then Stage2, in that order.
+ *   - Exactly one machine per stage.
+ *   - Every job released at time 0.
+ *
+ * Processing times are (5,2), (1,6), (9,7), (3,8), (10,4). They are chosen so
+ * the answer is not order-insensitive: the two sets of Johnson's rule are
+ * both non-empty (J2 and J4 have p1 <= p2; J1, J3, J5 do not), so the rule
+ * genuinely partitions rather than degenerating into a plain sort, and the
+ * dispatching rules land on a worse makespan.
+ *
+ * As with the problem above this is authored INPUT. The expected schedules
+ * are always the real lekinpy execution result, and the contract test
+ * additionally brute-forces all 120 permutations to confirm the makespan
+ * Johnson reports really is the minimum.
+ */
+export const REAL_EXECUTION_FLOW_SHOP_PROBLEM: ProblemDefinition = {
+  schemaVersion: "1.0.0",
+  problemId: "real-execution-flow-shop-fixture",
+  name: "Real execution fixture: two-machine flow shop",
+  jobs: [
+    ["J1", 5, 2],
+    ["J2", 1, 6],
+    ["J3", 9, 7],
+    ["J4", 3, 8],
+    ["J5", 10, 4],
+  ].map(([jobId, first, second]) => ({
+    jobId: jobId as string,
+    release: 0,
+    due: 40,
+    weight: 1,
+    operations: [
+      {
+        operationIndex: 0,
+        operationId: `${jobId}-O0`,
+        workcenterId: "Stage1",
+        processingTime: first as number,
+        status: "pending",
+      },
+      {
+        operationIndex: 1,
+        operationId: `${jobId}-O1`,
+        workcenterId: "Stage2",
+        processingTime: second as number,
+        status: "pending",
+      },
+    ],
+  })),
+  workcenters: [
+    { workcenterId: "Stage1", release: 0, status: "active", machineIds: ["M1"] },
+    { workcenterId: "Stage2", release: 0, status: "active", machineIds: ["M2"] },
+  ],
+  machines: [
+    { machineId: "M1", workcenterId: "Stage1", release: 0, status: "active" },
+    { machineId: "M2", workcenterId: "Stage2", release: 0, status: "active" },
+  ],
+};
