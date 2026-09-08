@@ -14,6 +14,7 @@ type MoveResult = { accepted: boolean; message: string; scheduledStartTime?: num
 type HoveredOperation = {
   operation: ScheduledOperation;
   workcenterId: string;
+  target: HTMLElement;
   anchor: { left: number; right: number; top: number; bottom: number };
 };
 type TooltipPosition = { left: number; top: number };
@@ -107,11 +108,21 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
   useEffect(() => {
     if (!hoveredOperation) return;
     const closeTooltip = () => setHoveredOperation(null);
+    const closeMovedTooltip = () => {
+      // A queued scroll event may arrive after mouseenter has already measured
+      // the new position. Keep that new tooltip; dismiss only a moved anchor.
+      // The 2px tolerance also allows the bar's 1px hover animation.
+      setHoveredOperation((current) => {
+        if (!current) return null;
+        const bounds = current.target.getBoundingClientRect();
+        return Math.abs(bounds.left - current.anchor.left) > 2 || Math.abs(bounds.top - current.anchor.top) > 2 ? null : current;
+      });
+    };
     window.addEventListener("resize", closeTooltip);
-    window.addEventListener("scroll", closeTooltip, true);
+    window.addEventListener("scroll", closeMovedTooltip, true);
     return () => {
       window.removeEventListener("resize", closeTooltip);
-      window.removeEventListener("scroll", closeTooltip, true);
+      window.removeEventListener("scroll", closeMovedTooltip, true);
     };
   }, [hoveredOperation]);
 
@@ -156,6 +167,7 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
     setHoveredOperation({
       operation,
       workcenterId,
+      target,
       anchor: {
         left: bounds.left,
         right: bounds.right,
@@ -248,7 +260,7 @@ export function GanttChart({ schedule, problem, dragMessage, manualStartConstrai
           <button type="button" onClick={onReset} disabled={!canReset}>Reset schedule</button>
         </div>
       </div>
-      <div className="legend">{problem.jobs.map((job) => <span key={job.jobId}><i style={{ background: rgbToCss(colors.get(job.jobId)!) }} />{job.jobId}</span>)}<span className="legend-note">Time units</span></div>
+      <div className="legend">{problem.jobs.map((job) => <span key={job.jobId}><i style={{ background: rgbToCss(colors.get(job.jobId)!) }} />{job.jobId}</span>)}{showIdle && schedule && <span className="legend-note"><i className="idle-swatch" />Idle time</span>}</div>
       <div className="gantt" style={{ height: `${Math.max(190, 30 + machineSchedules.length * 72)}px` }}>
         <div className="machine-labels">{machineSchedules.map((machine) => {
           const utilization = machineUtilization(machine.machineId, machine.operations);

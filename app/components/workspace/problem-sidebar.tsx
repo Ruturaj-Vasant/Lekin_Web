@@ -5,6 +5,7 @@ import type { ValidationIssue } from "../../../lib/schema/issue";
 import { ALGORITHM_REGISTRY } from "../../../lib/registry/algorithms";
 import { analyzeFlowShop } from "../../../lib/scheduling/flow-shop";
 import type { AlgorithmDefinition } from "../../../lib/schema/algorithm";
+import { AlgorithmGuidance } from "./algorithm-guidance";
 import {
   JOB_COLOR_PALETTE,
   automaticJobColor,
@@ -193,7 +194,6 @@ export function ProblemSidebar({
   showRunButton = true,
 }: Props) {
   const flowShop = analyzeFlowShop(problem);
-  const selectedAlgorithm = ALGORITHM_REGISTRY.find((algorithm) => algorithm.id === algorithmId);
 
   return (
     <aside className="sidebar" aria-label="Problem setup">
@@ -505,7 +505,7 @@ export function ProblemSidebar({
         </summary>
         <label className="field-label">
           Scheduling rule
-          <select value={algorithmId} onChange={(event) => onAlgorithmChange(event.target.value)} disabled={running}>
+          <select value={algorithmId} onChange={(event) => onAlgorithmChange(event.target.value)} disabled={running} aria-describedby={!flowShop.isFlowShop || algorithmId === "johnson" ? "algorithm-guidance" : undefined}>
             {ALGORITHM_REGISTRY.map((algorithm) => {
               // Johnson's rule is only defined on a flow shop, so offering it
               // on a job shop would just queue up a guaranteed failure.
@@ -520,17 +520,7 @@ export function ProblemSidebar({
             <option value="custom">Custom Python algorithm</option>
           </select>
         </label>
-        {selectedAlgorithm?.optimalityConditions && (
-          <p className="algorithm-note">
-            {selectedAlgorithm.guarantee === "optimal-under-conditions" ? "Provably optimal when: " : ""}
-            {selectedAlgorithm.optimalityConditions}
-          </p>
-        )}
-        {selectedAlgorithm?.requiresFlowShop && !flowShop.isFlowShop && (
-          <p className="algorithm-note">
-            Not available here because {flowShop.reason}.
-          </p>
-        )}
+        <AlgorithmGuidance problem={problem} algorithmId={algorithmId} />
       </details>
 
       {showRunButton && (

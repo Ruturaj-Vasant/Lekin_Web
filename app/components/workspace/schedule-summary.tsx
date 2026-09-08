@@ -16,7 +16,7 @@ const SUMMARY_FIELDS: Array<{
   { key: "weightedTardiness", symbol: <>ΣwT<sub>j</sub></>, label: "Weighted tardiness" },
 ];
 
-export function ScheduleSummary({ metrics }: { metrics: Metrics | null }) {
+export function ScheduleSummary({ metrics, optimalMakespan = false }: { metrics: Metrics | null; optimalMakespan?: boolean }) {
   return (
     <section className="schedule-summary" aria-labelledby="schedule-summary-title">
       <header>
@@ -24,14 +24,15 @@ export function ScheduleSummary({ metrics }: { metrics: Metrics | null }) {
           <span className="section-kicker">Performance</span>
           <h2 id="schedule-summary-title">Schedule summary</h2>
         </div>
-        <p>All values reported by <code>schedule.display_summary(system)</code></p>
+        <p>{metrics ? "Lower is better for completion and tardiness measures." : "Run a schedule to see performance measures."}</p>
       </header>
       <div className="summary-grid">
         {SUMMARY_FIELDS.map((field) => (
-          <article key={field.key} data-metric={field.key}>
+          <article key={field.key} data-metric={field.key} className={field.key === "makespan" && optimalMakespan ? "metric-optimal" : undefined}>
             <span>{field.symbol}</span>
             <strong>{metrics ? metrics[field.key] : "-"}</strong>
             <small>{field.label}</small>
+            {field.key === "makespan" && optimalMakespan && <em className="metric-certification">Proven minimum</em>}
           </article>
         ))}
       </div>
