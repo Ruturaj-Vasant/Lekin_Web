@@ -62,7 +62,7 @@ const typedFixture = fixture as unknown as {
 describe("fixture provenance", () => {
   it("was generated from the pinned lekinpy v0.3.0 wheel, not an arbitrary install", () => {
     expect(typedFixture.provenance.lekinLibraryTag).toBe("v0.3.0");
-    expect(typedFixture.provenance.lekinLibraryCommit).toBe("81a100b");
+    expect(typedFixture.provenance.lekinLibraryCommit).toBe("c8514c6");
     expect(typedFixture.provenance.lekinpyVersion).toBe("0.3.0");
     expect(typedFixture.provenance.wheelSha256).toMatch(/^[0-9a-f]{64}$/);
   });

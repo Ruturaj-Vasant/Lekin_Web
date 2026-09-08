@@ -7,7 +7,7 @@ import type { AlgorithmDefinition } from "../schema/algorithm";
  * snake_case -> camelCase) to the pinned lekinpy v0.3.0 build's
  * SchedulingAlgorithm.metadata dict. Verified directly against
  * lekin-library/lekinpy/algorithms/{fcfs,spt,edd,wspt,johnson}.py at commit
- * 81a100b (v0.3.0):
+ * c8514c6 (v0.3.0):
  *   fcfs: {id: "fcfs", display_name: "First-Come, First-Served", supports_multi_operation: true, version: "1.0.0"}
  *   spt:  {id: "spt",  display_name: "Shortest Processing Time",  supports_multi_operation: true, version: "1.0.0"}
  *   edd:  {id: "edd",  display_name: "Earliest Due Date",         supports_multi_operation: true, version: "1.0.0"}

@@ -1,12 +1,12 @@
 {
   "provenance": {
     "lekinLibraryTag": "v0.3.0",
-    "lekinLibraryCommit": "81a100b",
+    "lekinLibraryCommit": "c8514c6",
     "lekinpyVersion": "0.3.0",
     "wheelPath": "public/vendor/lekinpy-0.3.0-py3-none-any.whl",
     "wheelSha256": "e5bff601c6f5a33f0ece7a3591ce5392734ad9d63e95d3d29aa57288b98a1715",
-    "pythonVersion": "3.11.15",
-    "generatedAt": "2026-08-25T21:14:36.520Z",
+    "pythonVersion": "3.12.6",
+    "generatedAt": "2026-09-08T16:54:11.811Z",
     "registrySnapshot": [
       {
         "id": "fcfs",
