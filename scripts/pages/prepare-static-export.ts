@@ -36,8 +36,8 @@ await writeFile(path.join(outputDirectory, ".nojekyll"), "");
 
 const requiredFiles = [
   "favicon.svg",
-  "vendor/lekinpy-0.2.0-py3-none-any.whl",
-  "vendor/lekinpy-0.2.0-py3-none-any.whl.sha256",
+  "vendor/lekinpy-0.3.0-py3-none-any.whl",
+  "vendor/lekinpy-0.3.0-py3-none-any.whl.sha256",
 ];
 for (const requiredFile of requiredFiles) {
   await readFile(path.join(outputDirectory, requiredFile));

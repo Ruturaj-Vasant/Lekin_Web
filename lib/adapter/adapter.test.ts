@@ -135,6 +135,8 @@ describe("validateExecutionRequest", () => {
     const warning = issues.find((i) => i.code === "OPTIMALITY_CONDITIONS_NOT_MET");
     expect(warning).toBeDefined();
     expect(warning!.severity).toBe("warning");
+    // The stage count is what's wrong here, so the message must say so.
+    expect(warning!.message).toContain("3-stage flow shop");
     expect(issues.some((i) => i.code === "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION")).toBe(false);
   });
 
@@ -142,8 +144,15 @@ describe("validateExecutionRequest", () => {
     const problem = twoMachineFlowShop();
     problem.jobs[1]!.release = 4;
     const issues = validateExecutionRequest(problem, "johnson");
-    expect(issues.some((i) => i.code === "OPTIMALITY_CONDITIONS_NOT_MET")).toBe(true);
+    const warning = issues.find((i) => i.code === "OPTIMALITY_CONDITIONS_NOT_MET");
+    expect(warning).toBeDefined();
     expect(issues.some((i) => i.code === "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION")).toBe(false);
+    // Here the stage count is fine and the release time is the violated
+    // condition. Blaming the stage count would send the reader to change the
+    // one thing that isn't wrong, so assert the text, not just the code.
+    expect(warning!.message).toContain(problem.jobs[1]!.jobId);
+    expect(warning!.message).toMatch(/released at 4/);
+    expect(warning!.message).not.toMatch(/2-stage flow shop, not two/);
   });
 
   it("still surfaces schema-level structural issues alongside algorithm checks", () => {
