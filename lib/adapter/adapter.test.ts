@@ -30,6 +30,44 @@ function problemWithOperations(operationCount: number): ProblemDefinition {
   };
 }
 
+/** Flow shop over `stageCount` stages: every job visits every stage in order. */
+function flowShopProblem(stageCount: number): ProblemDefinition {
+  const stages = Array.from({ length: stageCount }, (_, i) => `WC${i + 1}`);
+  return {
+    schemaVersion: "1.0.0",
+    problemId: "flow-shop",
+    name: "flow shop",
+    jobs: ["J1", "J2", "J3"].map((jobId, jobIndex) => ({
+      jobId,
+      release: 0,
+      due: 30,
+      weight: 1,
+      operations: stages.map((workcenterId, stageIndex) => ({
+        operationIndex: stageIndex,
+        operationId: `${jobId}-O${stageIndex}`,
+        workcenterId,
+        processingTime: jobIndex + stageIndex + 1,
+        status: "pending",
+      })),
+    })),
+    workcenters: stages.map((workcenterId, i) => ({
+      workcenterId,
+      release: 0,
+      status: "active",
+      machineIds: [`M${i + 1}`],
+    })),
+    machines: stages.map((workcenterId, i) => ({
+      machineId: `M${i + 1}`,
+      workcenterId,
+      release: 0,
+      status: "active",
+    })),
+  };
+}
+
+const twoMachineFlowShop = () => flowShopProblem(2);
+const threeStageFlowShop = () => flowShopProblem(3);
+
 describe("checkExecutionPolicy", () => {
   it("returns null when the problem is within all limits", () => {
     const fcfs = getAlgorithmDefinition("fcfs")!;
@@ -63,12 +101,58 @@ describe("validateExecutionRequest", () => {
     expect(issues.some((i) => i.code === "UNKNOWN_ALGORITHM_ID")).toBe(true);
   });
 
-  it("all four built-in algorithms currently support multi-operation jobs, so no combination is flagged", () => {
+  it("every dispatching rule supports multi-operation jobs, so no combination is flagged", () => {
     const problem = problemWithOperations(3);
     for (const algorithm of ALGORITHM_REGISTRY) {
+      // Flow-shop-only algorithms are excluded here: this problem routes one
+      // job through WC1 three times, which is not a flow shop, so they are
+      // *expected* to flag it. Their own cases are below.
+      if (algorithm.requiresFlowShop) continue;
       const issues = validateExecutionRequest(problem, algorithm.id);
       expect(issues.some((i) => i.code === "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION")).toBe(false);
     }
+  });
+
+  it("rejects a flow-shop-only algorithm on a problem that is not a flow shop", () => {
+    const issues = validateExecutionRequest(problemWithOperations(3), "johnson");
+    const flagged = issues.find((i) => i.code === "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION");
+    expect(flagged).toBeDefined();
+    // The message has to name the actual obstacle, not just say "unsupported".
+    expect(flagged!.message).toContain("Johnson");
+    expect(flagged!.message).toMatch(/same workcenter more than once|same stages in the same order/);
+  });
+
+  it("accepts a flow-shop-only algorithm on a genuine two-machine flow shop", () => {
+    const issues = validateExecutionRequest(twoMachineFlowShop(), "johnson");
+    expect(issues.some((i) => i.code === "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION")).toBe(false);
+    expect(issues.some((i) => i.code === "OPTIMALITY_CONDITIONS_NOT_MET")).toBe(false);
+  });
+
+  it("warns without blocking when an optimality precondition is missed", () => {
+    // Three stages: Johnson still runs, but via the two-machine reduction,
+    // which is only a heuristic - so this must warn, never block.
+    const issues = validateExecutionRequest(threeStageFlowShop(), "johnson");
+    const warning = issues.find((i) => i.code === "OPTIMALITY_CONDITIONS_NOT_MET");
+    expect(warning).toBeDefined();
+    expect(warning!.severity).toBe("warning");
+    // The stage count is what's wrong here, so the message must say so.
+    expect(warning!.message).toContain("3-stage flow shop");
+    expect(issues.some((i) => i.code === "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION")).toBe(false);
+  });
+
+  it("warns when release times break the optimality proof even on two stages", () => {
+    const problem = twoMachineFlowShop();
+    problem.jobs[1]!.release = 4;
+    const issues = validateExecutionRequest(problem, "johnson");
+    const warning = issues.find((i) => i.code === "OPTIMALITY_CONDITIONS_NOT_MET");
+    expect(warning).toBeDefined();
+    expect(issues.some((i) => i.code === "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION")).toBe(false);
+    // Here the stage count is fine and the release time is the violated
+    // condition. Blaming the stage count would send the reader to change the
+    // one thing that isn't wrong, so assert the text, not just the code.
+    expect(warning!.message).toContain(problem.jobs[1]!.jobId);
+    expect(warning!.message).toMatch(/released at 4/);
+    expect(warning!.message).not.toMatch(/2-stage flow shop, not two/);
   });
 
   it("still surfaces schema-level structural issues alongside algorithm checks", () => {

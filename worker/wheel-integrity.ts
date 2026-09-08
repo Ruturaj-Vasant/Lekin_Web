@@ -1,4 +1,4 @@
-export const LEKINPY_VERSION = "0.2.0";
+export const LEKINPY_VERSION = "0.3.0";
 export const LEKINPY_WHEEL_PATH = `${import.meta.env.BASE_URL}vendor/lekinpy-${LEKINPY_VERSION}-py3-none-any.whl`;
 export const LEKINPY_CHECKSUM_PATH = `${LEKINPY_WHEEL_PATH}.sha256`;
 

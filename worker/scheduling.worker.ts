@@ -17,6 +17,10 @@ const VALIDATION_CODE_BY_EXCEPTION: Record<string, ValidationErrorCode> = {
   DuplicateMachineIdError: "DUPLICATE_MACHINE_ID",
   DuplicateWorkcenterIdError: "DUPLICATE_WORKCENTER_ID",
   MissingWorkcenterError: "MISSING_WORKCENTER_REFERENCE",
+  // Raised by JohnsonAlgorithm when the system isn't a flow shop. Normally
+  // caught up front by validate-request.ts's analyzeFlowShop(); this is the
+  // backstop for anything that check and lekinpy disagree about.
+  NotAFlowShopError: "UNSUPPORTED_ALGORITHM_PROBLEM_COMBINATION",
 };
 
 const PYTHON_EXECUTE = String.raw`
@@ -29,6 +33,7 @@ from lekinpy.algorithms.fcfs import FCFSAlgorithm
 from lekinpy.algorithms.spt import SPTAlgorithm
 from lekinpy.algorithms.edd import EDDAlgorithm
 from lekinpy.algorithms.wspt import WSPTAlgorithm
+from lekinpy.algorithms.johnson import JohnsonAlgorithm
 from lekinpy.exceptions import LekinValidationError
 
 def stable_rgb(value):
@@ -41,6 +46,7 @@ algorithms = {
     "spt": SPTAlgorithm,
     "edd": EDDAlgorithm,
     "wspt": WSPTAlgorithm,
+    "johnson": JohnsonAlgorithm,
 }
 
 try:

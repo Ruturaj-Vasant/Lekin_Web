@@ -34,7 +34,7 @@ test("measures real import, Pyodide scheduling, and Gantt rendering capacity", a
     const importAndRenderMs = Math.round(performance.now() - importStarted);
 
     const algorithmRuns: Record<string, { wallMs: number; reportedMs: number }> = {};
-    const algorithm = page.getByLabel("Dispatching rule");
+    const algorithm = page.getByLabel("Scheduling rule");
     for (const algorithmId of ["spt", "fcfs", "edd", "wspt"]) {
       await algorithm.selectOption(algorithmId);
       const started = performance.now();

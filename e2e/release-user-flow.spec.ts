@@ -38,7 +38,7 @@ test("completes the realistic MVP workflow from a blank project", async ({ page 
   await expect(page.locator(".bar")).toHaveCount(2);
   await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).toHaveText("7");
 
-  await page.getByLabel("Dispatching rule").selectOption("fcfs");
+  await page.getByLabel("Scheduling rule").selectOption("fcfs");
   await page.getByRole("button", { name: "Run schedule" }).click();
   await expect(page.locator(".valid-pill")).toContainText("Valid schedule", { timeout: 120_000 });
   await page.getByRole("tab", { name: "Algorithm comparison" }).click();

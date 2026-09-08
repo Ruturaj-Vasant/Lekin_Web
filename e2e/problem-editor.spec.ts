@@ -188,7 +188,7 @@ test.describe("problem editor", () => {
     await expect(page.locator(".bar")).toHaveCount(8);
     await expect(page.locator('.schedule-summary article[data-metric="makespan"] strong')).not.toHaveText(originalMakespan);
 
-    await page.getByLabel("Dispatching rule").selectOption("fcfs");
+    await page.getByLabel("Scheduling rule").selectOption("fcfs");
     await expect(page.locator(".valid-pill")).toContainText("Ready to run");
     await expect(page.locator(".bar")).toHaveCount(0);
     await page.getByRole("button", { name: "Run schedule" }).click();

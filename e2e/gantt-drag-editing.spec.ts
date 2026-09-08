@@ -46,6 +46,9 @@ test.describe("manual Gantt editing", () => {
 
     const bottomOperation = page.getByLabel("Drag J-102-O1");
     await bottomOperation.hover();
+    // Hover may scroll the lower row into view. A queued scroll event must
+    // not dismiss the tooltip that just measured its new anchor position.
+    await expect(page.getByRole("tooltip")).toBeVisible();
     const bottomCardBox = await page.getByRole("tooltip").boundingBox();
     const viewport = page.viewportSize();
     expect(bottomCardBox).not.toBeNull();

@@ -32,8 +32,8 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { REAL_EXECUTION_SAMPLE_PROBLEM } from "../../test/fixtures/real-execution/problem";
-import { validateProblemDefinition } from "../../lib/schema/problem";
+import { REAL_EXECUTION_SAMPLE_PROBLEM, REAL_EXECUTION_FLOW_SHOP_PROBLEM } from "../../test/fixtures/real-execution/problem";
+import { validateProblemDefinition, type ProblemDefinition } from "../../lib/schema/problem";
 import { hasBlockingError } from "../../lib/schema/issue";
 import { toLekinpySystemPayload, fromLekinpyScheduleDict, type LekinpyScheduleDict } from "../../lib/adapter/translate";
 import { computeMetrics } from "../../lib/scheduling/metrics";
@@ -41,8 +41,8 @@ import { ALGORITHM_REGISTRY, getAlgorithmDefinition } from "../../lib/registry/a
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const REPO_ROOT = resolve(__dirname, "../..");
-const WHEEL_PATH = join(REPO_ROOT, "public/vendor/lekinpy-0.2.0-py3-none-any.whl");
-const SHA256_PATH = join(REPO_ROOT, "public/vendor/lekinpy-0.2.0-py3-none-any.whl.sha256");
+const WHEEL_PATH = join(REPO_ROOT, "public/vendor/lekinpy-0.3.0-py3-none-any.whl");
+const SHA256_PATH = join(REPO_ROOT, "public/vendor/lekinpy-0.3.0-py3-none-any.whl.sha256");
 const PYTHON_SCRIPT = join(REPO_ROOT, "scripts/fixtures/run_lekinpy_fixture.py");
 const FIXTURE_PATH = join(REPO_ROOT, "test/fixtures/real-execution/fixture.json");
 
@@ -51,18 +51,33 @@ const FIXTURE_PATH = join(REPO_ROOT, "test/fixtures/real-execution/fixture.json"
 // Python script, not just asserted here) is the actual cryptographic proof
 // of provenance; this is the human-readable cross-reference to where that
 // wheel came from.
-const EXPECTED_LEKIN_LIBRARY_TAG = "v0.2.0";
-const EXPECTED_LEKIN_LIBRARY_COMMIT = "a3fee48";
-const EXPECTED_LEKINPY_VERSION = "0.2.0";
+const EXPECTED_LEKIN_LIBRARY_TAG = "v0.3.0";
+// 70a4ae0 is the commit that adds lekinpy/algorithms/johnson.py and bumps
+// the package to 0.3.0. It is on lekin-library's master and carries tag
+// v0.3.0, so this pin can be checked out and audited against the wheel.
+// It replaces 81a100b, which was recorded here from a working copy whose
+// commit never reached lekin-library -- the wheel was vendored but its
+// source was not pushed, leaving the pin pointing at nothing fetchable.
+const EXPECTED_LEKIN_LIBRARY_COMMIT = "70a4ae0";
+const EXPECTED_LEKINPY_VERSION = "0.3.0";
 
+/** Run against the job shop problem. */
 const ALGORITHM_IDS = ["fcfs", "spt", "edd", "wspt"] as const;
+/**
+ * Run against the two-machine flow shop problem. Johnson's rule only appears
+ * here: it raises NotAFlowShopError on the job shop, so a flow shop is the
+ * only place it can be given real-execution coverage.
+ */
+const FLOW_SHOP_ALGORITHM_IDS = ["fcfs", "spt", "edd", "wspt", "johnson"] as const;
 type AlgorithmId = (typeof ALGORITHM_IDS)[number];
+type FlowShopAlgorithmId = (typeof FLOW_SHOP_ALGORITHM_IDS)[number];
 
 interface RawFixtureOutput {
   lekinpyVersion: string;
   wheelSha256: string;
   pythonVersion: string;
   algorithms: Record<AlgorithmId, { schedule: LekinpyScheduleDict; metadata: Record<string, unknown> }>;
+  flowShopAlgorithms: Record<FlowShopAlgorithmId, { schedule: LekinpyScheduleDict; metadata: Record<string, unknown> }>;
 }
 
 function fail(message: string): never {
@@ -70,7 +85,7 @@ function fail(message: string): never {
   process.exit(1);
 }
 
-function runPythonExecution(problemPayloadPath: string): RawFixtureOutput {
+function runPythonExecution(problemPayloadPath: string, flowShopPayloadPath: string): RawFixtureOutput {
   if (!existsSync(WHEEL_PATH)) fail(`pinned wheel not found at ${WHEEL_PATH}`);
   if (!existsSync(SHA256_PATH)) fail(`checksum file not found at ${SHA256_PATH}`);
 
@@ -86,6 +101,8 @@ function runPythonExecution(problemPayloadPath: string): RawFixtureOutput {
         SHA256_PATH,
         "--problem",
         problemPayloadPath,
+        "--flow-shop-problem",
+        flowShopPayloadPath,
         "--expected-version",
         EXPECTED_LEKINPY_VERSION,
       ],
@@ -98,32 +115,27 @@ function runPythonExecution(problemPayloadPath: string): RawFixtureOutput {
   return JSON.parse(stdout);
 }
 
-function generateFixture() {
-  const validationIssues = validateProblemDefinition(REAL_EXECUTION_SAMPLE_PROBLEM);
+function validateOrFail(problem: ProblemDefinition, label: string) {
+  const validationIssues = validateProblemDefinition(problem);
   if (hasBlockingError(validationIssues)) {
-    fail(
-      `the sample ProblemDefinition itself fails lib/schema validation:\n${JSON.stringify(validationIssues, null, 2)}`,
-    );
+    fail(`the ${label} ProblemDefinition itself fails lib/schema validation:\n${JSON.stringify(validationIssues, null, 2)}`);
   }
+}
 
-  const systemPayload = toLekinpySystemPayload(REAL_EXECUTION_SAMPLE_PROBLEM);
-  const tempDir = mkdtempSync(join(tmpdir(), "real-execution-fixture-"));
-  const payloadPath = join(tempDir, "problem-payload.json");
-  writeFileSync(payloadPath, JSON.stringify(systemPayload));
-
-  const raw = runPythonExecution(payloadPath);
-
-  if (raw.lekinpyVersion !== EXPECTED_LEKINPY_VERSION) {
-    fail(`lekinpy reported version ${raw.lekinpyVersion}, expected ${EXPECTED_LEKINPY_VERSION}`);
-  }
-  const expectedSha256 = readFileSync(SHA256_PATH, "utf-8").trim();
-  if (raw.wheelSha256.toLowerCase() !== expectedSha256.toLowerCase()) {
-    fail(`wheel checksum reported by the Python step (${raw.wheelSha256}) does not match ${SHA256_PATH} (${expectedSha256})`);
-  }
-
+/**
+ * Turn one Python run's raw output into the fixture's per-algorithm section,
+ * cross-checking each algorithm's live metadata against ALGORITHM_REGISTRY on
+ * the way through.
+ */
+function collectResults(
+  algorithmIds: readonly string[],
+  rawAlgorithms: Record<string, { schedule: LekinpyScheduleDict; metadata: Record<string, unknown> }>,
+  problem: ProblemDefinition,
+  scheduleIdPrefix: string,
+): Record<string, unknown> {
   const results: Record<string, unknown> = {};
-  for (const algorithmId of ALGORITHM_IDS) {
-    const entry = raw.algorithms[algorithmId];
+  for (const algorithmId of algorithmIds) {
+    const entry = rawAlgorithms[algorithmId];
     if (!entry) fail(`Python step did not return a result for algorithm '${algorithmId}'`);
 
     const registryEntry = getAlgorithmDefinition(algorithmId);
@@ -145,16 +157,44 @@ function generateFixture() {
       );
     }
 
-    const scheduleId = `fixture-${algorithmId}`;
-    const webSchedule = fromLekinpyScheduleDict(entry.schedule, scheduleId, algorithmId);
-    const metrics = computeMetrics(webSchedule, REAL_EXECUTION_SAMPLE_PROBLEM);
-
+    const webSchedule = fromLekinpyScheduleDict(entry.schedule, `${scheduleIdPrefix}-${algorithmId}`, algorithmId);
     results[algorithmId] = {
       libraryMetadata: expected,
       rawLekinpyScheduleDict: entry.schedule,
       webSchedule,
-      metrics,
+      metrics: computeMetrics(webSchedule, problem),
     };
+  }
+  return results;
+}
+
+function generateFixture() {
+  validateOrFail(REAL_EXECUTION_SAMPLE_PROBLEM, "sample");
+  validateOrFail(REAL_EXECUTION_FLOW_SHOP_PROBLEM, "flow shop");
+
+  const tempDir = mkdtempSync(join(tmpdir(), "real-execution-fixture-"));
+  const payloadPath = join(tempDir, "problem-payload.json");
+  const flowShopPayloadPath = join(tempDir, "flow-shop-payload.json");
+  writeFileSync(payloadPath, JSON.stringify(toLekinpySystemPayload(REAL_EXECUTION_SAMPLE_PROBLEM)));
+  writeFileSync(flowShopPayloadPath, JSON.stringify(toLekinpySystemPayload(REAL_EXECUTION_FLOW_SHOP_PROBLEM)));
+
+  const raw = runPythonExecution(payloadPath, flowShopPayloadPath);
+
+  if (raw.lekinpyVersion !== EXPECTED_LEKINPY_VERSION) {
+    fail(`lekinpy reported version ${raw.lekinpyVersion}, expected ${EXPECTED_LEKINPY_VERSION}`);
+  }
+  const expectedSha256 = readFileSync(SHA256_PATH, "utf-8").trim();
+  if (raw.wheelSha256.toLowerCase() !== expectedSha256.toLowerCase()) {
+    fail(`wheel checksum reported by the Python step (${raw.wheelSha256}) does not match ${SHA256_PATH} (${expectedSha256})`);
+  }
+
+  // Every registry algorithm must appear in at least one of the two runs, or
+  // it has no real-execution coverage at all.
+  const covered = new Set([...ALGORITHM_IDS, ...FLOW_SHOP_ALGORITHM_IDS]);
+  for (const entry of ALGORITHM_REGISTRY) {
+    if (!covered.has(entry.id as AlgorithmId)) {
+      fail(`algorithm '${entry.id}' is in ALGORITHM_REGISTRY but is not run by this fixture`);
+    }
   }
 
   return {
@@ -162,14 +202,21 @@ function generateFixture() {
       lekinLibraryTag: EXPECTED_LEKIN_LIBRARY_TAG,
       lekinLibraryCommit: EXPECTED_LEKIN_LIBRARY_COMMIT,
       lekinpyVersion: raw.lekinpyVersion,
-      wheelPath: "public/vendor/lekinpy-0.2.0-py3-none-any.whl",
+      wheelPath: "public/vendor/lekinpy-0.3.0-py3-none-any.whl",
       wheelSha256: raw.wheelSha256,
       pythonVersion: raw.pythonVersion,
       generatedAt: process.env.FIXTURE_FREEZE_TIMESTAMP ?? new Date().toISOString(),
       registrySnapshot: ALGORITHM_REGISTRY.map((a) => a.libraryMetadata),
     },
     problem: REAL_EXECUTION_SAMPLE_PROBLEM,
-    results,
+    results: collectResults(ALGORITHM_IDS, raw.algorithms, REAL_EXECUTION_SAMPLE_PROBLEM, "fixture"),
+    flowShopProblem: REAL_EXECUTION_FLOW_SHOP_PROBLEM,
+    flowShopResults: collectResults(
+      FLOW_SHOP_ALGORITHM_IDS,
+      raw.flowShopAlgorithms,
+      REAL_EXECUTION_FLOW_SHOP_PROBLEM,
+      "fixture-flow-shop",
+    ),
   };
 }
 

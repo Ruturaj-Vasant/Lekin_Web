@@ -7,6 +7,7 @@ import pinedo423 from "../../examples/pinedo/pinedo-4.2.3-deadlines.lekin.json";
 import pinedo611 from "../../examples/pinedo/pinedo-6.1.1-flow-shop.lekin.json";
 import { ProblemDefinitionSchema, type ProblemDefinition } from "../../lib/schema/problem";
 import { SAMPLE_PROBLEM } from "../execution/sample-problem";
+import { TWO_MACHINE_FLOW_SHOP_PROBLEM } from "../execution/two-machine-flow-shop";
 
 export type ExampleCompatibility = "ready" | "partial";
 
@@ -122,6 +123,19 @@ export const EXAMPLE_LIBRARY: readonly ExampleDefinition[] = [
     compatibility: "ready",
     compatibilityNote: "The route and processing times map directly into LEKIN workcenters.",
     problem: problemFromEnvelope(pinedo611),
+  },
+  {
+    id: "two-machine-flow-shop",
+    title: "Two-machine flow shop",
+    reference: "Johnson's rule",
+    environment: "Flow shop",
+    objective: "Minimum makespan",
+    description:
+      "Five jobs through two machines in the same order - the setting where Johnson's rule (SPT(1)-LPT(2)) provably minimizes makespan.",
+    compatibility: "ready",
+    compatibilityNote:
+      "Johnson's rule returns the optimal sequence here (makespan 30); the dispatching rules do not.",
+    problem: TWO_MACHINE_FLOW_SHOP_PROBLEM,
   },
 ] as const;
 

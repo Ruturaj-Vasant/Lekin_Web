@@ -334,6 +334,54 @@
 .sidebar>details>summary b{font-size:17px;color:var(--muted)}
 .sidebar>details>.field-label{gap:9px;margin-top:14px;font-size:12px;font-weight:700}
 .sidebar>details>.field-label>select{height:44px;padding:10px 12px;font-size:14px;font-weight:600}
+.algorithm-guidance{margin-top:14px;padding:14px;border:1px solid #dce1e7;border-radius:8px;background:#f7f8fa;color:#434852;overflow-wrap:anywhere}
+.algorithm-guidance>strong{display:block;font-size:14px;line-height:1.4}
+.guidance-kicker{display:block;margin-bottom:4px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.algorithm-guidance p{margin:10px 0 0;font-size:12px;line-height:1.55}
+.algorithm-guidance ul{display:grid;gap:8px;list-style:none;margin:12px 0;padding:0}
+.algorithm-guidance li{display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.4}
+.algorithm-guidance li>span{flex:0 0 17px;text-align:center;font-weight:800}
+.guidance-optimal{background:#f0f8f3;border-color:#bedac8;color:#23593c}
+.guidance-heuristic{background:#fff8ec;border-color:#e8ce9c;color:#765019}
+.condition-unmet{font-weight:700}
+.guidance-heuristic .condition-met{color:#53594f}
+.result-guarantee{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;padding:16px 18px;border:1px solid #dce1e7;border-radius:9px;background:#f5f6f8;color:#434852}
+.guarantee-optimal{background:#f0f8f3;border-color:#bedac8;color:#23593c}
+.guarantee-heuristic{background:#fff8ec;border-color:#e8ce9c;color:#765019}
+.guarantee-icon{display:grid;place-items:center;flex:0 0 28px;height:28px;border:1px solid currentColor;border-radius:50%;font-size:19px;font-weight:700}
+.result-guarantee strong{font-size:15px;line-height:1.5}
+.result-guarantee p{margin:3px 0 0;max-width:90ch;font-size:13px;line-height:1.5}
+.schedule-summary{container-type:inline-size}
+.summary-grid article>strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere;min-width:0}
+.summary-grid article[data-metric=makespan]{background:#faf7fc}
+.summary-grid article.metric-optimal{background:#f0f8f3}
+.summary-grid article.metric-optimal>span,.summary-grid article.metric-optimal>strong{color:#23593c}
+.metric-certification{grid-column:1/-1;color:#23593c;font-size:11px;font-style:normal;font-weight:700}
+@container(max-width:760px){
+  .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .summary-grid article{padding:16px;gap:6px 10px;grid-template-columns:minmax(0,1fr);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .summary-grid article>strong{grid-row:2;grid-column:1}
+  .summary-grid article>small{grid-row:3}
+  .summary-grid article:nth-child(odd){border-right:1px solid var(--line)}
+  .summary-grid article:nth-child(even){border-right:0}
+  .summary-grid article:nth-last-child(-n+4){border-bottom:1px solid var(--line)}
+  .summary-grid article:nth-last-child(-n+2){border-bottom:0}
+  .schedule-summary>header{align-items:flex-start;flex-direction:column;gap:8px;padding:18px 16px}
+}
+/* Keep machine identity visible while a narrow viewport scrolls the time axis. */
+.gantt{isolation:isolate}
+.gantt-card{container-type:inline-size}
+@container(max-width:850px){.gantt-head{align-items:flex-start;flex-direction:column}.chart-toolbar{width:100%}}
+.gantt .machine-labels{position:sticky;left:0;z-index:110;background:white;box-shadow:1px 0 0 var(--line)}
+.timeline .ticks{font-size:11px}
+.legend{font-size:11px;gap:14px}
+.idle-segment{color:#626573;font-size:10px;border-color:#c6c8d1}
+.legend .idle-swatch{border:1px dashed #9fa3ae;border-radius:2px;background:repeating-linear-gradient(135deg,#fafafd,#fafafd 3px,#dfe1e8 3px,#dfe1e8 4px)}
+.bar{container-type:inline-size}
+.bar>span{font-size:11px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.bar>small{font-size:9px;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+@container(max-width:60px){.bar>.drag-handle,.bar>small{display:none}.bar>span{font-size:10px;margin-left:-12px;width:calc(100% + 12px);max-width:none}}
+@media(max-width:480px){.result-guarantee{padding:14px;gap:10px}.result-guarantee p{font-size:13px}}
 .information-section{max-width:1120px;margin:0 auto;padding:64px 24px;border-top:1px solid var(--line)}
 .project-information{display:grid;grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr);align-items:start;gap:56px}
 .information-heading{max-width:520px;padding-top:18px}

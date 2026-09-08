@@ -26,6 +26,7 @@ const CLASS_NAMES: Record<string, string> = {
   spt: "SPTAlgorithm",
   edd: "EDDAlgorithm",
   wspt: "WSPTAlgorithm",
+  johnson: "JohnsonAlgorithm",
 };
 
 function readLiveMetadata(source: string, algorithmId: string): {

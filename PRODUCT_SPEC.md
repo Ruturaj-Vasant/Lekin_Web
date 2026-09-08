@@ -106,7 +106,10 @@ Avoid modal windows for every small change.
 
 ## 6. Algorithm execution and compatibility
 
-Initial platform exposes: FCFS, SPT, EDD, WSPT. The application must verify
+Initial platform exposes: FCFS, SPT, EDD, WSPT, and Johnson's rule
+(SPT(1)-LPT(2)). The first four are dispatching rules that run on any
+problem; Johnson's rule is defined only on a flow shop and is offered only
+when the loaded problem is one. The application must verify
 - against the actual current library, not assumed capability - whether each
 algorithm supports: single-operation jobs, multi-operation jobs, parallel
 machines, multiple workcenters, release times, due dates, weights.

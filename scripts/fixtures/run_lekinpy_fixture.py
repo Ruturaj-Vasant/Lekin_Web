@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
-"""Run the pinned lekinpy v0.2.0 wheel against a ProblemDefinition payload
-and dump raw Schedule.to_dict() output for all four built-in algorithms.
+"""Run the pinned lekinpy wheel against ProblemDefinition payloads and dump
+raw Schedule.to_dict() output for every built-in algorithm.
+
+Two payloads, because the algorithms do not all accept the same problems:
+--problem is the job shop every dispatching rule runs on, and
+--flow-shop-problem is a two-machine flow shop, which is the only shape
+Johnson's rule is defined for (it raises NotAFlowShopError otherwise).
+Every algorithm is run against the flow shop; only the dispatching rules are
+run against the job shop.
 
 Provenance guarantees (per the real-execution-fixture task):
   - The wheel's actual SHA-256 is checked against the committed .sha256
@@ -27,6 +34,10 @@ Prints one JSON object to stdout:
     "algorithms": {
       "fcfs": {"schedule": {...to_dict()...}, "metadata": {...}},
       "spt":  {...}, "edd": {...}, "wspt": {...}
+    },
+    "flowShopAlgorithms": {
+      "fcfs": {...}, "spt": {...}, "edd": {...}, "wspt": {...},
+      "johnson": {...}
     }
   }
 """
@@ -142,40 +153,54 @@ def main() -> None:
     parser.add_argument("--wheel", required=True, type=Path)
     parser.add_argument("--sha256", required=True, type=Path)
     parser.add_argument("--problem", required=True, type=Path, help="ProblemDefinition-derived System payload JSON")
-    parser.add_argument("--expected-version", default="0.2.0")
+    parser.add_argument(
+        "--flow-shop-problem",
+        required=True,
+        type=Path,
+        help="Two-machine flow shop System payload JSON, for algorithms that require one",
+    )
+    parser.add_argument("--expected-version", default="0.3.0")
     args = parser.parse_args()
 
     actual_checksum = verify_checksum(args.wheel, args.sha256)
     lekinpy = import_lekinpy_from_wheel(args.wheel, args.expected_version)
 
     payload = json.loads(args.problem.read_text())
+    flow_shop_payload = json.loads(args.flow_shop_problem.read_text())
 
-    algorithm_classes = {
+    dispatching_rules = {
         "fcfs": lekinpy.FCFSAlgorithm,
         "spt": lekinpy.SPTAlgorithm,
         "edd": lekinpy.EDDAlgorithm,
         "wspt": lekinpy.WSPTAlgorithm,
     }
+    # Johnson's rule only applies to a flow shop, so it appears in the flow
+    # shop run only. The dispatching rules appear in both, which is what
+    # makes the flow shop results comparable across algorithms.
+    flow_shop_algorithms = {**dispatching_rules, "johnson": lekinpy.JohnsonAlgorithm}
 
-    results = {}
-    for algorithm_id, algorithm_class in algorithm_classes.items():
-        # Fresh System per algorithm: _assign_single_operation mutates
-        # Operation/Job objects in place, so reusing one System across
-        # multiple algorithm runs would corrupt later results with earlier
-        # runs' start/end times.
-        system = build_system(lekinpy, payload)
-        instance = algorithm_class()
-        schedule = instance.schedule(system)
-        results[algorithm_id] = {
-            "schedule": schedule.to_dict(),
-            "metadata": dict(instance.metadata),
-        }
+    def run_all(algorithm_classes, system_payload):
+        results = {}
+        for algorithm_id, algorithm_class in algorithm_classes.items():
+            # Fresh System per algorithm: _assign_single_operation mutates
+            # Operation/Job objects in place, so reusing one System across
+            # multiple algorithm runs would corrupt later results with earlier
+            # runs' start/end times.
+            system = build_system(lekinpy, system_payload)
+            instance = algorithm_class()
+            schedule = instance.schedule(system)
+            results[algorithm_id] = {
+                "schedule": schedule.to_dict(),
+                "metadata": dict(instance.metadata),
+            }
+        return results
 
     output = {
         "lekinpyVersion": lekinpy.__version__,
         "wheelSha256": actual_checksum,
         "pythonVersion": sys.version.split()[0],
-        "algorithms": results,
+        "algorithms": run_all(dispatching_rules, payload),
+        "flowShopAlgorithms": run_all(flow_shop_algorithms, flow_shop_payload),
     }
     print(json.dumps(output))
 

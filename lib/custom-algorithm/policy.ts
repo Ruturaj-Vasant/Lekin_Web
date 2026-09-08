@@ -117,4 +117,10 @@ export const SYNTHETIC_CUSTOM_ALGORITHM_DEFINITION: AlgorithmDefinition = {
   estimatedComplexity: "unknown",
   defaultBrowserOperationLimit: DEFAULT_BROWSER_EXECUTION_POLICY.maxOperations,
   parameters: [],
+  // User code, so the web has no idea what shape of problem it accepts or
+  // what it guarantees. Claim nothing: no structural precondition is
+  // enforced on its behalf, and no result of it is ever labelled optimal.
+  requiresFlowShop: false,
+  guarantee: "heuristic",
+  optimalityConditions: null,
 };

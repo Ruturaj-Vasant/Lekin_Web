@@ -20,6 +20,8 @@ import { DetailTabs } from "./detail-tabs";
 import { GanttChart } from "./gantt-chart";
 import { ProblemSidebar } from "./problem-sidebar";
 import { ScheduleSummary } from "./schedule-summary";
+import { ResultGuarantee } from "./result-guarantee";
+import { scheduleGuarantee } from "../../../lib/presentation/schedule-guarantee";
 import { downloadProblemFile, readProblemFile } from "../../import-export/browser-problem-files";
 import { CustomAlgorithmEngine } from "../../execution/custom-execution-engine";
 import { DEFAULT_CUSTOM_ALGORITHM_TEMPLATE } from "../../execution/custom-algorithm-templates";
@@ -140,6 +142,7 @@ export function WorkspaceShell({ initialProblem, onClose, onBrowseExamples, exec
     && customTrusted;
   const canRun = algorithmId === "custom" ? canRunCustom : canRunProblem;
   const comparisonResults = comparisonResultsFor(comparisonHistory, problem);
+  const guarantee = scheduleGuarantee(problem, result);
 
   async function run() {
     if (!canRun) return;
@@ -501,6 +504,9 @@ export function WorkspaceShell({ initialProblem, onClose, onBrowseExamples, exec
               {running ? "…" : result?.status === "completed" || customRunResult?.status === "completed" ? "✓" : "○"} {stateLabel}
             </span>
           </div>
+          {result?.policyViolation && (
+            <p className="execution-error" role="alert">{result.policyViolation.message}</p>
+          )}
           {result?.warnings.map((warning) => (
             <p className="execution-error" key={warning}>
               {warning}
@@ -542,6 +548,7 @@ export function WorkspaceShell({ initialProblem, onClose, onBrowseExamples, exec
               onCancel={cancel}
             />
           )}
+          <ResultGuarantee guarantee={guarantee} />
           <GanttChart
             schedule={result?.schedule ?? null}
             problem={problem}
@@ -556,7 +563,7 @@ export function WorkspaceShell({ initialProblem, onClose, onBrowseExamples, exec
             onCheckMove={checkManualMove}
             onMoveOperation={moveScheduledOperation}
           />
-          <ScheduleSummary metrics={result?.metrics ?? null} />
+          <ScheduleSummary metrics={result?.metrics ?? null} optimalMakespan={guarantee?.kind === "optimal"} />
           <DetailTabs
             result={result}
             validationIssues={validationIssues}
