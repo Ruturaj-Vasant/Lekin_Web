@@ -52,12 +52,13 @@ const FIXTURE_PATH = join(REPO_ROOT, "test/fixtures/real-execution/fixture.json"
 // of provenance; this is the human-readable cross-reference to where that
 // wheel came from.
 const EXPECTED_LEKIN_LIBRARY_TAG = "v0.3.0";
-// c8514c6 is the commit that adds lekinpy/algorithms/johnson.py and bumps
-// the package to 0.3.0. It replaces 81a100b, which was recorded here from a
-// working copy whose commit never reached lekin-library -- the wheel was
-// vendored but its source was not pushed, so 81a100b pointed at nothing
-// fetchable and could not be used to audit what this wheel contains.
-const EXPECTED_LEKIN_LIBRARY_COMMIT = "c8514c6";
+// 70a4ae0 is the commit that adds lekinpy/algorithms/johnson.py and bumps
+// the package to 0.3.0. It is on lekin-library's master and carries tag
+// v0.3.0, so this pin can be checked out and audited against the wheel.
+// It replaces 81a100b, which was recorded here from a working copy whose
+// commit never reached lekin-library -- the wheel was vendored but its
+// source was not pushed, leaving the pin pointing at nothing fetchable.
+const EXPECTED_LEKIN_LIBRARY_COMMIT = "70a4ae0";
 const EXPECTED_LEKINPY_VERSION = "0.3.0";
 
 /** Run against the job shop problem. */
