@@ -2,8 +2,8 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const outputDirectory = path.resolve("dist/client");
-const repositoryName = process.env.GITHUB_REPOSITORY?.split("/").at(-1) ?? "Lekin_Web";
-const basePath = `/${repositoryName}`;
+// Empty for the custom domain root; e.g. "/Lekin_Web" for a project-path deploy.
+const basePath = (process.env.PAGES_BASE_PATH ?? "").replace(/\/+$/, "");
 
 async function htmlFiles(directory: string): Promise<string[]> {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -27,7 +27,7 @@ for (const file of files) {
     .replaceAll("url(/assets/", `url(${basePath}/assets/`);
   await writeFile(file, prepared);
 
-  if (prepared.includes('href="/assets/') || prepared.includes("url(/assets/")) {
+  if (basePath && (prepared.includes('href="/assets/') || prepared.includes("url(/assets/"))) {
     throw new Error(`Unprefixed asset URL remains in ${path.relative(outputDirectory, file)}`);
   }
 }
@@ -43,4 +43,4 @@ for (const requiredFile of requiredFiles) {
   await readFile(path.join(outputDirectory, requiredFile));
 }
 
-console.log(`Prepared ${files.length} static pages for ${basePath}.`);
+console.log(`Prepared ${files.length} static pages for ${basePath || "/"}.`);
