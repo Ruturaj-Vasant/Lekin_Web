@@ -8,8 +8,11 @@ const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
 
 const { d1, r2 } = hostingConfig;
 const isGitHubPages = process.env.GITHUB_PAGES === "true";
-const repositoryName = process.env.GITHUB_REPOSITORY?.split("/").at(-1) ?? "Lekin_Web";
-const pagesBasePath = `/${repositoryName}/`;
+// Served from the root of the custom domain (schedulekin.com). Set
+// PAGES_BASE_PATH=/Lekin_Web to serve from ruturaj-vasant.github.io/Lekin_Web.
+const pagesBasePath = `${(process.env.PAGES_BASE_PATH ?? "").replace(/\/+$/, "")}/`;
+// Expose the same prefix to app code (favicon links in app/layout.tsx).
+process.env.NEXT_PUBLIC_BASE_PATH ??= isGitHubPages ? pagesBasePath.slice(0, -1) : "";
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";

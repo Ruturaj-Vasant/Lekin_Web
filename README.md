@@ -2,7 +2,7 @@
 
 Browser-based scheduling research workbench built on `lekinpy`.
 
-Live application: [ruturaj-vasant.github.io/Lekin_Web](https://ruturaj-vasant.github.io/Lekin_Web/)
+Live application: [schedulekin.com](https://schedulekin.com/)
 
 ## Current milestone
 
